@@ -1,9 +1,20 @@
 {% extends 'blog/base.html' %}
-
+{% load static %}
 {% block content %}
-    <h1>New post</h1>
-    <form method="POST" class="post-form">{% csrf_token %}
+    <h1 style="font-family: 'Poppins', sans-serif;">New post</h1>
+
+    	<form method="POST" class="post-form" enctype="multipart/form-data">{% csrf_token %}
         {{ form.as_p }}
-        <button type="submit" class="save btn btn-default">Save</button>
-    </form>
+        
+
+        <button type="submit" style="padding: 5px; border-radius: 5px; border: 1px solid #ccc; background-color: #f2f2f2; float: right;font-family: 'Poppins', sans-serif;display: inline-block;">Save</button>
+
+        <input id="file-input" type="file" accept=".jpg, .png, .jpeg" name="coverphoto" multiple style="display: none; font-family: 'Poppins', sans-serif" oninput ="func()">
+
+        <label for="file-input" style="padding: 5px; border-radius: 5px; border: 1px solid #ccc; background-color: #f2f2f2;color: #666; font-family: 'Poppins', sans-serif;">Select file</label>
+    	</form>
+    	<section style="background-color: #f2f2f2">
+    	<h3>Current Cover:</h3> 
+    	<img id = "post_cover" width="185px"; height="185px" align="left" style="border:1px solid #ccc;position:relative;object-fit: cover;overflow: hidden; border-radius: 5px" src=" http://127.0.0.1:8000/media/{{post_cover}} ">
+    	</section>
 {% endblock %}

@@ -1,18 +1,20 @@
 {% load static %}
-<html>
+<html style="height: 100%;">
     <head>
-        <title>Alan's Blog</title>
+        <title>iLIVE</title>
         <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
         <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
-        <link href='//fonts.googleapis.com/css?family=Lobster&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+        <link href="https://fonts.googleapis.com/css?family=Poppins&display=swap" rel="stylesheet">
         <link rel="stylesheet" href="{% static 'css/blog.css' %}">
     </head>
-    <body>
-        <div class="page-header">
+    <body style="display: flex;flex-direction: column; min-height: 100vh;">
+     <div style="flex-grow: 1;">
+        <div class="page-header" style="background-color:#329D9C;margin-top:-10px ">
             {% if user.is_authenticated %}
             <a href="{% url 'post_new' %}" class="top-menu"><span class="glyphicon glyphicon-plus"></span></a>
             {% endif %}
-            <h1><a href="/">Django Girls Blog</a></h1>
+            <h1 style="font-family: 'Poppins',"><a href="/">iLIVE</a></h1>
+            <!-- i mean inversse -->
         </div>
         <div class="content container">
             <div class="row">
@@ -22,5 +24,16 @@
                 </div>
             </div>
         </div>
+    </div>
+        <div id="footer" style=" background-color:#329D9C;color: #fff;flex-shrink: 0; padding: 5px;">© Alan's Dreams LLC, All rights reserved </div>
     </body>
+    <script type="text/javascript">
+        var cover = document.getElementById("post_cover");
+        function func(){
+            var input = document.getElementById("file-input");
+            var file = input.value.split("\\");
+            var fileName = file[file.length-1];
+            cover.src = 'http://127.0.0.1:8000/media/blog/static/media/' + fileName; 
+        }
+    </script>
 </html>

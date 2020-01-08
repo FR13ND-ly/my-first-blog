@@ -1,26 +1,26 @@
 {% extends 'blog/base.html' %}
-{% load static %}ё
-<html>
-    <head>
-        <title>Django Girls blog</title>
-        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
-        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
-        <link rel="stylesheet" href="{% static 'css/blog.css' %}">
-        <link href="https://fonts.googleapis.com/css?family=Lobster&subset=latin,cyrillic" rel="stylesheet" type="text/css">
-    </head>
-    <body>
-        
+{% load static %}
+
 
 {% block content %}
     {% for post in posts %}
-        <div class="post">
-            <div class="date">
-                {{ post.published_date }}
+        <div class="post" style="display: absolute; margin-bottom: 20px">
+             
+            <div style="background-color: #f2f2f2; border-radius: 5px; margin-right: -180px; padding-left: 15px; padding-top: 1px;">
+            <img width="185px"; height="185px" align="left" style="border:1px solid #ccc;position:relative;margin-top: 10px; margin-bottom: 15px; object-fit: cover;overflow: hidden; border-radius: 5px" src='media/{{post.cover}}'> 
+            <h1 style="font-family: 'Poppins',sans-serif; white-space: nowrap;overflow: hidden;text-overflow: ellipsis; "><a style="margin-left: 10px;color:#56C596;" href="{% url 'post_detail' pk=post.pk %}">{{ post.title }}</a></h1>
+            <hr size="2" align="left" width="300" style="margin-left: 200px;margin-top:0px;margin-bottom:5px;color: #ccc; border:1px solid" ></hr>
+            <p id="paragraph" style="font-size: 16px;margin-left: 200px;color:#666;margin-right: 5px; margin-top:15px">{{ post.cover_text|linebreaksbr }}... <a href="{% url 'post_detail' pk=post.pk %}">Read More</a></p>
+            
+            <hr size="2" align="left" width="300" style="margin-left: 200px;margin-top: 15px;margin-bottom:15px;color: #ccc; border:1px solid" ></hr>
+            <p class="date" style="max-height: :5px; margin-top: -10px; margin-left: 200px; padding-bottom: 15px; padding-right: 15px; color:#205072;">
+
+                {{ post.published_date }} | {{post.author}} | views: {{post.count_of_views}}
+            </p>
+
             </div>
-            <h1><a href="{% url 'post_detail' pk=post.pk %}">{{ post.title }}</a></h1>
-            <p>{{ post.text|linebreaksbr }}</p>
+      <!--  <hr align="left" width="300" size="4" style="margin-bottom: -40px; border: 2px solid; border-radius: 10px; color: #ccc; margin-top: 45px" /> -->
         </div>
+
     {% endfor %}
 {% endblock %}
-    </body>
-</html>

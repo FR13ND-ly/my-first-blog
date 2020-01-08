@@ -7,6 +7,9 @@ class Post(models.Model):
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     title = models.CharField(max_length=200)
     text = models.TextField()
+    cover_text = models.CharField(max_length=40, null=True)
+    count_of_views = models.PositiveIntegerField(default=0)
+    cover = models.ImageField(upload_to="blog/static/media/",null=True, blank=True)
     created_date = models.DateTimeField(default=timezone.now)
     published_date = models.DateTimeField(blank=True, null=True)
 
