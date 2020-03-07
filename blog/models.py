@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.db import models
+from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
 
 
@@ -9,9 +10,13 @@ class Post(models.Model):
     text = models.TextField()
     cover_text = models.CharField(max_length=40, null=True)
     count_of_views = models.PositiveIntegerField(default=0)
+    index = models.PositiveIntegerField(default=0)
+    status = models.BooleanField(default=False)
     cover = models.ImageField(upload_to="blog/static/media/",null=True, blank=True)
+    inpostphotos = models.ImageField(upload_to="blog/static/media/",null=True, blank=True)
     created_date = models.DateTimeField(default=timezone.now)
     published_date = models.DateTimeField(blank=True, null=True)
+    question = models.CharField(max_length=200, default=True)
 
     def publish(self):
         self.published_date = timezone.now()
@@ -19,3 +24,48 @@ class Post(models.Model):
 
     def __str__(self):
         return self.title
+
+class Comment(models.Model):
+    author = models.CharField(max_length=200, null=True)
+    text = models.TextField(null=True)
+    post = models.ForeignKey('blog.Post', on_delete=models.CASCADE, related_name='comments')
+    created_date = models.DateTimeField(default=timezone.now)
+    photo_of_user = models.ImageField(upload_to="blog/static/media/", blank=True)
+
+    def __str__(self):
+        return self.text
+
+class Profile(models.Model):
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    date_of_birth = models.DateField(blank=True, null=True)
+    photo = models.ImageField(upload_to="blog/static/media/", blank=True)
+    darktheme = models.BooleanField(default=False)
+
+
+    def __str__(self):
+        return 'Profile for user {}'.format(self.user.username)
+        
+class Like(models.Model):
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    post = models.ForeignKey('blog.Post', on_delete=models.CASCADE, related_name='likes')
+
+class Survey(models.Model):
+    post = models.ForeignKey('blog.Post', on_delete=models.CASCADE, related_name='survey', null=True)
+    typeofvote = models.BooleanField(default=False)
+    variant = models.CharField(max_length=200)
+    count = models.PositiveIntegerField(default=0)
+
+
+class Vote(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    variant = models.ForeignKey('blog.Survey', on_delete=models.CASCADE, related_name='vote')
+
+class Ad(models.Model):
+    contact = models.CharField(max_length=200)
+    text = models.TextField()
+    remove_date = models.PositiveIntegerField(default=0)
+    published_date = models.DateTimeField(blank=True, null=True)
+
+    def publish(self):
+        self.published_date = timezone.now()
+        self.save()

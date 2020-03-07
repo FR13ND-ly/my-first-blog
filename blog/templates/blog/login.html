@@ -1,0 +1,17 @@
+{% extends 'blog/base.html' %}
+{% block title %}Log-in{% endblock %}
+{% block content %}
+    <h1>Log-in</h1>
+    <p>Please, use the following form to log-in:</p>
+    {% if incorrect_login_or_password %}
+    <p>Incorrect login or password</p>
+    {% endif %}
+    <form action="." method="post">{% csrf_token %}
+        <input name="logininput" placeholder="Username" required><br>
+        <input type="password" name="passwordinput" placeholder="Password">
+        
+        <p><input type="submit" value="Log-in"></p>
+        <a href="{% url 'social:begin' 'facebook' %}">Sign in with Facebook</a>
+        <a href="{% url 'social:begin' 'google' %}">Login with Google</a>
+    </form>
+{% endblock %}

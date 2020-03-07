@@ -1,0 +1,14 @@
+{% extends 'blog/base.html' %}
+{% block title %}Ads{% endblock %}
+{% block content %}
+{% for ad in ads %}
+<h3>Ad</h3>
+<p>{{ ad.published_date }}</p>
+<p>{{ ad.text }}</p>
+<b>{{ ad.contact }}</b>
+{% if user.is_staff %}
+     <a class="btn btn-default" href="{% url 'ad_edit' pk=ad.pk %}" style="border: 0px" ><span class="glyphicon glyphicon-pencil"></span></a>
+     <a class="btn btn-default" href="{% url 'ad_delete' pk=ad.pk %}" style="border: 0px">Remove</a>
+{% endif %}
+{% endfor %}
+{% endblock %}

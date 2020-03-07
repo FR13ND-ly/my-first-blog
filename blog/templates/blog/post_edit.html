@@ -1,20 +1,129 @@
 {% extends 'blog/base.html' %}
 {% load static %}
 {% block content %}
+<div id= "Edit"style="min-width: 1000px;min-height: 450px; position: fixed;  border: 1px solid #ccc; z-index: 9999; background-color: #f2f2f2; display:none ">
+            <div style="font-size: 32px">Edit Image<button id='closebtn' align="right" style="border:0 ;font-size: 16px">x</button></div>
+            <hr size= "2" />
+            <h3>Align</h3>
+            Right <input type="radio" id='a' name='a' value="right"> 
+            Left <input type="radio" id="a" name="a" value="left"checked>  
+            Center <input type="radio" id="a" name="a" value="center">
+            Undefined <input type="radio" name="a" value="undefined" >
+            <h3>Size</h3>
+            <select id="size">
+                <option selected hidden>Size</option>
+                <option value="small">Small</option>
+                <option value="normal">Normal</option>
+                <option value="big">Big</option>
+                <option value="custom">Custom</option>
+            </select>
+            <input id="widthinp" style="display: none" placeholder="width">
+            <input id="heightinp" style="display: none" placeholder="height">
+            <img id="vmag" width="200" height="150" align="right" src="sa" class="editimage">
+            <input id='legend' style="display: block" placeholder="Legend">
+            <button id="imgbtn">Add image</button>
+         </div>
     <h1 style="font-family: 'Poppins', sans-serif;">New post</h1>
+        <button style="padding: 5px; border-radius: 5px; border: 1px solid #ccc; background-color: #f2f2f2;color: #666; font-family: 'Poppins', sans-serif;" onclick="f('bold')"><b>bold</b></button>
+        <button style="padding: 5px; border-radius: 5px; border: 1px solid #ccc; background-color: #f2f2f2;color: #666; font-family: 'Poppins', sans-serif;" onclick="f('italic')"><i>cursiv</i></button>
+        <select style="padding: 4px; border-radius: 5px; border: 1px solid #ccc; background-color: #f2f2f2;color: #666; font-family: 'Poppins', sans-serif;"onchange="f('fontsize',this[this.selectedIndex].value);this.selectedIndex=0;">
+        <option selected hidden>font size</option>
+        <option style="background-color: #f2f2f2;color: #666; font-family: 'Poppins', sans-serif;" value="2">small</option>
+        <option style="background-color: #f2f2f2;color: #666; font-family: 'Poppins', sans-serif;" value="4">normal</option>
+        <option style="background-color: #f2f2f2;color: #666; font-family: 'Poppins', sans-serif;" value="6">big</option>
+        </select>
+        <select style="padding: 4px; border-radius: 5px; border: 1px solid #ccc; background-color: #f2f2f2;color: #666; font-family: 'Poppins', sans-serif;"onchange="f('forecolor',this[this.selectedIndex].value);this.selectedIndex=0;">
+        <option selected hidden>color</option>
+        <option style="background-color: #f2f2f2;color: #666; font-family: 'Poppins', sans-serif;color: red;" value="red">Red</option>
+        <option style="background-color: #f2f2f2;color: #666; font-family: 'Poppins', sans-serif;color: blue;" value="blue">Blue</option>
+        <option style="background-color: #f2f2f2;color: #666; font-family: 'Poppins', sans-serif;color: green;" value="green">Green</option>
+        </select>
+        <select style="padding: 4px; border-radius: 5px; border: 1px solid #ccc; background-color: #f2f2f2;color: #666; font-family: 'Poppins', sans-serif;"onchange="f('fontname',this[this.selectedIndex].value);this.selectedIndex=0;">
+        <option selected hidden>font name</option>
+        <option style="background-color: #f2f2f2;color: #666; font-family: 'Arial', sans-serif;" value="Arial">Arial</option>
+        <option style="background-color: #f2f2f2;color: #666; font-family: 'Poppins', sans-serif;" value="Poppins">Poppins</option>
+        <option style="background-color: #f2f2f2;color: #666; font-family: 'Impact', sans-serif;" value="Impact">Impact</option>
+        <option style="background-color: #f2f2f2;color: #666; font-family: 'Times New Roman', sans-serif;" value="Times New Roman">Times New Roman</option>
+        <option style="background-color: #f2f2f2;color: #666; font-family: 'Courier New', sans-serif;" value="Courier New">Courier New</option>
+        <option style="background-color: #f2f2f2;color: #666; font-family: 'Verdana', sans-serif;" value="Verdana">Verdana</option>
+        <option style="background-color: #f2f2f2;color: #666; font-family: 'Calibri', sans-serif;" value="Calibri">Calibri</option>
+        </select>
+        <select style="padding: 4px; border-radius: 5px; border: 1px solid #ccc; background-color: #f2f2f2;color: #666; font-family: 'Poppins', sans-serif;"onchange="f('backcolor',this[this.selectedIndex].value);this.selectedIndex=0;">
+        <option selected hidden>font size</option>
+        <option style="background-color: #f2f2f2;color: #666; font-family: 'Poppins', sans-serif;" value="black">black</option>
+        <option style="background-color: #f2f2f2;color: #666; font-family: 'Poppins', sans-serif;" value="white">white</option>
+        <option style="background-color: #f2f2f2;color: #666; font-family: 'Poppins', sans-serif;" value="green">green</option>
+        </select>
+        <select style="padding: 4px; border-radius: 5px; border: 1px solid #ccc; background-color: #f2f2f2;color: #666; font-family: 'Poppins', sans-serif;"onchange="f('formatblock',this[this.selectedIndex].value);this.selectedIndex=0;">
+        <option selected hidden>Format</option>
+        <option style="background-color: #f2f2f2;color: #666; font-family: 'Poppins', sans-serif;font-size:36px" value="h1"><h1>Title 1</h1></option>
+        <option style="background-color: #f2f2f2;color: #666; font-family: 'Poppins', sans-serif;font-size:24px" value="h2"><h2>Title 2</h2></option>
+        <option style="background-color: #f2f2f2;color: #666; font-family: 'Poppins', sans-serif;font-size:18px" value="h3"><h3>Title 3</h3></option>
+        <option style="background-color: #f2f2f2;color: #666; font-family: 'Poppins', sans-serif;" value="h4"><h4>Title 4</h4></option>
+        <option style="background-color: #f2f2f2;color: #666; font-family: 'Poppins', sans-serif;font-size:13px" value="h5"><h5>Title 5</h5></option>
+        <option style="background-color: #f2f2f2;color: #666; font-family: 'Poppins', sans-serif;font-size:10px" value="h6"><h6>Title 6</h6></option>
+         <option style="background-color: #f2f2f2;color: #666; font-family: 'Poppins', sans-serif;" value="p"><p>Paragraph</p></option>
+        <option style="background-color: #f2f2f2;color: #666; font-family: 'Poppins', sans-serif;" value="pre"><pre>Preformatat</pre></option>
+        </select>
+        <button style="padding: 5px; border-radius: 5px; border: 1px solid #ccc; background-color: #f2f2f2;color: #666; font-family: 'Poppins', sans-serif;" onclick="f('underline')"><u>lined</u></button>
+        <button style="padding: 5px; border-radius: 5px; border: 1px solid #ccc; background-color: #f2f2f2;color: #666; font-family: 'Poppins', sans-serif;" onclick="f('removeFormat')">clear</button>
+        <button style="padding: 5px; border-radius: 5px; border: 1px solid #ccc; background-color: #f2f2f2;color: #666; font-family: 'Poppins', sans-serif;" onclick="f('strikethrough')"><strike>deleted</strike></button>
+        <button style="padding: 5px; border-radius: 5px; border: 1px solid #ccc; background-color: #f2f2f2;color: #666; font-family: 'Poppins', sans-serif;" onclick="f('insertOrderedList')">list</button>
+        <button style="padding: 5px; border-radius: 5px; border: 1px solid #ccc; background-color: #f2f2f2;color: #666; font-family: 'Poppins', sans-serif;" onclick="f('insertUnorderedList')">ulist</button>
+        <button style="padding: 5px; border-radius: 5px; border: 1px solid #ccc; background-color: #f2f2f2;color: #666; font-family: 'Poppins', sans-serif;" onclick="f('justifyLeft')">left</button>
+        <button style="padding: 5px; border-radius: 5px; border: 1px solid #ccc; background-color: #f2f2f2;color: #666; font-family: 'Poppins', sans-serif;" onclick="f('justifyCenter')">center</button>
+        <button style="padding: 5px; border-radius: 5px; border: 1px solid #ccc; background-color: #f2f2f2;color: #666; font-family: 'Poppins', sans-serif;" onclick="f('justifyRight')"><div>right</button>
+
+
+       <!-- <button style="padding: 5px; border-radius: 5px; border: 1px solid #ccc; background-color: #f2f2f2;color: #666; font-family: 'Poppins', sans-serif;" onclick="f('redo')">repeta</button>
+        <button style="padding: 5px; border-radius: 5px; border: 1px solid #ccc; background-color: #f2f2f2;color: #666; font-family: 'Poppins', sans-serif;" onclick="f('undo')">назад</button> -->
+
+        
+
+
+
 
     	<form method="POST" class="post-form" enctype="multipart/form-data">{% csrf_token %}
+        <div id="file_input">
+        <input id="file-in-article-input" class="photoinpost" type="file" accept=".jpg, .png, .jpeg" name="inpostphoto1" style="display: none" oninput="insert_img_in_post()">
+
+        <label for="file-in-article-input" id="coverforinput" style="padding: 5px; border-radius: 5px; border: 1px solid #ccc; background-color: #f2f2f2;color: #666; font-family: 'Poppins', sans-serif;">Add photo</label> 
+        </div>
         {{ form.as_p }}
+        
+        <h2>Text</h2>
+        {% autoescape off %}
+        <input id="textarea" name="posttext" oninput="thirdfunchi()" onchange="thirdfunchi()">
+        <div id="div" contenteditable="True" name="div" id="post_text"  required style="overflow: auto;height : 50vh;border:1px solid #ccc; border-radius: 5px; margin-bottom: 20px;  resize: none; font-size:18px" oninput="secondfunchi(); " onkeydown="sad()" onclick="ModifySelection()">{{post_text}}</div>
+        {% endautoescape %}
         
 
         <button type="submit" style="padding: 5px; border-radius: 5px; border: 1px solid #ccc; background-color: #f2f2f2; float: right;font-family: 'Poppins', sans-serif;display: inline-block;">Save</button>
 
-        <input id="file-input" type="file" accept=".jpg, .png, .jpeg" name="coverphoto" multiple style="display: none; font-family: 'Poppins', sans-serif" oninput ="func()">
+        <input id="file-input" type="file" accept=".jpg, .png, .jpeg" name="coverphoto" style="display: none; font-family: 'Poppins', sans-serif" oninput ="func()">
 
         <label for="file-input" style="padding: 5px; border-radius: 5px; border: 1px solid #ccc; background-color: #f2f2f2;color: #666; font-family: 'Poppins', sans-serif;">Select file</label>
-    	</form>
+    	
+        
+        <div>Chernovic <input type="checkbox" id="status" name="status" {% if post_status %} checked {% endif %}></div>
+        <input style="display: none" id="numberofquestions" name="numberofvariants" value="2">
+         <div id="Customsurvey" >
+            <div>Radio<input type="radio" name="typeofcheck" value="radio" id="radioinsurvey" onclick="typeofcheckinsurvey(this.value)" {% if surveytype or post_new %}checked {% endif %}><input type="radio" name="typeofcheck" onclick="typeofcheckinsurvey(this.value)" value="checkbox" id="checkinsurvey" {% if not surveytype %} checked {% endif %}>Check buttons</div>
+            <div id="surveyvariants">
+            <textarea name="question" placeholder="question" id="survey_question">{{post.question}}</textarea>
+            {% if not post_new %}
+            {% for variant, index  in surveys.items %}
+                <input class="variantcheck" type={% if surveytype %}"radio" {% else %} "checkbox" {% endif %} id="input{{index}}" name="d"><input id="textinput{{index}}" class="variantinput" name="textofvariant{{index}}" value="{{variant}}" required><button class="variantmbtn" value="{{index}}" id="minusquestion{{index}}" onclick="deletequestion(this.value)">-</button><br class="variantbr" id="br{{index}}">
+            {% endfor %}
+            {% endif %}
+         </div>
+        </form>
+        <button onclick="addquestion()">+ Question</button>
+        <a onclick="putrandomsurvey(); ">Random survey</a>
     	<section style="background-color: #f2f2f2">
-    	<h3>Current Cover:</h3> 
+    	<h3 >Current Cover:</h3>
     	<img id = "post_cover" width="185px"; height="185px" align="left" style="border:1px solid #ccc;position:relative;object-fit: cover;overflow: hidden; border-radius: 5px" src=" http://127.0.0.1:8000/media/{{post_cover}} ">
     	</section>
+
+
 {% endblock %}

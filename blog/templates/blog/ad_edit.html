@@ -1,0 +1,28 @@
+{% extends 'blog/base.html' %}
+{% block title %}Ads{% endblock %}
+{% block content %}
+<form method="POST">
+	{% csrf_token %}
+	<textarea placeholder="Text" name="ad_text" required>{{ ad.text }}</textarea><br>
+	<input placeholder="Date de contact" name="contact_data" value="{{ ad.contact }}" required><br>
+	<select name="count_of_days">
+	{% if ad_new %}	<option selected hidden>Nr. de saptamani</option> {% endif %}
+		<option value="1" {% if ad.remove_date == 1 %} selected {% endif %}>1</option>
+		<option value="2" {% if ad.remove_date == 2 %} selected {% endif %}>2</option>
+		<option value="3" {% if ad.remove_date == 3 %} selected {% endif %}>3</option>
+		<option value="4" {% if ad.remove_date == 4 %} selected {% endif %}>4</option>
+		<option value="5" {% if ad.remove_date == 5 %} selected {% endif %}>5</option>
+		<option value="6" {% if ad.remove_date == 6 %} selected {% endif %}>6</option>
+		<option value="7" {% if ad.remove_date == 7 %} selected {% endif %}>7</option>
+		<option value="8" {% if ad.remove_date == 8 %} selected {% endif %}>8</option>
+		<option value="9" {% if ad.remove_date == 9 %} selected {% endif %}>9</option>
+		<option value="10" {% if ad.remove_date == 10 %} selected {% endif %}>10</option>
+		<option value="11" {% if ad.remove_date == 11 %} selected {% endif %}>11</option>
+		<option value="12" {% if ad.remove_date == 12 %} selected {% endif %}>12</option>
+	</select><br>
+	<button type="submit" style="padding: 5px; border-radius: 5px; border: 1px solid #ccc; background-color: #f2f2f2;font-family: 'Poppins', sans-serif;">Save</button>
+	{% if not ad_new %}
+	<a class="btn btn-default" href="remove" style="border: 0px">Remove</a>
+	{% endif %}
+</form>
+{% endblock %}

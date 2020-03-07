@@ -28,6 +28,12 @@ DEBUG = True
 ALLOWED_HOSTS = ['127.0.0.1', '.pythonanywhere.com']
 
 
+AUTHENTICATION_BACKENDS = (
+    'social_core.backends.vk.VKOAuth2',         
+    'django.contrib.auth.backends.ModelBackend',
+    'social_core.backends.facebook.FacebookOAuth2',
+    'social_core.backends.google.GoogleOAuth2',
+)
 # Application definition
 
 INSTALLED_APPS = [
@@ -38,6 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'blog',
+    'social_django',
 ]
 
 MIDDLEWARE = [
@@ -63,6 +70,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'social_django.context_processors.backends',
             ],
         },
     },
@@ -70,7 +78,11 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'myproject.wsgi.application'
 
+SOCIAL_AUTH_FACEBOOK_KEY = '175264060473297'
+SOCIAL_AUTH_FACEBOOK_SECRET = '531c8a378b423d621c7f0fa92573d9b8'
 
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = "867638231969-bk7gfdle2apttdmu05aj26mhvnon6tcu.apps.googleusercontent.com"
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = "fP2lRRPePQl1XnrEb5W59cSY"
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
