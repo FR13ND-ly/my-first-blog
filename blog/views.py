@@ -1,11 +1,10 @@
 from django.shortcuts import render
 from django.utils import timezone
 from datetime import timedelta
-from .models import Post, Comment, Profile, Like, Survey, Vote, Ad
+from .models import Post, Comment, Profile, Like, Survey, Vote, Ad, Image
 from django.http import HttpResponse
 from django.contrib.auth.models import User
 from django.shortcuts import render, get_object_or_404
-from .forms import PostForm
 from django.shortcuts import redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login
@@ -101,7 +100,7 @@ def post_detail(request, pk):
 def comment_remove(request, pk):
     if not request.user.is_staff:
         return HttpResponse(status=404)
-    comment = get_object_or_404(Comment, pk=pk)
+    comment = Comment.objects.get(pk=pk)
     comment.delete()
     return redirect('post_detail', pk=comment.post.pk)
     
@@ -110,17 +109,20 @@ def post_new(request):
     if not request.user.is_staff:
         return HttpResponse(status=404)
     if request.method == "POST":
-        form = PostForm(request.POST)
-        if form.is_valid():
-            post = form.save(commit=False)
-            post.author = request.user
+        if request.POST.get("mybtn"):
+            image = Image.objects.create(image = request.FILES.get('inpostphoto'))
+            rendertemplate = {'tposts' : top_posts, "post_new": True, 'post_cover':request.FILES.get('coverphoto'), 'post_text':request.POST.get("posttext"), "post_title":request.POST.get("title")}
+            return render(request, 'blog/post_edit.html', set_dict_for_render(rendertemplate, request))
+        else: 
+            post = Post.objects.create(author = request.user)
+            post.text = request.POST.get("title", "")
             post.published_date = timezone.now()
-            post.cover = request.FILES.get('coverphoto', False)
+            post.cover = request.FILES.get('coverphoto')
             if request.POST.get('status') == "on":
                 post.status = True;
             else:
                 post.status = False;
-            post.text = request.POST["posttext"]
+            post.text = request.POST.get("posttext")
             post.cover_text = post.text[0:240]
             post.question = request.POST.get("question")
             post.save()
@@ -135,31 +137,30 @@ def post_new(request):
                     survey.save()
                 a +=1
             return redirect('post_detail', pk=post.pk)
-    else:
-        form = PostForm()
-    rendertemplate = {'form': form, 'tposts' : top_posts, "post_new": True}
+    rendertemplate = {'tposts' : top_posts, "post_new": True}
     return render(request, 'blog/post_edit.html', set_dict_for_render(rendertemplate, request))
 
 @login_required
 def post_edit(request, pk):
     if not request.user.is_staff:
         return HttpResponse(status=404)
-    post = get_object_or_404(Post, pk=pk)
+    post = Post.objects.get(pk=pk)
     surveys = dict()
     a = 1
     for i in Survey.objects.filter(post=post):
         surveys.update({i.variant:a})
         a += 1
-
     if request.method == "POST":
-        form = PostForm(request.POST, instance=post)
-        if form.is_valid():
-            post = form.save(commit=False)
-            print(request.FILES.getlist('inpostphotos'))
+        if request.POST.get("mybtn"):
+            image = Image.objects.create(image = request.FILES.get('inpostphoto'))
+            rendertemplate = {'tposts' : top_posts, "post_new": True, 'post_cover':request.FILES.get('coverphoto', post.cover), 'post_text':request.POST.get("posttext"), "post_title":request.POST.get("title")}
+            return render(request, 'blog/post_edit.html', set_dict_for_render(rendertemplate, request))
+        else: 
+            post.text = request.POST.get("title", "")
             post.author = request.user
             post.published_date = timezone.now()
             post.cover = request.FILES.get('coverphoto', post.cover)
-            post.text = request.POST.get("posttext")
+            post.text = request.POST.get("posttext", "")
             post.cover_text = post.text[0:240]
             a = 1
             nowadaysvariants = []
@@ -176,7 +177,6 @@ def post_edit(request, pk):
             for i in Survey.objects.filter(post = post):
                 if i not in nowadaysvariants:
                     i.delete()
-
             post.question = request.POST.get("question")
             if request.POST.get('status') == "on":
                 post.status = True;
@@ -184,16 +184,14 @@ def post_edit(request, pk):
                 post.status = False;
             post.save()
             return redirect('post_detail', pk=post.pk)
-    else:
-        form = PostForm(instance=post)
-    rendertemplate = {'form': form, 'post_cover':post.cover, "post_text":post.text, "post_status" :post.status, 'post': post, 'surveys': surveys,'surveytype':Survey.objects.filter(post=post)[0].typeofvote}
+    rendertemplate = {'post_cover':post.cover, "post_text":post.text, "post_status" :post.status, 'post': post, 'surveys': surveys,'surveytype':Survey.objects.filter(post=post)[0].typeofvote}
     return render(request, 'blog/post_edit.html', set_dict_for_render(rendertemplate, request))
 
 @login_required
 def post_remove(request, pk):
     if not request.user.is_staff:
         return HttpResponse(status=404)
-    post = get_object_or_404(Post, pk=pk)
+    post = Post.objects.get(pk=pk)
     post.delete()
     posts = Post.objects.filter(published_date__lte=timezone.now()).order_by('published_date')
     return redirect('post_list')
@@ -226,7 +224,6 @@ def register(request):
             user.date_joined = timezone.now()
             user.save()
             profile = Profile.objects.create(user=user)
-            profile.date_of_birth = request.POST.get('date')
             profile.photo = request.FILES.get('userphoto')
             profile.save()
             theuser = authenticate(username=request.POST.get('username'), password=request.POST.get('password'))
@@ -243,7 +240,7 @@ def user_logout(request):
 
 @login_required
 def add_like(request, pk):
-    post = get_object_or_404(Post, pk=pk)
+    post = Post.objects.get(pk=pk)
     new_like, created = Like.objects.get_or_create(author=request.user, post=post)
     if created:
         new_like.save()
@@ -254,7 +251,7 @@ def add_like(request, pk):
 
 @login_required
 def vote(request,pk):
-    post = get_object_or_404(Post, pk=pk)
+    post = Post.objects.get(pk=pk)
     surveyofpost = Survey.objects.filter(post=post)
     if surveyofpost[0].typeofvote:
         survey = Survey.objects.get(post = post, variant = request.GET.get('value'))
@@ -283,6 +280,7 @@ def menulogin(request):
     else:
         return render(request, 'blog/login.html', {'incorrect_login_or_password':True})
 
+@login_required
 def setusertheme(request, theme):
     profile = Profile.objects.get(user = request.user)
     profile.darktheme = bool(theme)
@@ -296,6 +294,8 @@ def ads_list(request):
     return render(request, 'blog/ads.html', {'ads_page':True, 'ads': Ad.objects.all()})
 
 def ad_new(request):
+    if request.user.is_staff:
+        return redirect('post_list')
     if request.method == "POST":
         ad = Ad.objects.create()
         ad.text = request.POST.get('ad_text')
@@ -307,6 +307,8 @@ def ad_new(request):
     return render(request, 'blog/ad_edit.html', {'ads_page':True, 'ad_new':True})
 
 def ad_edit(request, pk):
+    if request.user.is_staff:
+        return redirect('post_list')
     ad = Ad.objects.get(pk=pk)
     if request.method == "POST":
         ad.text = request.POST.get('ad_text')
@@ -317,6 +319,8 @@ def ad_edit(request, pk):
     return render(request, 'blog/ad_edit.html', {'ads_page':True, 'ad':ad})
 
 def ad_delete(request, pk):
+    if request.user.is_staff:
+        return redirect('post_list')
     ad = Ad.objects.get(pk=pk)
     ad.delete()
     return redirect('ads')

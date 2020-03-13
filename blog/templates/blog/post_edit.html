@@ -1,28 +1,7 @@
 {% extends 'blog/base.html' %}
 {% load static %}
 {% block content %}
-<div id= "Edit"style="min-width: 1000px;min-height: 450px; position: fixed;  border: 1px solid #ccc; z-index: 9999; background-color: #f2f2f2; display:none ">
-            <div style="font-size: 32px">Edit Image<button id='closebtn' align="right" style="border:0 ;font-size: 16px">x</button></div>
-            <hr size= "2" />
-            <h3>Align</h3>
-            Right <input type="radio" id='a' name='a' value="right"> 
-            Left <input type="radio" id="a" name="a" value="left"checked>  
-            Center <input type="radio" id="a" name="a" value="center">
-            Undefined <input type="radio" name="a" value="undefined" >
-            <h3>Size</h3>
-            <select id="size">
-                <option selected hidden>Size</option>
-                <option value="small">Small</option>
-                <option value="normal">Normal</option>
-                <option value="big">Big</option>
-                <option value="custom">Custom</option>
-            </select>
-            <input id="widthinp" style="display: none" placeholder="width">
-            <input id="heightinp" style="display: none" placeholder="height">
-            <img id="vmag" width="200" height="150" align="right" src="sa" class="editimage">
-            <input id='legend' style="display: block" placeholder="Legend">
-            <button id="imgbtn">Add image</button>
-         </div>
+
     <h1 style="font-family: 'Poppins', sans-serif;">New post</h1>
         <button style="padding: 5px; border-radius: 5px; border: 1px solid #ccc; background-color: #f2f2f2;color: #666; font-family: 'Poppins', sans-serif;" onclick="f('bold')"><b>bold</b></button>
         <button style="padding: 5px; border-radius: 5px; border: 1px solid #ccc; background-color: #f2f2f2;color: #666; font-family: 'Poppins', sans-serif;" onclick="f('italic')"><i>cursiv</i></button>
@@ -79,20 +58,39 @@
         <button style="padding: 5px; border-radius: 5px; border: 1px solid #ccc; background-color: #f2f2f2;color: #666; font-family: 'Poppins', sans-serif;" onclick="f('undo')">назад</button> -->
 
         
-
-
-
-
-    	<form method="POST" class="post-form" enctype="multipart/form-data">{% csrf_token %}
-        <div id="file_input">
-        <input id="file-in-article-input" class="photoinpost" type="file" accept=".jpg, .png, .jpeg" name="inpostphoto1" style="display: none" oninput="insert_img_in_post()">
-
-        <label for="file-in-article-input" id="coverforinput" style="padding: 5px; border-radius: 5px; border: 1px solid #ccc; background-color: #f2f2f2;color: #666; font-family: 'Poppins', sans-serif;">Add photo</label> 
+        <form method="POST" class="post-form" enctype="multipart/form-data">{% csrf_token %}
+        <div id= "Edit"style="min-width: 1000px;min-height: 450px; position: fixed;  border: 1px solid #ccc; z-index: 9999; background-color: #f2f2f2; display:none; margin-top: -200px ">
+            <div style="font-size: 32px">Edit Image<a id='closebtn' align="right" style="border:0 ;font-size: 16px">x</a></div>
+            <hr size= "2" />
+            <h3>Align</h3>
+            Right <input type="radio" id='a' name='a' value="right"> 
+            Left <input type="radio" id="a" name="a" value="left"checked>  
+            Center <input type="radio" id="a" name="a" value="center">
+            <h3>Size</h3>
+            <select id="size">
+                <option selected hidden>Size</option>
+                <option value="small">Small</option>
+                <option value="normal">Normal</option>
+                <option value="big">Big</option>
+                <option value="custom">Custom</option>
+            </select>
+            <input id="widthinp" style="display: none" placeholder="width">
+            <input id="heightinp" style="display: none" placeholder="height">
+            <img id="vmag" width="200" height="150" align="right" src="sa" class="editimage">
+            <input id='legend' style="display: block" placeholder="Legend">
+            <input id="imgbtn" name="mybtn" type="submit" value="Add image">
+         </div>
+        
+        <div id="file-in-article-div">
+        <input id="file-in-article-input" class="photoinpost" type="file" accept=".jpg, .png, .jpeg" name="inpostphoto" style="display: none" oninput="insert_img_in_post()">
+        <label for="file-in-article-input" id="coverforinput" style="padding: 5px; border-radius: 5px; border: 1px solid #ccc; background-color: #f2f2f2;color: #666; font-family: 'Poppins', sans-serif;">Add photo</label>
         </div>
+        
         {{ form.as_p }}
         
         <h2>Text</h2>
         {% autoescape off %}
+        <input type="" name="title" placeholder="Titlu" value="{{post_title}}">
         <input id="textarea" name="posttext" oninput="thirdfunchi()" onchange="thirdfunchi()">
         <div id="div" contenteditable="True" name="div" id="post_text"  required style="overflow: auto;height : 50vh;border:1px solid #ccc; border-radius: 5px; margin-bottom: 20px;  resize: none; font-size:18px" oninput="secondfunchi(); " onkeydown="sad()" onclick="ModifySelection()">{{post_text}}</div>
         {% endautoescape %}

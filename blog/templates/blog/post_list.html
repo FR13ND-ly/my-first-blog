@@ -9,7 +9,8 @@
     {% for post in posts %}
         <div style="display: inline-block; position: initial;" id="post{{post.index}}">
         
-        <a href="{% url 'post_detail' pk=post.pk %}"><img width="930px" height="485px" style="border:1px solid #ccc;position:relative;margin-top: 10px; margin-bottom: 15px; object-fit: cover;overflow: hidden; border-radius: 15px;" src='http://127.0.0.1:8000/media/{{post.cover}}'>
+        <a href="{% url 'post_detail' pk=post.pk %}">
+        <img width="930px" height="485px" style="border:1px solid #ccc;position:relative;margin-top: 10px; margin-bottom: 15px; object-fit: cover;overflow: hidden; border-radius: 15px;" src='http://127.0.0.1:8000/media/{{post.cover}}'>
         <h1 style="font-family: 'Poppins',sans-serif; white-space: nowrap;overflow: hidden;text-overflow: ellipsis;margin-left: 10px;color:#fff;position: absolute;font-size: 64px; display: inline-block; top:350; left: 50" >{{ post.title }}</h1></a>
         
         </div>

@@ -3,7 +3,8 @@
 {% block content %}
 <form method="POST">
 	{% csrf_token %}
-	<textarea placeholder="Text" name="ad_text" required>{{ ad.text }}</textarea><br>
+	
+	<textarea id="div" placeholder="Text" name="ad_text" required style="overflow: auto;width: 120vh;height : 50vh;border:1px solid #ccc; border-radius: 5px; margin-bottom: 20px;  resize: none; font-size:18px">{{ ad.text }}</textarea><br>
 	<input placeholder="Date de contact" name="contact_data" value="{{ ad.contact }}" required><br>
 	<select name="count_of_days">
 	{% if ad_new %}	<option selected hidden>Nr. de saptamani</option> {% endif %}
@@ -20,7 +21,7 @@
 		<option value="11" {% if ad.remove_date == 11 %} selected {% endif %}>11</option>
 		<option value="12" {% if ad.remove_date == 12 %} selected {% endif %}>12</option>
 	</select><br>
-	<button type="submit" style="padding: 5px; border-radius: 5px; border: 1px solid #ccc; background-color: #f2f2f2;font-family: 'Poppins', sans-serif;">Save</button>
+	<a class="waves-effect waves-light btn">button</a>
 	{% if not ad_new %}
 	<a class="btn btn-default" href="remove" style="border: 0px">Remove</a>
 	{% endif %}

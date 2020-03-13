@@ -37,7 +37,6 @@ class Comment(models.Model):
 
 class Profile(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    date_of_birth = models.DateField(blank=True, null=True)
     photo = models.ImageField(upload_to="blog/static/media/", blank=True)
     darktheme = models.BooleanField(default=False)
 
@@ -69,3 +68,7 @@ class Ad(models.Model):
     def publish(self):
         self.published_date = timezone.now()
         self.save()
+
+class Image(models.Model):
+    image = models.ImageField(upload_to="blog/static/media/",null=True, blank=True)
+        
