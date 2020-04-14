@@ -1,5 +1,5 @@
 {% extends 'blog/base.html' %}
-
+{% load static %}
 {% block content %}
     <div class="post">
         {% if post.published_date %}
@@ -7,13 +7,13 @@
         {% endif %}
         
     
-        <div style="border-radius: 5px; padding-bottom: 15px;margin-right: -180px;">
-        <h1 style="padding-left: 15px; padding-top: 15px; padding-bottom: 5px; border-radius: 5px;">{{ post.title }}</h1>
-        <hr style="border: 1px solid #ccc; margin-left: 15px; border-radius: 5px; margin-top: -5px; margin-bottom: 0px; margin-right: 15px" />
-        <p style="padding-left: 15px; padding-top: 5px; padding-bottom: 5px; border-radius: 5px">Date: {{ post.published_date }} | Author: {{post.author}} | Views: {{post.count_of_views}}</p>
-        <hr style="border: 1px solid #ccc; margin-left: 15px; border-radius: 5px; margin-top: -10px; margin-bottom: 5px; margin-right: 15px" />
+        <div class="post_detailed_container">
+        <h1 class="post_detailed_title">{{ post.title }}</h1>
+        <hr class="post_detailed_line" />
+        <p class="post_detailed_info">Date: {{ post.published_date }} | Author: {{post.author}} | Views: {{post.count_of_views}}</p>
+        <hr class="post_detailed_line" />
         {% autoescape off %}
-        <div id="post_text" style="margin-right: 15px; padding-left: 15px; padding-top: 5px; padding-bottom: 5px; border-radius: 5px; font-size: 18px;" >{{ post.text|linebreaksbr }} </div>
+        <div id="post_text" class="post_detailed_text" >{{ post.text|linebreaksbr }} </div>
         {% endautoescape %}
         </div>
         {% if user.is_active %}
@@ -56,7 +56,7 @@
 
 <div style="display: none" id="comment_form" >
 <form method="POST" >{% csrf_token %}
-<img width="85px"; height="85px" align="left" style="border:1px solid #ccc;position:relative;margin-top: 10px; margin-bottom: 15px; object-fit: cover;overflow: hidden; border-radius: 5px" src='http://127.0.0.1:8000/media/{{profile.photo|default:"/blog/static/media/746199.jpg"}}'> 
+<img width="85px"; height="85px" align="left" class="comment_image_author" style="" src='http://127.0.0.1:8000/media/{{profile.photo|default:"/blog/static/media/746199.jpg"}}'> 
 {% if not user.is_active %}
 <input id="author_of_comment" name="author_of_comment"><br>
 {% else %}
@@ -64,7 +64,7 @@
 {% endif %}
 
 <input id="text_of_comment" name="text_of_comment" placeholder="sd">
-<button type="submit" class="save btn btn-default" id="Append_comment" >Send</button>
+<button type="submit" name="add_comment" value="add_comment" class="save btn btn-default" id="Append_comment" >Send</button>
 </form>
 </div>
 <p>There are: {{ post.comments.count }} Comments</p>
@@ -74,13 +74,14 @@
         {% if user.is_staff %}
         <a class="btn btn-default" href="{% url 'comment_remove' pk=comment.pk %}"><span class="glyphicon glyphicon-remove"></span></a>
         {% endif %}
-        <img width="85px"; height="85px" align="left" style="border:1px solid #ccc;position:relative;margin-top: 10px; margin-bottom: 15px; object-fit: cover;overflow: hidden; border-radius: 5px" src='http://127.0.0.1:8000/media/{{comment.photo_of_user}}'> 
-        <div class="date">{{ comment.created_date }}</div>
+        <img width="85px"; height="85px" align="left" class="comment_image_author" src='http://127.0.0.1:8000/media/{{comment.photo_of_user|default:"/blog/static/media/746199.jpg"}}'> 
+        <div class="comment_date">{{ comment.created_date }}</div>
         <strong>{{ comment.author }}</strong>
         <p>{{ comment.text|linebreaks }}</p>
     </div>
 {% empty %}
-    <p>No comments here yet :(</p>
+    <p>Nici-un comentariu</p>
 {% endfor %}
     </div>
+    <script type="text/javascript" src="{% static 'js/post_detail.js' %}"></script>
 {% endblock %}

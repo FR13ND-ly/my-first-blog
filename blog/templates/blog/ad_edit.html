@@ -4,7 +4,7 @@
 <form method="POST">
 	{% csrf_token %}
 	
-	<textarea id="div" placeholder="Text" name="ad_text" required style="overflow: auto;width: 120vh;height : 50vh;border:1px solid #ccc; border-radius: 5px; margin-bottom: 20px;  resize: none; font-size:18px">{{ ad.text }}</textarea><br>
+	<textarea id="div" placeholder="Text" name="ad_text" class="text_input" required >{{ ad.text }}</textarea><br>
 	<input placeholder="Date de contact" name="contact_data" value="{{ ad.contact }}" required><br>
 	<select name="count_of_days">
 	{% if ad_new %}	<option selected hidden>Nr. de saptamani</option> {% endif %}

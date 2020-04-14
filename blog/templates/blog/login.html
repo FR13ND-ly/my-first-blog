@@ -7,8 +7,8 @@
     <p>Incorrect login or password</p>
     {% endif %}
     <form action="." method="post">{% csrf_token %}
-        <input name="logininput" placeholder="Username" required><br>
-        <input type="password" name="passwordinput" placeholder="Password">
+        <input name="logininput" placeholder="Numele de profil" required><br>
+        <input type="password" name="passwordinput" placeholder="Parola">
         
         <p><input type="submit" value="Log-in"></p>
         <a href="{% url 'social:begin' 'facebook' %}">Sign in with Facebook</a>

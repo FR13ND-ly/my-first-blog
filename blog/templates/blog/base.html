@@ -1,5 +1,5 @@
 {% load static %}
-<html style="height: 100%;" >
+<html>
     <head>
         <title>Est-Curier</title>
         <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
@@ -9,17 +9,17 @@
 
     </head>
 
-    <body style="display: flex;flex-direction: column; min-height: 100vh;{% if profile.darktheme %} background-color: #666; {% endif %}" onload="remove_admin_photo_tools();funchi();loadnumberofvariants(); {% if post_new %} putrandomsurvey() {% endif %}" onscroll ="document.getElementById('usermenu').style.display = 'none'">
+    <body {% if profile.darktheme %} class="body_dark_theme" {% endif %} onload=" {% if post_new %} putrandomsurvey() {% endif %}" onscroll ="document.getElementById('usermenu').style.display = 'none'">
      <div style="flex-grow: 1;">
 
-        <div class="page-header" style="background-color:#329D9C;margin-top:-10px; margin-bottom: 5px;">
+        <div class="page-header">
             {% if user.is_staff %}
             <a href="{% if ads_page %} {% url 'new_ad' %} {% else %} {% url 'post_new' %} {% endif %}" class="top-menu"><span class="glyphicon glyphicon-plus"></span></a>
             {% endif %}
             {% if user.is_active %}
-            <img width="90" height="90" align="right" style="border:3px solid;border-radius: 100px; position:relative;object-fit: cover;overflow: hidden;cursor: pointer;" src='http://127.0.0.1:8000/media/{{profile.photo|default:"/blog/static/media/746199.jpg"}}' onclick="makevisibleusermenu()">
-            <div id='usermenu' style="z-index: 9999; position: fixed; margin-left: 80%; background-color: #fff; margin-top: 110px; border: 2px solid;border-radius: 5px; padding: 20px; display: none;">
-                <h2 align="center" style="margin-top: 0px;">{{user.username}}</h2>
+            <img width="90" height="90" align="right" class="user_image" src='http://127.0.0.1:8000/media/{{profile.photo|default:"/blog/static/media/746199.jpg"}}' onclick="makevisibleusermenu()">
+            <div id='usermenu' class="user_menu" style="">
+                <h2 align="center">{{user.username}}</h2>
                 <p>Temă:
             {% if profile.darktheme %}
                 <a href="{% url 'setusertheme' theme=0 %}"><button >De zi</button></a>
@@ -30,33 +30,34 @@
                 
             </div>
             {% else %}
-            <img width="90" height="90" align="right" style="border:3px solid; border-radius: 100px; position:relative;object-fit: cover;overflow: hidden; cursor: pointer;" src='http://127.0.0.1:8000/media/{{profile.photo|default:"/blog/static/media/2446756_0.jpg"}}' onclick="makevisibleusermenu()">
-            <div id='usermenu' style="z-index: 9999; position: fixed; margin-left: 80%; background-color: #fff; margin-top: 110px; border: 2px solid;border-radius: 5px; padding: 20px; display: none;">
-                <h2 align="center" style="margin-top: 0px;">Oaspete</h2>
-                <form method="GET" action="/menulogin">
-                <input type="" name="menulogin" placeholder="Login-ul"><br>
-                <input type="password" name="menupassword" placeholder="Parola"><br>
+            <img width="90" height="90" align="right" class="user_image" src='http://127.0.0.1:8000/media/{{profile.photo|default:"/blog/static/media/2446756_0.jpg"}}' onclick="makevisibleusermenu()">
+            <div id='usermenu' class="user_menu">
+                <h2 align="center">Oaspete</h2>
+                <form method="POST" action="/login/">
+                    {% csrf_token %}
+                <input type="" name="logininput" placeholder="Login-ul"><br>
+                <input type="password" name="passwordinput" placeholder="Parola"><br>
                 <button type="submit">Loghează-te</button>
                 </form>
-                <a href="register">Înregistrează-te</a>
+                <a href="/register">Înregistrează-te</a>
             </div>
             {% endif %}
 
-            <h1 style="font-family: 'Poppins',"><a {% if ads_page %}href="/ads">Est-Curier<div style="color:red; display: inline;">Est-Curier</div>{% else %}href="/">Est-Curier{% endif %}</a></h1>
+            <h1><a {% if ads_page %} href="/ads">Est-Curier<div style="color:red; display: inline;">Ads</div>{% else %}href="/">Est-Curier{% endif %}</a></h1>
         </div>
         {% if tposts %}
-        <div align="right" style="float: right;display: inline-block;border-radius: 15px; border: 3px solid #ccc; margin-right: 1%; margin-top: 9px; height: 485px; ">
-                        <h1 align="left" style="padding: 5px; margin-bottom: -10px; margin-top: 10px">Top articole</h1>
+        <div class="top_posts" >
+                        <h1 class="top_posts_title">Top articole</h1>
                         <hr style="margin-top: 10px; margin-bottom: 30px;" />
                         {% for tpost in tposts %}
-                        <div style="min-height: 85px; max-width: 290px; min-width: 280px;margin-top: -20px; margin-bottom: 40px; background-color: #f2f2f2; border-radius: 5px; margin-right: 5px; margin-left: 5px;{% if profile.darktheme %} background-color: #ccc; color: #fff{% endif %}">
-                        <img width="75px"; height="75px" align="left" style="display: block;border:1px solid #ccc;position:relative;margin-top: 10px; margin-bottom: 15px; object-fit: cover;overflow: hidden; border-radius: 5px; margin-left: 5px;margin-top: 5px" src='http://127.0.0.1:8000/media/{{tpost.cover}}'>
-                        <h2 align="left" style="font-family: 'Poppins',sans-serif; white-space: nowrap;overflow: hidden;text-overflow: ellipsis; padding-top: 10px"><a href="{% url 'post_detail' pk=tpost.pk %}">
+                        <div class="top_post_container">
+                        <img align="left" class="top_post_image" src='http://127.0.0.1:8000/media/{{tpost.cover}}'>
+                        <h2 align="left" class="top_post_title" style=""><a href="{% url 'post_detail' pk=tpost.pk %}">
                         {{ tpost.title }}</a></h2>
                         <p>{{ tpost.count_of_views}} views</p>
                       </div>
                         {% endfor %}
-                        </div>{% endif %}     
+                        </div>{% endif %}    
         <div class="content container">
 
             <div class="row">
@@ -69,365 +70,8 @@
             </div>
         </div>
     </div>
-        <div id="footer" style=" background-color:#329D9C;color: #fff;flex-shrink: 0; padding: 5px;">© Alan's Dreams LLC, All rights reserved </div>
+        <div id="footer" class="footer">© Est-Curier LLC, Toate drepturile sunt privatizate </div>
     </body>
-    
-    <script type="text/javascript">
-        var textarea = document.getElementById('textarea');
-        var div = document.getElementById('div');
-        post0 = document.getElementById('post0');
-        post1 = document.getElementById('post1');
-        post2 = document.getElementById('post2');
-        post3 = document.getElementById('post3');
-        post4 = document.getElementById('post4');
-        post0.style.display = 'block';
-        post1.style.display = 'none';
-        post2.style.display = 'none';
-        post3.style.display = 'none';
-        post4.style.display = 'none';
-        rbtn = document.getElementById('nextpost');
-        lbtn = document.getElementById('previouspost');
-        function remove_admin_photo_tools(){
-            var removeimgbtns = document.querySelectorAll(".remove_image");
-          /*  for (i = 0; i < removeimgbtns.length +1; i++){
-                document.getElementById(removeimgbtns[i].id).removeChild(removeimgbtns[i]);
-            }*/ 
-        }
-        function makevisibleusermenu(){
-            var usermenu = document.getElementById('usermenu');
-            if (usermenu.style.display != 'none'){
-                usermenu.style.display = 'none';
-            }
-            else{
-                usermenu.style.display = 'block';
-            }
-        }
-        function getpattern(){
-            passwordinput =document.getElementById('passwordinput');
-            repeatpassword = document.getElementById('repeatpasswordinput');
-            repeatpassword.pattern = passwordinput.value
-        }
-        function checkrepeatpassword(value){
-            passwordinput =document.getElementById('passwordinput');
-            repeatpassword = document.getElementById('repeatpasswordinput');
-            if (passwordinput.value != repeatpassword.value){
-                document.getElementById('registersubmit').disabled =true;
-            }
-            else{
-                document.getElementById('registersubmit').disabled =false;
-            }
-        }
-        function putrandomsurvey(){
-            randomsurvey = [['Cat de tare va placut acest articol?', ['1','2','3','4','5'], 'radio'],['Cat de tare va placut acest articol?', ['1','2','3','4','5'], 'checkbox'],['V-a placut acest articol?', ['Da','Nu'], 'radio'],['Ce puteti spune despre acest articol?', ['nesatisfacator','Satisfacator','Bun','Foarte bun'], 'checkbox'],['Ce puteti spune despre acest articol?', ['nesatisfacator','Satisfacator','Bun','Foarte bun'], 'radio']];
-
-            
-            var oldquestions = document.querySelectorAll(".variantinput");
-            var surveyinputs = document.getElementById('surveyvariants');
-            var oldbrs = document.querySelectorAll(".variantbr");
-            var oldchecks = document.querySelectorAll(".variantcheck");
-            var oldmbtns = document.querySelectorAll(".variantmbtn");
-            var question = document.getElementById('survey_question');
-            a  = Math.floor(Math.random() * (randomsurvey.length));
-            document.getElementById("numberofquestions").value = randomsurvey[a][1].length;
-            question.innerHTML = randomsurvey[a][0];
-            if (randomsurvey[a][2] == 'checkbox'){
-                document.getElementById('checkinsurvey').checked = true;
-            }
-            for (i = 1; i < randomsurvey[a][1].length +1; i++){
-                    var surveyvariants = document.getElementById('surveyvariants');
-                    var inputinsurvey = document.createElement("input");
-                    inputinsurvey.id = 'input' + String(i);
-                    inputinsurvey.name = 'd';
-                    inputinsurvey.type = randomsurvey[a][2];
-                    inputinsurvey.className = 'variantcheck';
-                    var textinput = document.createElement("input");
-                    textinput.id = 'textinput' + String(i);
-                    textinput.placeholder = String(i);
-                    textinput.required = true;
-                    textinput.value = randomsurvey[a][1][i-1];
-                    textinput.name = 'textofvariant' + String(i);
-                    textinput.className = 'variantinput';
-                    var minusquestion = document.createElement("button");
-                    minusquestion.id = 'minusquestion' + String(i);
-                    minusquestion.value = String(i);
-                    minusquestion.className = 'variantmbtn';
-                    minusquestion.innerHTML = '-';
-                    var br = document.createElement("br");
-                    br.id = 'br' + String(i);
-                    br.className = 'variantbr';
-                    minusquestion.onclick = function() {
-                        surveyvariants.removeChild(document.getElementById('input' + minusquestion.value));
-                        surveyvariants.removeChild(document.getElementById('textinput' + minusquestion.value)   );
-                        surveyvariants.removeChild(document.getElementById('minusquestion' + minusquestion. value));
-                        surveyvariants.removeChild(document.getElementById('br' + minusquestion.value));
-                        }
-
-            
-                    surveyvariants.appendChild(inputinsurvey);
-                    surveyvariants.appendChild(textinput);
-                    surveyvariants.appendChild(minusquestion);
-                    surveyvariants.appendChild(br);
-                    }
-            
-
-            for (i = 0; i < Number(oldquestions.length) ; i++){
-                surveyinputs.removeChild(oldquestions[i]);
-                surveyinputs.removeChild(oldbrs[i]);
-                surveyinputs.removeChild(oldchecks[i]);
-                surveyinputs.removeChild(oldmbtns[i]);
-            } 
-        }
-        function loadnumberofvariants(){
-            numberofquestions = document.querySelectorAll(".variantinput");
-            document.getElementById("numberofquestions").value = numberofquestions.length;
-        }
-        function deletequestion(number){
-            var surveyinputs = document.getElementById('surveyvariants');
-            surveyinputs.removeChild(document.getElementById('input' + number));
-            surveyinputs.removeChild(document.getElementById('textinput' + number));
-
-            surveyinputs.removeChild(document.getElementById('minusquestion' + number));
-            surveyinputs.removeChild(document.getElementById('br' + number));
-          //  document.getElementById('numberofquestions').value = Number(document.getElementById('numberofquestions').value) - 1
-        }
-        function addquestion(){
-            currentvariant = Number(document.getElementById('numberofquestions').value) + 1;
-            var surveyvariants = document.getElementById('surveyvariants');
-            var inputinsurvey = document.createElement("input");
-            inputinsurvey.id = 'input' + String(currentvariant);
-            inputinsurvey.name = 'd';
-            inputinsurvey.className = 'variantcheck';
-            var textinput = document.createElement("input");
-            textinput.id = 'textinput' + String(currentvariant);
-            textinput.placeholder = String(currentvariant);
-            textinput.required = true;
-            textinput.name = 'textofvariant' + String(currentvariant);
-            textinput.className = 'variantinput';
-            var minusquestion = document.createElement("button");
-            minusquestion.id = 'minusquestion' + String(currentvariant);
-            minusquestion.value = String(currentvariant);
-            minusquestion.className = 'variantmbtn';
-            var br = document.createElement("br");
-            br.id = 'br' + String(currentvariant);
-            br.className = 'variantbr';
-            minusquestion.innerHTML = '-';
-            minusquestion.onclick = function() {
-                surveyvariants.removeChild(document.getElementById('input' + minusquestion.value));
-                surveyvariants.removeChild(document.getElementById('textinput' + minusquestion.value));
-                surveyvariants.removeChild(document.getElementById('minusquestion' + minusquestion.value));
-                surveyvariants.removeChild(document.getElementById('br' + minusquestion.value));
-            //    document.getElementById('numberofquestions').value = Number(document.getElementById('numberofquestions').value) - 1;
-                    }
-
-            inputinsurvey.type = 'radio';
-            
-            surveyvariants.appendChild(inputinsurvey);
-            surveyvariants.appendChild(textinput);
-            surveyvariants.appendChild(minusquestion);
-            surveyvariants.appendChild(br);
-            document.getElementById('numberofquestions').value = currentvariant;
-
-        }
-        function typeofcheckinsurvey(type){
-            for (i = 1; i < Number(document.getElementById('numberofquestions').value) + 1; i++) {
-                inputinsurvey = document.getElementById('input' + String(i));
-                inputinsurvey.type = type;
-                }
-        }
-        function thirdmagicfunchi(){
-            rbtn.style.visibility = 'visible';
-            lbtn.style.visibility = 'visible';
-        }
-        function fourthmagicfunchi(){
-            rbtn.style.visibility = 'hidden';
-            lbtn.style.visibility = 'hidden';
-        }
-
-        function add_comment(){
-            var comment_form = document.getElementById('comment_form')
-            var add_comment_btn = document.getElementById('add_comment');
-            add_comment_btn.style.display = "none";
-            comment_form.style.display = "block";
-        }
-        function secondmagicfunchi(){
-            if (post0.style.display == 'block'){
-                post0.style.display = 'none';
-                post4.style.display = 'block';
-            }
-            else if (post1.style.display == 'block'){
-                post1.style.display = 'none';
-                post0.style.display = 'block';
-            }
-            else if (post2.style.display == 'block'){
-                post2.style.display = 'none';
-                post1.style.display = 'block';
-            }
-            else if (post3.style.display == 'block'){
-                post3.style.display = 'none';
-                post2.style.display = 'block';
-            }
-            else if (post4.style.display == 'block'){
-                post4.style.display = 'none';
-                post3.style.display = 'block';
-            }
-        }
-        function magicfunchi(){
-            if (post0.style.display == 'block'){
-                post0.style.display = 'none';
-                post1.style.display = 'block';
-            }
-            else if (post1.style.display == 'block'){
-                post1.style.display = 'none';
-                post2.style.display = 'block';
-            }
-            else if (post2.style.display == 'block'){
-                post2.style.display = 'none';
-                post3.style.display = 'block';
-            }
-            else if (post3.style.display == 'block'){
-                post3.style.display = 'none';
-                post4.style.display = 'block';
-            }
-            else if (post4.style.display == 'block'){
-                post4.style.display = 'none';
-                post0.style.display = 'block';
-            }
-            
-        }
-
-        function funchi(){
-            textarea.value = div.innerHTML;    
-        }
-        function secondfunchi(){
-            textarea.value = div.innerHTML
-            for(i of textarea.value){
-                textarea.value = textarea.value.replace("&lt;","<");
-                textarea.value = textarea.value.replace("&gt;",">");
-                textarea.value = textarea.value.replace("&nbsp;"," ");
-            }
-        }
-        function thirdfunchi(){ 
-            div.innerHTML = textarea.value;
-        }
-        function f(a, b) {
-            document.execCommand(a, false, b);
-            div.focus();
-            thirdfunchi();
-        }
-        
-        function func(){
-            var input = document.getElementById("file-input");
-            var cover = document.getElementById("post_cover");
-            cover.src = URL.createObjectURL(input.files[0]);
-        }
-        function edit_img_in_article(img){
-            var editimage = document.getElementById("Edit");
-            editimage.style.display = "block"
-            var vimage = document.getElementById("vmag");
-            vimage.src = 'http://127.0.0.1:8000/media//blog/static/media/' + img;
-            var clsbtn = document.getElementById("closebtn");
-            clsbtn.onclick = function(){
-                editimage.style.display = "none";
-            }
-            var size = document.getElementById('size');
-            size.onchange = function(){
-
-                if(size[size.selectedIndex].value == 'small'){
-                    width = 150;
-                    height = 150;
-                }
-                if(size[size.selectedIndex].value == 'normal'){
-                    width = 300;
-                    height= 200;
-                }
-                if(size[size.selectedIndex].value == 'big'){
-                    width = 900;
-                    height = 600;
-                }
-                if(size[size.selectedIndex].value == 'custom'){
-
-                    widthinp.style.display = "block";
-                    heightinp.style.display = "block";
-                    check = true;
-                }
-
-                document.getElementById(img).height = height;
-                document.getElementById(img).width = width;
-                var aligncheck = document.querySelector('input[name="a"]:checked');
-                document.getElementById(img + 'div').align = aligncheck.value;
-                size.selectedIndex=1; 
-
-            }
-        }
-        function insert_img_in_post(){
-            var input = document.getElementById("file-in-article-input");
-            var editimage = document.getElementById("Edit");
-            var vimage = document.getElementById("vmag");
-            var clsbtn = document.getElementById("closebtn");
-            var imgbtn = document.getElementById("imgbtn");
-            var size = document.getElementById('size');
-            var legend = document.getElementById('legend');
-            editimage.style.display = "block";
-            var check = false;
-            var widthinp = document.getElementById('widthinp');
-            var heightinp = document.getElementById('heightinp');
-            var src = URL.createObjectURL(input.files[0]);
-            vimage.src = src;
-            var width = 300;
-            var height = 200;
-
-            size.onchange = function(){
-
-                if(size[size.selectedIndex].value == 'small'){
-                    width = 150;
-                    height = 150;
-                }
-                if(size[size.selectedIndex].value == 'normal'){
-                    width = 300;
-                    height= 200;
-                }
-                if(size[size.selectedIndex].value == 'big'){
-                    width = 900;
-                    height = 600;
-                }
-                if(size[size.selectedIndex].value == 'custom'){
-
-                    widthinp.style.display = "block";
-                    heightinp.style.display = "block";
-                    check = true;
-                }
-
-
-                size.selectedIndex=1; 
-            }
-            clsbtn.onclick = function(){
-                editimage.style.display = "none";
-            }
-            imgbtn.onclick = function(){
-
-                var c = document.querySelector('input[name="a"]:checked');
-                var align = c.value;
-
-                if (check == true){
-                    width = widthinp.value;
-                    height = heightinp.value;
-                    check = false;
-                    widthinp.style.display = 'none';
-                    heightinp.style.display = 'none';
-                }
-
-                editimage.style.display = "none";
-                var legend = document.getElementById('legend').value;
-                var style ="border:1px solid #ccc;position:relative;object-fit: cover;overflow: hidden; border-radius: 5px";
-                image = "<div class='image_container' id='"+input.files[0].name+"div' style='display: inline-block; position: initial;'>"+"<img src='" + 'http://127.0.0.1:8000/media//blog/static/media/' +input.files[0].name + "' width= '" + String(width)+ "' id='"+ input.files[0].name + "' height='" + String(height) +  "' align = '" + align + "' style='" + style + "'>" + "<div id='" + input.files[0].name+ "'class='remove_image' onclick="+"'document.getElementById("+'"' +"div" + '"'+ ").removeChild(document.getElementById(" +'"' + input.files[0].name+ 'div")); secondfunchi()' + "'"+ ">x</div><a class='btn btn-default' onclick='edit_img_in_article("+'"' + input.files[0].name +'"' +")'><span class='glyphicon glyphicon-pencil'></span></a></div>";
-                div.focus();
-                f("insertHTML",image)
-                alert('c');
-                secondfunchi();
-            }
-            
-        }
-
-    </script>
+    <script type="text/javascript" src="{% static 'js/base.js' %}"></script>
     
 </html>

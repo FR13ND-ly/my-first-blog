@@ -4,46 +4,38 @@
 
 {% block content %}
  
-    <div onmouseover="thirdmagicfunchi()" onmouseout="fourthmagicfunchi()">
+    <div onmouseover="make_visible_tools_of_big_image()" onmouseout="make_hidden_tools_of_big_image()">
     {% if bigimage %}
     {% for post in posts %}
-        <div style="display: inline-block; position: initial;" id="post{{post.index}}">
-        
+        <div style="position: initial;" id="post{{post.index}}">
         <a href="{% url 'post_detail' pk=post.pk %}">
-        <img width="930px" height="485px" style="border:1px solid #ccc;position:relative;margin-top: 10px; margin-bottom: 15px; object-fit: cover;overflow: hidden; border-radius: 15px;" src='http://127.0.0.1:8000/media/{{post.cover}}'>
-        <h1 style="font-family: 'Poppins',sans-serif; white-space: nowrap;overflow: hidden;text-overflow: ellipsis;margin-left: 10px;color:#fff;position: absolute;font-size: 64px; display: inline-block; top:350; left: 50" >{{ post.title }}</h1></a>
-        
+        <img width="930px" height="485px" class="big_image_photo" src='http://127.0.0.1:8000/media/{{post.cover}}'>
+        <h1 class="big_image_title" >{{ post.title }}</h1></a>
         </div>
-
-
     {% endfor %}
-     <a style="font-family: 'Poppins',sans-serif; white-space: nowrap;overflow: hidden;text-overflow: ellipsis;margin-left: 10px;color:#fff;position: absolute;font-size: 128px; display: inline-block; top:160; left: 50; cursor: pointer;visibility: hidden;" id="previouspost" onclick="secondmagicfunchi()"><</a>
-        <a style="font-family: 'Poppins',sans-serif; white-space: nowrap;overflow: hidden;text-overflow: ellipsis;margin-left: 10px;color:#fff;position: absolute;font-size: 128px; display: inline-block; top:160; right: -120; cursor: pointer;visibility: hidden; z-index: 9999" id="nextpost" onclick="magicfunchi()">></a>
+     <a class="change_big_image_button" style="left: 50;" id="previous_big_image" onclick="previous_big_image()"><</a>
+        <a class="change_big_image_button" style="right: -120;" id="next_big_image" onclick="next_big_image()">></a>
     </div>
     {% endif %}
-        {% for post in posts %}
-
-        <div class="post" style="display: absolute; margin-bottom: 20px">
-             
-            <div style="background-color: #f2f2f2; border-radius: 5px; margin-right: -180px; padding-left: 15px; padding-top: 1px;">
-            <img width="185px"; height="185px" align="left" style="border:1px solid #ccc;position:relative;margin-top: 10px; margin-bottom: 15px; object-fit: cover;overflow: hidden; border-radius: 5px" src='http://127.0.0.1:8000/media/{{post.cover}}'> 
-            <h1 style="font-family: 'Poppins',sans-serif; white-space: nowrap;overflow: hidden;text-overflow: ellipsis; "><a style="margin-left: 10px;color:#56C596;" href="{% url 'post_detail' pk=post.pk %}">{{ post.title }}</a></h1>
-            <hr size="2" align="left" width="300" style="margin-left: 200px;margin-top:0px;margin-bottom:5px;color: #ccc; border:1px solid" ></hr>
-            <p id="paragraph" style="height: 70px; font-size: 16px;margin-left: 200px;color:#666;margin-right: 5px; margin-top:15px">{{ post.cover_text|striptags|linebreaksbr }}... <a href="{% url 'post_detail' pk=post.pk %}">Read More</a></p>
+        {% for post in posts %} 
+            <div class="post">
+            <img width="185px"; height="185px" class="post_image" align="left" src='http://127.0.0.1:8000/media/{{post.cover}}'> 
+            <h1 class="post_title" style=""><a style="margin-left: 10px;color:#56C596;" href="{% url 'post_detail' pk=post.pk %}">{% if post.status %}<mark>Schiță: </mark>{% endif %}{{ post.title }}</a></h1>
+            <hr size="2" align="left" width="300" class="post_line"></hr>
+            <p id="paragraph" class="post_text">{{ post.text|striptags|linebreaksbr|truncatewords:50 }} <a href="{% url 'post_detail' pk=post.pk %}">Read More</a></p>
             
-            <hr size="2" align="left" width="300" style="margin-left: 200px;margin-top: 15px;margin-bottom:15px;color: #ccc; border:1px solid" ></hr>
-            <p class="date" style="max-height: :5px; margin-top: -10px; margin-left: 200px; padding-bottom: 15px; padding-right: 15px; color:#205072;">
+            <hr size="2" align="left" width="300" class="post_line" ></hr>
+            <p class="date" class="post_date">
 
                 {{ post.published_date }} | {{post.author}} | views: {{post.count_of_views}}
             </p>
             </div>
-      <!--  <hr align="left" width="300" size="4" style="margin-bottom: -40px; border: 2px solid; border-radius: 10px; color: #ccc; margin-top: 45px" /> -->
-        </div>
 
         {% endfor %}
-    <div style="font-size: 24px; margin-left: 50%;">
+    <div class="list_of_pages">
         {% for i in number_of_pages %}
             <a href="{% url 'choose_page' lk=i %}"> {{i}} </a>
         {% endfor %}
     </div>
+    <script type="text/javascript" src="{% static 'js/post_list.js' %}"></script>
 {% endblock %}

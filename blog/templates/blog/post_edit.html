@@ -52,37 +52,32 @@
         <button style="padding: 5px; border-radius: 5px; border: 1px solid #ccc; background-color: #f2f2f2;color: #666; font-family: 'Poppins', sans-serif;" onclick="f('justifyLeft')">left</button>
         <button style="padding: 5px; border-radius: 5px; border: 1px solid #ccc; background-color: #f2f2f2;color: #666; font-family: 'Poppins', sans-serif;" onclick="f('justifyCenter')">center</button>
         <button style="padding: 5px; border-radius: 5px; border: 1px solid #ccc; background-color: #f2f2f2;color: #666; font-family: 'Poppins', sans-serif;" onclick="f('justifyRight')"><div>right</button>
-
-
-       <!-- <button style="padding: 5px; border-radius: 5px; border: 1px solid #ccc; background-color: #f2f2f2;color: #666; font-family: 'Poppins', sans-serif;" onclick="f('redo')">repeta</button>
-        <button style="padding: 5px; border-radius: 5px; border: 1px solid #ccc; background-color: #f2f2f2;color: #666; font-family: 'Poppins', sans-serif;" onclick="f('undo')">назад</button> -->
-
         
         <form method="POST" class="post-form" enctype="multipart/form-data">{% csrf_token %}
-        <div id= "Edit"style="min-width: 1000px;min-height: 450px; position: fixed;  border: 1px solid #ccc; z-index: 9999; background-color: #f2f2f2; display:none; margin-top: -200px ">
-            <div style="font-size: 32px">Edit Image<a id='closebtn' align="right" style="border:0 ;font-size: 16px">x</a></div>
+        <div id= "edit_image_menu"style="min-width: 1000px;min-height: 450px; position: fixed;  border: 1px solid #ccc; z-index: 9999; background-color: #f2f2f2; display:none; margin-top: -200px ">
+            <div style="font-size: 32px">Edit Image<a id='close_editmenu_btn' align="right" style="border:0 ;font-size: 16px">x</a></div>
             <hr size= "2" />
             <h3>Align</h3>
-            Right <input type="radio" id='a' name='a' value="right"> 
-            Left <input type="radio" id="a" name="a" value="left"checked>  
-            Center <input type="radio" id="a" name="a" value="center">
+            Right <input type="radio" name="image_align" tag='image_align' value="right"> 
+            Left <input type="radio" name="image_align"tag="image_align" value="left"checked>  
+            Center <input type="radio" name="image_align" tag="image_align" value="center">
             <h3>Size</h3>
-            <select id="size">
+            <select id="img_size_selector">
                 <option selected hidden>Size</option>
                 <option value="small">Small</option>
                 <option value="normal">Normal</option>
                 <option value="big">Big</option>
-                <option value="custom">Custom</option>
+                <option value="custom">Personalizat</option>
             </select>
-            <input id="widthinp" style="display: none" placeholder="width">
-            <input id="heightinp" style="display: none" placeholder="height">
-            <img id="vmag" width="200" height="150" align="right" src="sa" class="editimage">
-            <input id='legend' style="display: block" placeholder="Legend">
-            <input id="imgbtn" name="mybtn" type="submit" value="Add image">
+            <input id="custom_width_input" style="display: none" placeholder="width">
+            <input id="custom_height_input" style="display: none" placeholder="height">
+            <img id="representative_img" width="200" height="150" align="right" src="sa" class="editimage">
+            <input id='img_title' style="display: block" placeholder="Legend">
+            <input id="save_img_btn" name="mybtn" type="submit" value="Save Image">
          </div>
         
         <div id="file-in-article-div">
-        <input id="file-in-article-input" class="photoinpost" type="file" accept=".jpg, .png, .jpeg" name="inpostphoto" style="display: none" oninput="insert_img_in_post()">
+        <input id="file-in-article-input" class="photoinpost" type="file" accept=".jpg, .png, .jpeg" name="inpostphoto" style="display: none" oninput="edit_img_menu(false)" >
         <label for="file-in-article-input" id="coverforinput" style="padding: 5px; border-radius: 5px; border: 1px solid #ccc; background-color: #f2f2f2;color: #666; font-family: 'Poppins', sans-serif;">Add photo</label>
         </div>
         
@@ -91,24 +86,26 @@
         <h2>Text</h2>
         {% autoescape off %}
         <input type="" name="title" placeholder="Titlu" value="{{post_title}}">
-        <input id="textarea" name="posttext" oninput="thirdfunchi()" onchange="thirdfunchi()">
-        <div id="div" contenteditable="True" name="div" id="post_text"  required style="overflow: auto;height : 50vh;border:1px solid #ccc; border-radius: 5px; margin-bottom: 20px;  resize: none; font-size:18px" oninput="secondfunchi(); " onkeydown="sad()" onclick="ModifySelection()">{{post_text}}</div>
+        <button type="button" value="1" id="set_text_or_code_btn" align='right' onclick="set_text_or_code(this.value)">Cod</button>
+        <textarea id="code_part_of_post" name="posttext" onchange="set_post_text_like_code()" class="text_input"></textarea>
+        
+        <div id="visual_part_of_post" contenteditable="True" name="div" id="post_text" class="text_input" oninput="set_post_code_like_text(); " required>{{post_text}}</div>
         {% endautoescape %}
         
 
-        <button type="submit" style="padding: 5px; border-radius: 5px; border: 1px solid #ccc; background-color: #f2f2f2; float: right;font-family: 'Poppins', sans-serif;display: inline-block;">Save</button>
+        <button type="submit" name="save_post" class="save" value="Save Post" style="">Save</button>
 
-        <input id="file-input" type="file" accept=".jpg, .png, .jpeg" name="coverphoto" style="display: none; font-family: 'Poppins', sans-serif" oninput ="func()">
+        <input id="file-input" type="file" accept=".jpg, .png, .jpeg" name="coverphoto" style="display: none; font-family: 'Poppins', sans-serif" oninput ="set_representative_cover_of_post()">
 
-        <label for="file-input" style="padding: 5px; border-radius: 5px; border: 1px solid #ccc; background-color: #f2f2f2;color: #666; font-family: 'Poppins', sans-serif;">Select file</label>
+        <label for="file-input" class="file_input">Select file</label>
     	
         
-        <div>Chernovic <input type="checkbox" id="status" name="status" {% if post_status %} checked {% endif %}></div>
+        <div>Schiță<input type="checkbox" id="status" name="status" {% if post_status %} checked {% endif %}></div>
         <input style="display: none" id="numberofquestions" name="numberofvariants" value="2">
          <div id="Customsurvey" >
             <div>Radio<input type="radio" name="typeofcheck" value="radio" id="radioinsurvey" onclick="typeofcheckinsurvey(this.value)" {% if surveytype or post_new %}checked {% endif %}><input type="radio" name="typeofcheck" onclick="typeofcheckinsurvey(this.value)" value="checkbox" id="checkinsurvey" {% if not surveytype %} checked {% endif %}>Check buttons</div>
             <div id="surveyvariants">
-            <textarea name="question" placeholder="question" id="survey_question">{{post.question}}</textarea>
+            <input name="question" placeholder="question" id="survey_question" value="{{post_question}}">
             {% if not post_new %}
             {% for variant, index  in surveys.items %}
                 <input class="variantcheck" type={% if surveytype %}"radio" {% else %} "checkbox" {% endif %} id="input{{index}}" name="d"><input id="textinput{{index}}" class="variantinput" name="textofvariant{{index}}" value="{{variant}}" required><button class="variantmbtn" value="{{index}}" id="minusquestion{{index}}" onclick="deletequestion(this.value)">-</button><br class="variantbr" id="br{{index}}">
@@ -116,12 +113,11 @@
             {% endif %}
          </div>
         </form>
-        <button onclick="addquestion()">+ Question</button>
-        <a onclick="putrandomsurvey(); ">Random survey</a>
+        <button type="button" onclick="addquestion()">+1 Întrebare</button>
+        <button type="button" onclick="putrandomsurvey(); ">Șablon de chestionar</button>
     	<section style="background-color: #f2f2f2">
     	<h3 >Current Cover:</h3>
-    	<img id = "post_cover" width="185px"; height="185px" align="left" style="border:1px solid #ccc;position:relative;object-fit: cover;overflow: hidden; border-radius: 5px" src=" http://127.0.0.1:8000/media/{{post_cover}} ">
+    	<img id = "post_cover" width="185px"; height="185px" align="left" class="post_representative_img" src=" http://127.0.0.1:8000/media/{{post_cover}} ">
     	</section>
-
-
+        <script type="text/javascript" src="{% static 'js/post_edit.js' %}"></script>
 {% endblock %}

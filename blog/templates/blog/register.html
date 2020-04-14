@@ -5,16 +5,19 @@
 {% block content %}
     <h1>Creează un profil</h1>
     <form action="." method="post" enctype="multipart/form-data".>
+        {% if error %}
+            <p>{{error}}}</p>
+        {% endif %}
         <input name="username" placeholder="Numele de profil" required><br>
-    	<input name="firstname" placeholder="Numele vostru" required><br>
-    	<input type="email" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$" name="email" placeholder="Email" required><br>
-    	<input type="password" name="password" id="passwordinput" oninput="getpattern()" placeholder="Parola" required><br>
-    	<input type="password" name="repeatedpassword" id="repeatpasswordinput" placeholder="Repetați parola" required oninput="checkrepeatpassword(this.value)">
-    	<input id="userphoto" type="file" accept=".jpg, .png, .jpeg" name="userphoto" style="display: none; font-family: 'Poppins', sans-serif" oninput ="func()">
-
-        <label for="userphoto" style="padding: 5px; border-radius: 5px; border: 1px solid #ccc; background-color: #f2f2f2;color: #666; font-family: 'Poppins', sans-serif;">Fotografie de profil</label>
-        {% csrf_token %}
-        <p><input type="submit" id="registersubmit" value="Continuă"></p>
+    	<input name="firstname" placeholder="Numele real" required><br>
+    	<input type="email" name="email" placeholder="Email" required><br>
+    	<input type="password" name="password" id="passwordinput" placeholder="Parola" required><br>
+    	<input type="password" name="repeatedpassword" id="repeatpasswordinput" placeholder="Repetați parola" required>
+    	<input id="userphoto" type="file" accept=".jpg, .png, .jpeg" name="userphoto" style="display: none">
+        <label for="userphoto" class="file_input">Fotografie de profil</label>
+        {% csrf_token %}<br>
+        <input type="checkbox" oninput="document.getElementById('registersubmit').disabled = !this.checked">Sunt deacord cu Termenii de licență
+        <p><input type="submit" id="registersubmit" value="Continuă" disabled></p>
     </form>
     	
 {% endblock %}

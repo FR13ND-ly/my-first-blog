@@ -19,7 +19,6 @@ urlpatterns = [
  	path('social-auth/', include('social_django.urls', namespace='social')),
  	path('post/<int:pk>/like', views.add_like, name='add_like'),
  	path('post/<int:pk>/vote', views.vote, name="vote"),
- 	path('menulogin/', views.menulogin, name='menulogin'),
  	path('setusertheme/<int:theme>', views.setusertheme, name='setusertheme'),
  	path('ads', views.ads_list, name='ads'),
 	path('ads/new/', views.ad_new, name='new_ad'),

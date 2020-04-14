@@ -12,11 +12,6 @@ from django.contrib.auth import logout
 from django.contrib import messages
 from django.contrib.auth.hashers import make_password
 
-
-def top_posts():
-    top_posts = Post.objects.filter(published_date__lte=timezone.now()).order_by('count_of_views').reverse().filter(status=False)[0:4]
-    return top_posts
-
 def set_dict_for_render(rdict, request):
     rdict.update({'tposts' : Post.objects.filter(published_date__lte=timezone.now()).order_by('count_of_views').reverse().filter(status=False)[0:4]})
     if request.user.is_active:
@@ -27,19 +22,18 @@ def set_dict_for_render(rdict, request):
 
 def post_list(request):
     if request.user.is_staff:
-        a = (len(Post.objects.filter(published_date__lte=timezone.now()))//5)
+        relative_number_of_pages = (len(Post.objects.filter(published_date__lte=timezone.now()))//5)
         posts = Post.objects.filter(published_date__lte=timezone.now()).order_by('published_date').reverse()[0:5]
     else:
-        a = (len(Post.objects.filter(published_date__lte=timezone.now()).filter(status=False))//5)
+        relative_number_of_pages = (len(Post.objects.filter(published_date__lte=timezone.now()).filter(status=False))//5)
         posts = Post.objects.filter(published_date__lte=timezone.now()).order_by('published_date').reverse().filter(status=False)[0:5]
     number_of_pages = []
-    b = 2
-    c = 0
+    index = 0
     for post in posts:
-        post.index = c
-        c += 1
+        post.index = index
+        index += 1
     for i in range(8):
-        if 1 + i < a + 2:
+        if 1 + i < relative_number_of_pages + 2:
             number_of_pages.append(1+i)
     rendertemplate = {'posts': posts, 'number_of_pages': number_of_pages, "bigimage": True}
     return render(request, 'blog/post_list.html', set_dict_for_render(rendertemplate, request))
@@ -48,23 +42,22 @@ def post_list_next(request, lk):
     if lk == 1:
         return redirect('post_list')
     if request.user.is_staff:
-        a = (len(Post.objects.filter(published_date__lte=timezone.now()) )- 1)//5
+        relative_number_of_pages = (len(Post.objects.filter(published_date__lte=timezone.now()) )- 1)//5
         posts = Post.objects.filter(published_date__lte=timezone.now()).order_by('published_date').reverse()
     else:
-        a = (len(Post.objects.filter(published_date__lte=timezone.now()).filter(status=False))- 1)//5
+        relative_number_of_pages = (len(Post.objects.filter(published_date__lte=timezone.now()).filter(status=False))- 1)//5
         posts = Post.objects.filter(published_date__lte=timezone.now()).order_by('published_date').reverse().filter(status=False)
     if (len(posts) - lk * 5) < 0:
         posts = posts[(lk-1)*5:]
     else:
         posts = posts[(lk-1) * 5:lk * 5]
-    
     number_of_pages = []
     for i in range(4):
         if lk-(4-i) > 0:
             number_of_pages.append(lk-(4-i))
 
     for i in range(4):
-        if lk + i < a + 2:
+        if lk + i < relative_number_of_pages + 2:
             number_of_pages.append(lk+i)
 
     rendertemplate = {'posts': posts, 'number_of_pages': number_of_pages}
@@ -82,16 +75,16 @@ def post_detail(request, pk):
             if i.user == request.user:
                 uservoted = True
     if request.method == "POST":
-        comment = Comment.objects.create(post = post)
-        if user.is_active:
-            comment.author = user.username
-            comment.photo_of_user = Profile.objects.get(user = request.user).photo
-        else:
-            comment.author =request.POST.get('author_of_comment')
-        comment.text = request.POST.get('text_of_comment')
-        comment.save()
-
-        return redirect('post_detail', pk=post.pk)
+        if request.POST.get("add_comment"):
+            comment = Comment.objects.create(post = post)
+            if user.is_active:
+                comment.author = user.username
+                comment.photo_of_user = Profile.objects.get(user = request.user).photo
+            else:
+                comment.author =request.POST.get('author_of_comment')
+            comment.text = request.POST.get('text_of_comment')
+            comment.save()
+            return redirect('post_detail', pk=post.pk)
     rendertemplate = {'post': post, 'user':user, 'survey': survey, 'uservoted': uservoted}
     return render(request, 'blog/post_detail.html', set_dict_for_render(rendertemplate, request))
 
@@ -103,7 +96,7 @@ def comment_remove(request, pk):
     comment = Comment.objects.get(pk=pk)
     comment.delete()
     return redirect('post_detail', pk=comment.post.pk)
-    
+
 @login_required
 def post_new(request):
     if not request.user.is_staff:
@@ -111,33 +104,27 @@ def post_new(request):
     if request.method == "POST":
         if request.POST.get("mybtn"):
             image = Image.objects.create(image = request.FILES.get('inpostphoto'))
-            rendertemplate = {'tposts' : top_posts, "post_new": True, 'post_cover':request.FILES.get('coverphoto'), 'post_text':request.POST.get("posttext"), "post_title":request.POST.get("title")}
+            if request.POST.get('status') == "on":
+                status = True;
+            else:
+                status = False;
+            rendertemplate = {"post_new": True, 'post_cover':request.FILES.get('coverphoto'), 'post_text':request.POST.get("posttext"), "post_title":request.POST.get("title"), 'post_status':status}
             return render(request, 'blog/post_edit.html', set_dict_for_render(rendertemplate, request))
         else: 
-            post = Post.objects.create(author = request.user)
-            post.text = request.POST.get("title", "")
-            post.published_date = timezone.now()
-            post.cover = request.FILES.get('coverphoto')
-            if request.POST.get('status') == "on":
-                post.status = True;
-            else:
-                post.status = False;
-            post.text = request.POST.get("posttext")
-            post.cover_text = post.text[0:240]
-            post.question = request.POST.get("question")
-            post.save()
-            a = 1
-            while a < int(request.POST.get("numberofvariants"))+1:
-                if request.POST.get("textofvariant" + str(a)) != None:
-                    survey = Survey.objects.create(post=post, variant = request.POST.get("textofvariant" + str(a)))
-                    if request.POST.get("typeofcheck") == 'radio':
-                        survey.typeofvote = True
-                    elif request.POST.get("typeofcheck") == "checkbox":
-                        survey.typeofvote = False
-                    survey.save()
-                a +=1
-            return redirect('post_detail', pk=post.pk)
-    rendertemplate = {'tposts' : top_posts, "post_new": True}
+            if request.POST.get("save_post"):
+                post = Post.objects.create(author = request.user)
+                post.title = request.POST.get("title", "Fără Titlu")
+                post.published_date = timezone.now()
+                post.cover = request.FILES.get('coverphoto')
+                if request.POST.get('status') == "on":
+                    post.status = True;
+                else:
+                    post.status = False;
+                post.text = request.POST.get("posttext")
+                post.question = request.POST.get("question")
+                post.save()
+                return redirect('post_detail', pk=post.pk)
+    rendertemplate = {"post_new": True}
     return render(request, 'blog/post_edit.html', set_dict_for_render(rendertemplate, request))
 
 @login_required
@@ -153,38 +140,41 @@ def post_edit(request, pk):
     if request.method == "POST":
         if request.POST.get("mybtn"):
             image = Image.objects.create(image = request.FILES.get('inpostphoto'))
-            rendertemplate = {'tposts' : top_posts, "post_new": True, 'post_cover':request.FILES.get('coverphoto', post.cover), 'post_text':request.POST.get("posttext"), "post_title":request.POST.get("title")}
+            if request.POST.get('status') == "on":
+                status = True;
+            else:
+                status = False;
+            rendertemplate = {"post_new": True, 'post_cover':request.FILES.get('coverphoto', post.cover), 'post_text':request.POST.get("posttext"), "post_title":request.POST.get("title"), 'post_status':status}
             return render(request, 'blog/post_edit.html', set_dict_for_render(rendertemplate, request))
         else: 
-            post.text = request.POST.get("title", "")
-            post.author = request.user
-            post.published_date = timezone.now()
-            post.cover = request.FILES.get('coverphoto', post.cover)
-            post.text = request.POST.get("posttext", "")
-            post.cover_text = post.text[0:240]
-            a = 1
-            nowadaysvariants = []
-            while a < int(request.POST.get("numberofvariants"))+1:
-                if request.POST.get("textofvariant" + str(a)) != None:
-                    survey, exist = Survey.objects.get_or_create(post=post, variant = request.POST.get("textofvariant" + str(a)))
-                    if request.POST.get("typeofcheck") == 'radio':
-                        survey.typeofvote = True
-                    elif request.POST.get("typeofcheck") == "checkbox":
-                        survey.typeofvote = False
-                    survey.save()
+            if request.POST.get("save_post"):
+                post.title = request.POST.get("title", "Fără Titlu")
+                post.author = request.user
+                post.cover = request.FILES.get('coverphoto', post.cover)
+                post.text = request.POST.get("posttext", "")
+                a = 1
+                nowadaysvariants = []
+                while a < int(request.POST.get("numberofvariants"))+1:
+                    if request.POST.get("textofvariant" + str(a)) != None:
+                        survey, exist = Survey.objects.get_or_create(post=post, variant = request.POST.get("textofvariant" + str(a)))
+                        if request.POST.get("typeofcheck") == 'radio':
+                            survey.typeofvote = True
+                        elif request.POST.get("typeofcheck") == "checkbox":
+                            survey.typeofvote = False
+                        survey.save()
                     nowadaysvariants.append(survey)
-                a +=1
-            for i in Survey.objects.filter(post = post):
-                if i not in nowadaysvariants:
-                    i.delete()
-            post.question = request.POST.get("question")
-            if request.POST.get('status') == "on":
-                post.status = True;
-            else:
-                post.status = False;
-            post.save()
-            return redirect('post_detail', pk=post.pk)
-    rendertemplate = {'post_cover':post.cover, "post_text":post.text, "post_status" :post.status, 'post': post, 'surveys': surveys,'surveytype':Survey.objects.filter(post=post)[0].typeofvote}
+                    a +=1
+                for i in Survey.objects.filter(post = post):
+                    if i not in nowadaysvariants:
+                        i.delete()
+                post.question = request.POST.get("question")
+                if request.POST.get('status') == "on":
+                    post.status = True;
+                else:
+                    post.status = False;
+                post.save()
+                return redirect('post_detail', pk=post.pk)
+    rendertemplate = {'post_cover':post.cover, 'post_question':post.question, "post_text":post.text, "post_status" :post.status,'post_title':post.title,'surveys': surveys,'surveytype':Survey.objects.filter(post=post)[0].typeofvote}
     return render(request, 'blog/post_edit.html', set_dict_for_render(rendertemplate, request))
 
 @login_required
@@ -193,9 +183,7 @@ def post_remove(request, pk):
         return HttpResponse(status=404)
     post = Post.objects.get(pk=pk)
     post.delete()
-    posts = Post.objects.filter(published_date__lte=timezone.now()).order_by('published_date')
     return redirect('post_list')
-    return render(request, 'blog/post_list.html', {'posts': posts})
 
     
 def user_login(request):
@@ -217,20 +205,22 @@ def register(request):
     if request.method == 'POST':
         for i in User.objects.all():
             if i.username == request.POST.get('username'):
-                return HttpResponse('This login is already occuped')
-        user = User.objects.create(username = request.POST.get('username'), first_name = request.POST.get('firstname'), email = request.POST.get('email'))
+                return HttpResponse('This login is taken')
         if request.POST.get('password') == request.POST.get('repeatedpassword'):
-            user.password = make_password(request.POST.get('repeatedpassword'))
-            user.date_joined = timezone.now()
-            user.save()
-            profile = Profile.objects.create(user=user)
-            profile.photo = request.FILES.get('userphoto')
-            profile.save()
-            theuser = authenticate(username=request.POST.get('username'), password=request.POST.get('password'))
-            login(request, theuser)
-            return redirect('post_list')
+            if len(request.POST.get('password')) >5:
+                user = User.objects.create(username = request.POST.get('username'), first_name = request.POST.get('firstname'), email = request.POST.get('email'))
+                user.password = make_password(request.POST.get('repeatedpassword'))
+                user.date_joined = timezone.now()
+                user.save()
+                profile = Profile.objects.create(user=user)
+                profile.photo = request.FILES.get('userphoto')
+                profile.save()
+                theuser = authenticate(username=request.POST.get('username'), password=request.POST.get('password'))
+                login(request, theuser)
+                return redirect('post_list')
+            else:
+                return HttpResponse('Password is weak')
         else:
-            user.delete()
             return HttpResponse('Passwords dont match')
     return render(request, 'blog/register.html')
 
@@ -267,18 +257,7 @@ def vote(request,pk):
                 survey.count = (len(Vote.objects.filter(variant= survey)))
                 survey.save()
                 vote.save()
-        
-    
     return redirect('post_detail', pk=pk)
-
-def menulogin(request):
-    user = authenticate(username=request.GET.get('menulogin'), password=request.GET.get('menupassword'))
-    if user is not None:
-        if user.is_active:
-            login(request, user)
-            return redirect('post_list')
-    else:
-        return render(request, 'blog/login.html', {'incorrect_login_or_password':True})
 
 @login_required
 def setusertheme(request, theme):
@@ -294,8 +273,8 @@ def ads_list(request):
     return render(request, 'blog/ads.html', {'ads_page':True, 'ads': Ad.objects.all()})
 
 def ad_new(request):
-    if request.user.is_staff:
-        return redirect('post_list')
+    if not request.user.is_staff:
+        return redirect('ads')
     if request.method == "POST":
         ad = Ad.objects.create()
         ad.text = request.POST.get('ad_text')
@@ -307,8 +286,8 @@ def ad_new(request):
     return render(request, 'blog/ad_edit.html', {'ads_page':True, 'ad_new':True})
 
 def ad_edit(request, pk):
-    if request.user.is_staff:
-        return redirect('post_list')
+    if not request.user.is_staff:
+        return redirect('ads')
     ad = Ad.objects.get(pk=pk)
     if request.method == "POST":
         ad.text = request.POST.get('ad_text')
@@ -319,8 +298,8 @@ def ad_edit(request, pk):
     return render(request, 'blog/ad_edit.html', {'ads_page':True, 'ad':ad})
 
 def ad_delete(request, pk):
-    if request.user.is_staff:
-        return redirect('post_list')
+    if not request.user.is_staff:
+        return redirect('ads')
     ad = Ad.objects.get(pk=pk)
     ad.delete()
     return redirect('ads')
