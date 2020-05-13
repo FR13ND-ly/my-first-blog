@@ -1,22 +1,32 @@
 {% extends 'blog/base.html' %}
 {% load static %}
 {% block content %}
-    <div class="post">
-        {% if post.published_date %}
-            
-        {% endif %}
-        
-    
-        <div class="post_detailed_container">
-        <h1 class="post_detailed_title">{{ post.title }}</h1>
-        <hr class="post_detailed_line" />
-        <p class="post_detailed_info">Date: {{ post.published_date }} | Author: {{post.author}} | Views: {{post.count_of_views}}</p>
-        <hr class="post_detailed_line" />
-        {% autoescape off %}
-        <div id="post_text" class="post_detailed_text" >{{ post.text|linebreaksbr }} </div>
+<div class="row" >
+    <div class="col s12 ">
+    <div class="card" style="padding: 2%;">
+        <div class="section">
+            <h4 >{{ post.title }}</h4>
+            <div class="divider"></div>
+            <p style="display: flex"><i class="material-icons tiny " style="line-height: inherit;padding-right: 0.5rem">access_time</i> {{ post.published_date }} |<i class="material-icons tiny" style="line-height: inherit;padding-right: 0.5rem;padding-left: 0.5rem">contacts</i> {{post.author}} |  {{post.count_of_views}} <i class="material-icons tiny " style="line-height: inherit;padding-left: 0.5rem">remove_red_eye</i></p>
+            <div class="divider"></div>
+        </div>{% autoescape off %}
+        <div id="post_text">{{ post.text|linebreaksbr }} </div>
         {% endautoescape %}
-        </div>
         {% if user.is_active %}
+        <div style="font-size: 28px; display: flex;"><a href="{% url 'add_like' pk=post.pk %}"><i class="material-icons red-text small" style="line-height: inherit;">favorite{% if not liked %}_border{% endif %}</i></a>{{ post.likes.count }}</div>
+        {% else %}
+        <div style="font-size: 28px; display: flex;"><i class="material-icons red-text small" style="line-height: inherit;" onclick="Materialize.toast('Need to login', 4000)">favorite_border</i>{{ post.likes.count }}</div>
+        {% endif %}
+        {% if user.is_staff %}
+        <a class="btn waves-effect waves-light  indigo darken-1" href="{% url 'post_edit' pk=post.pk %}">
+        <i class="material-icons">edit</i></a>
+        <a class="btn waves-effect waves-light  red darken-2" href="{% url 'post_remove' pk=post.pk %}">
+        <i class="material-icons">delete</i></a>
+{% endif %}
+        </div>
+   <!--     {% if user.is_active %}
+        <div class="col">
+        <div class="card">
             <form method="GET" action="vote">
             <p>{{post.question}}</p>
             {% for i in survey %}
@@ -30,6 +40,7 @@
                 <button class="btn btn-default" type="submit">Vote</button>
                 </form>
             {% endif %}
+        </div>
         
         {% else %}
         <p>{{post.question}}</p>
@@ -39,48 +50,118 @@
         <p>You already voted</p>
         <button class="btn btn-default" type="submit">Login</button>
         {% endif %}
-    </form>
-        
-        {% if user.is_staff %}
-     <a class="btn btn-default" href="{% url 'post_edit' pk=post.pk %}" style="border: 0px"><span class="glyphicon glyphicon-pencil"></span></a>
-     <a class="btn btn-default" href="{% url 'post_remove' pk=post.pk %}" style="border: 0px">Remove</a>
-{% endif %}
-<br>
-<p>There are: {{ post.likes.count }} likes</p>
-{% if user.is_active %}
-<a href="{% url 'add_like' pk=post.pk %}">Add like</a>
-{% endif %}
-<hr>
-<a class="btn btn-default" id="add_comment" onclick="add_comment()">Add comment</a>
+    </form> -->
+<p>{{ post.comments.count }} Comentarii</p> 
+<a class="btn center-align" id="add_comment" onclick="add_comment()">Lasă un comentariu</a>
 
 
-<div style="display: none" id="comment_form" >
+
+    <div class="row">
+        <div class="col s12" >
+            <div class="card" id="comment_form" style="display: none">
+                <form method="POST">
+                {% if user.is_active %}
+                <div class="card-content">
+                        {% csrf_token %}
+                        <div class="row">
+                            <h4 style="margin-left: 1.5%">{{ user.username }}</h4>
+                            <div class="input-field col s10">
+                                <input name="text_of_comment" id="author_of_comment" type="text" required>
+                                <label class="active" for="first_name2">Nume de utilizator</label>
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="card-content">
+                        <h5>Comentariu</h5>
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="input-field col s10">
+                                <input name="author_of_comment" id="author_of_comment" type="text" required>
+                                <label class="active" for="first_name2">Nume de utilizator</label>
+                            </div>
+                            <div class="input-field col s10">
+                                <input id="last_name" name="text_of_comment" type="text" required>
+                                <label for="last_name">Last Name</label>
+                            </div>
+                        </div>
+                    </div>                
+                {% endif %}
+                    <div class="card-action">
+                            <button class="btn-flat btn waves-effect waves-light white yellow-text text-darken-4" type="submit" value="add_comment" name="add_comment">Trimite <i class="material-icons right">send</i></button>
+                        </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- <div style="display: none" id="comment_form">
 <form method="POST" >{% csrf_token %}
-<img width="85px"; height="85px" align="left" class="comment_image_author" style="" src='http://127.0.0.1:8000/media/{{profile.photo|default:"/blog/static/media/746199.jpg"}}'> 
+<div class="card">
+    <div class="card-content">
 {% if not user.is_active %}
-<input id="author_of_comment" name="author_of_comment"><br>
-{% else %}
 <p>{{user.username}}</p>
+{% else %}
+<div class="input-field col s12">
+                <input name="logininput" id="author_of_comment" name="author_of_comment" type="text" {% if incorrect_login_or_password %} class="validate invalid {% endif %}">
+                <label class="active" for="first_name2">Numele de utilizator</label>
+            </div>
 {% endif %}
 
-<input id="text_of_comment" name="text_of_comment" placeholder="sd">
-<button type="submit" name="add_comment" value="add_comment" class="save btn btn-default" id="Append_comment" >Send</button>
+         <div class="input-field col s12">
+          <textarea id="text_of_comment" name="text_of_comment" id="textarea1" class="materialize-textarea"></textarea>
+          <label for="textarea1">Comentariu</label>
+        </div>   </div>
+        <div class="card-action">
+        <button class="btn waves-effect waves-light" type="submit" name="add_comment" value="add_comment"><i class="material-icons right">send</i></button>
+    </div>
 </form>
 </div>
-<p>There are: {{ post.comments.count }} Comments</p>
-{% for comment in post.comments.all %}
+</div> -->
 
-    <div class="comment">
-        {% if user.is_staff %}
-        <a class="btn btn-default" href="{% url 'comment_remove' pk=comment.pk %}"><span class="glyphicon glyphicon-remove"></span></a>
-        {% endif %}
-        <img width="85px"; height="85px" align="left" class="comment_image_author" src='http://127.0.0.1:8000/media/{{comment.photo_of_user|default:"/blog/static/media/746199.jpg"}}'> 
-        <div class="comment_date">{{ comment.created_date }}</div>
-        <strong>{{ comment.author }}</strong>
-        <p>{{ comment.text|linebreaks }}</p>
+{% for comment in post.comments.all %}
+<div class="col s12">
+    <div class="card horizontal">
+        <div class="card-stacked">
+            <div class="card-content">
+                <h5>{{ comment.author }}</h5>
+                <p>{{ comment.text|linebreaks }} </p>
+                <p class="right">{{ comment.created_date }}</p>
+                {% if user.is_staff %}
+                    <a class="btn-floating halfway-fab waves-effect waves-light red" href="{% url 'comment_remove' pk=comment.pk %}"><i class="material-icons">delete</i></a>
+                {% endif %}
+            </div>
+        </div>
     </div>
-{% empty %}
-    <p>Nici-un comentariu</p>
+</div>
 {% endfor %}
     </div>
     <script type="text/javascript" src="{% static 'js/post_detail.js' %}"></script>

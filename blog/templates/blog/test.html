@@ -1,0 +1,296 @@
+{% extends 'blog/base.html' %}
+{% load static %}
+{% block content %}
+<div class="card content" style="padding: 2%;">
+	<div class="row">
+		<div class="col s12">
+			<a class="btn col" style="margin-right: 0.5%; width: 7.1%" onclick="format('bold')"><i class="material-icons">format_bold</i></a>
+        	<a class="btn col" style="margin-right: 0.5%; width: 7.1%" onclick="format('italic')"><i class="material-icons">format_italic</i></a>
+	        <a class="btn col" style="margin-right: 0.5%; width: 7.1%" onclick="format('underline')"><i class="material-icons">format_underlined</i></a>
+	        <a class="btn col" style="margin-right: 0.5%; width: 7.1%" onclick="format('strikethrough')"><i class="material-icons">format_strikethrough</i></a>
+	        <a class="btn col" style="margin-right: 0.5%; width: 7.1%" onclick="format('justifyLeft')"><i class="material-icons">format_align_left</i></a>
+	        <a class="btn col" style="margin-right: 0.5%; width: 7.1%" onclick="format('justifyCenter')"><i class="material-icons">format_align_center</i></a>
+	        <a class="btn col" style="margin-right: 0.5%; width: 7.1%" onclick="format('justifyRight')"><i class="material-icons">format_align_right</i></a>
+	        <a class="btn col" style="margin-right: 0.5%; width: 7.1%" onclick="format('justifyFull')"><i class="material-icons">format_align_justify</i></a>
+	        <a class="btn col" style="margin-right: 0.5%; width: 7.1%" onclick="format('insertUnorderedList')"><i class="material-icons">format_list_bulleted</i></a>
+    	    <a class="btn col" style="margin-right: 0.5%; width: 7.1%" onclick="format('insertOrderedList')"><i class="material-icons">format_list_numbered</i></a>
+    	    <a class="btn col" style="margin-right: 0.5%; width: 7.1%" onclick="format('undo')"><i class="material-icons">undo</i></a>
+    	    <a class="btn col" style="margin-right: 0.5%; width: 7.1%" onclick="format('redo')"><i class="material-icons">redo</i></a>
+    	    <a class="btn col" style="margin-right: 0.5%; width: 7.1%" onclick="format('removeFormat')"><i class="material-icons">format_clear</i></a>
+		</div>
+
+		<div class="col s12">
+			<div class="input-field col s2" style="padding-left: 0">
+	        	<select onchange="format('forecolor',this[this.selectedIndex].value);this.selectedIndex=0;">
+        			<option selected hidden disabled>Culoarea Textului</option>
+	        		<option value="red">Roșu</option>
+    	    		<option value="blue">Albastru</option>
+        			<option value="green">Verde</option>
+        		</select>
+    		</div>
+
+    		<div class="input-field col s2">
+        		<select onchange="format('fontname',this[this.selectedIndex].value);this.selectedIndex=0;">
+	       			<option selected hidden>Font</option>
+    	    		<option value="Arial">Arial</option>
+        			<option value="Poppins">Poppins</option>
+	        		<option value="Impact">Impact</option>
+    	    		<option value="Times New Roman">Times New Roman</option>
+        			<option value="Courier New">Courier New</option>
+	        		<option value="Verdana">Verdana</option>
+   		    		<option value="Calibri">Calibri</option>
+        			<option value="Roboto">Roboto</option>
+        		</select>
+    		</div>
+
+    		<div class="input-field col s3">
+        		<select onchange="format('backcolor',this[this.selectedIndex].value);this.selectedIndex=0;">
+	    		    <option selected hidden>Culoarea Fundalului</option>
+    			    <option value="black">Negru</option>
+    			    <option value="white">Alb</option>
+    			    <option value="green">Verde</option>
+        		</select>
+        	</div>
+        	<div class="input-field col s2">
+
+        		<select onchange="format('formatblock',this[this.selectedIndex].value);this.selectedIndex=0;">
+
+        			<option selected hidden>Format</option>
+	        		<option value="h1"><h1>Title 1</h1></option>
+    	    		<option value="h2"><h2>Title 2</h2></option>
+        			<option value="h3"><h3>Title 3</h3></option>
+        			<option value="h4"><h4>Title 4</h4></option>
+        			<option value="h5"><h5>Title 5</h5></option>
+        			<option value="h6"><h6>Title 6</h6></option>
+        			<option value="p"><p>Paragraph</p></option>
+        			<option value="pre"><pre>Preformatat</pre></option>
+        		</select>
+        	</div>
+
+        	<div class="input-field col s3">
+            	<select onchange="format('fontsize',this[this.selectedIndex].value);this.selectedIndex=0;">
+                	<option selected hidden>Mărime Font</option>
+	                <option value="2">small</option>
+    	            <option value="4">normal</option>
+        	        <option value="6">big</option>
+            	</select>
+        	</div>
+    	</div>
+    	<div class="col s12 content">
+    		<a class="btn modal-trigger" onclick="format('removeFormat')" href="#modal1"><i class="material-icons">add_a_photo</i></a>
+    		<a class="btn" onclick="add_video()"><i class="material-icons">video_call</i></a>
+    		<a class="btn right"><i class="material-icons">code</i></a>
+    	</div>
+	</div>
+<form method="POST" enctype="multipart/form-data" target="hidden-iframe" id="add_image_form" onsubmit ="$('#modal1').modal('close'); $('#modal2').modal('open')">
+	{% csrf_token %}
+    <div id="modal1" class="modal">
+    	<div class="modal-content">
+    		
+      		<h4>Adaugă o fotografie</h4>
+      		<div class="file-field input-field">
+      			<div class="btn">
+        			<span >File</span>
+        			<input type="file" name="file" accept="image/*" oninput="first_stage_add_image()" id="file-input" required>
+      			</div>
+      		<div class="file-path-wrapper">
+        		<input class="file-path validate" type="text">
+      		</div>
+    	</div>
+    </div>
+    <div class="modal-footer">
+    	<a class="waves-effect waves-light btn left red" onclick="$('#modal1').modal('close')"><i class="material-icons">close</i></a>
+    	<button class="btn waves-effect waves-light"  type="submit" name="action">Submit
+    <i class="material-icons right">send</i></button>
+  </button>
+    </div>
+  </div>
+</form>
+
+<div id="modal2" class="modal modal-fixed-footer">
+    	<div class="modal-content">
+      		<h4>Ajustă imaginea</h4>
+      		<img class="responsive-img" id="representative-img">
+      		<div class="input-field col s6">
+                <input id="image_title" type="text">
+                <label class="active" for="image_title">Titlu</label>
+            </div>
+      		<h5>Aliniere</h5>
+      			<input class="with-gap" name="image_align" type="radio" value="left" id="align_left" checked />
+      			<label for="align_left"><i class="material-icons">format_align_left</i></label>
+      			<input class="with-gap" name="image_align" type="radio" value="center" id="align_center" />
+      			<label for="align_center"><i class="material-icons">format_align_center</i></label>
+      			<input class="with-gap" name="image_align" type="radio" value="right" id="align_right" />
+      			<label for="align_right"><i class="material-icons">format_align_right</i></label>
+      		<h5>Mărime</h5>
+      		<div class="input-field col s3">
+            	<select id="img_size_selector">
+	                <option value="30">Mică</option>
+    	            <option value="60" selected>Medie</option>
+    	            <option value="100">Întreg ecranul</option>
+        	        <option value="custom">Personalizată</option>
+            	</select>
+            	<div class="input-field col s6 hide">
+                	<input name="username" id="first_name1" type="text" class="validate">
+                	<label class="active" for="first_name1">Lungimea</label>
+            	</div>
+            	<div class="input-field col s6 hide">
+                	<input name="username" id="first_name1" type="text" class="validate">
+                	<label class="active" for="first_name1">Înălțimea</label>
+            	</div>
+        	</div>
+
+      		
+    	</div>
+    <div class="modal-footer">
+    	<a class="waves-effect waves-light btn left red" onclick="$('#modal2').modal('close')"><i class="material-icons">close</i></a>
+    	<a class="waves-effect waves-light btn green" onclick="second_stage_add_image();$('#modal2').modal('close')"><i class="material-icons">check</i></a>
+  </button>
+    </div>
+  </div>
+        
+        
+
+        
+	<div class="col s12">
+    <iframe class="text_input s12 z-depth-1" id="post_text" style="width: 100%; height: 400px">
+    	<!DOCTYPE html>
+    	<html>
+    	<head><link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"></head>
+    	<body></body>
+    	</html>
+    </iframe>
+</div>
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+        <script type="text/javascript">
+            $(document).ready(function() {
+                $('select').material_select();
+            });
+            $(document).ready(function(){
+    			$('.modal').modal();
+  			});
+  			$('.modal').modal({
+      			dismissible: false
+    		});
+        </script>
+
+<script type="text/javascript">
+	$(function(){
+     	$('form').on('submit', function(e){
+         	e.preventDefault();
+         	$.ajax({
+             	url: $(this).attr('action'),
+             	method: $(this).attr('method'),
+             	data: new FormData(this),
+             	cache: false,
+    			processData: false,
+    			contentType: false,
+             	success: function(data){ $('#target').html(data);}
+         	});
+     	});
+	});
+</script>
+
+<script type="text/javascript">
+	var post_text = window.frames[0].document.getElementsByTagName("body")[0];
+	var iframe_head = window.frames[0].document.getElementsByTagName("head")[0];
+	var material_icons = document.createElement('link');
+	var materialize = document.createElement('link');
+	var materialize_script = document.createElement('script');
+	materialize_script.src = "https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"
+	materialize.href = "https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css";
+	material_icons.href = "https://fonts.googleapis.com/icon?family=Material+Icons";
+	materialize.rel = 'stylesheet';
+	material_icons.rel = 'stylesheet';
+	iframe_head.appendChild(material_icons);
+	iframe_head.appendChild(materialize);
+	iframe_head.appendChild(materialize_script);
+	post_text.oninput = function(){
+		images = post_text.querySelectorAll('img[class="responsive-img"]');
+		for (i = 0; i<images.length; i++){
+			images[i].addEventListener("click", function(e){create_img_tools(e.target.id)}, 
+				true)
+		}
+	}	
+
+	window.frames[0].document.getElementsByTagName("body")[0].contentEditable = true;
+	img_size_selector = document.getElementById("img_size_selector");
+	img_title  = document.getElementById("image_title")
+	function first_stage_add_image(){
+		document.getElementById('representative-img').src= URL.createObjectURL(document.getElementById('file-input').files[0]);
+	}
+	function reset_add_image_menu(){
+		img_size_selector.selectedIndex = 1;
+		img_title.value = '';
+		$('#add_image_form').trigger("reset");
+		document.querySelector('input[name="image_align"][value ="left"]').checked = true;
+		
+	}
+
+	function second_stage_add_image(){
+        if(img_size_selector[img_size_selector.selectedIndex].value != 'custom'){
+        	size = img_size_selector[img_size_selector.selectedIndex].value;
+        	img_name = document.getElementById('file-input').files[0].name
+			code = "<img class='responsive-img' id='" + img_name + "' title='" + img_title.value +"' align='"+ document.querySelector('input[name="image_align"]:checked').value + "' style='width:"+ size + "%'  src='http://127.0.0.1:8000/media//blog/static/media/" + img_name + "'/>";
+		}
+		format('insertHTML', code);
+		console.log(code);
+		reset_add_image_menu()
+	}
+	
+	function create_img_tools(img){
+        var img_container = document.createElement('div');
+        img_container.id = img + 'container';
+        img_container.style = "position: relative;"
+        var remove_img_icon = document.createElement('i');
+        remove_img_icon.className = "material-icons";
+        remove_img_icon.innerHTML = 'delete';
+        var remove_img_tool = document.createElement('a');
+        remove_img_tool.className = "btn"
+        remove_img_tool.id = img + 'remove';
+        remove_img_tool.style = "position:absolute; top:1%; right:1%;"
+        var edit_img_icon = document.createElement('i');
+        edit_img_icon.className = "material-icons"
+        edit_img_icon.innerHTML = 'edit'
+        var edit_img_tool = document.createElement('a');
+        edit_img_tool.className="btn"
+        edit_img_tool.id = img + 'edit';
+        edit_img_tool.style = "position:absolute; top:1%; right:1%;"
+        edit_img_tool.appendChild(edit_img_icon)
+        remove_img_tool.appendChild(remove_img_icon)
+        image = window.frames[0].document.getElementById(img);
+        image.insertAdjacentElement("beforebegin", img_container);
+        img_container.appendChild(image);
+        img_container.appendChild(remove_img_tool);
+        img_container.appendChild(edit_img_tool);
+    }
+	function add_video(){
+		var video = prompt("Inserează link-ul la video");
+		alert(video)
+		if (video == null) {
+    		Materialize.toast('Acest link nu este valid');
+  		}
+  		else {
+  			format('insertHTML', video);
+  		}
+	}
+	function format(a,b){
+		window.frames[0].document.execCommand(a, false,b);
+		window.frames[0].focus();
+	}
+</script>
+{% endblock %}

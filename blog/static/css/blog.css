@@ -1,14 +1,8 @@
-.register_file_input {
-
-}
-
 .big_image_title {
-    font-family: 'Poppins',sans-serif; 
     white-space: nowrap;overflow: 
     hidden;text-overflow: ellipsis;
     margin-left: 10px;color:#fff;
     position: absolute;
-    font-size: 64px; 
     display: inline-block; 
     top:350; 
     left: 50
@@ -30,14 +24,13 @@
 }
 
 .footer {
-    background-color:#329D9C;
+    background-color: #3e72a0;
     color: #fff;
     flex-shrink: 0; 
     padding: 5px;
 }
 
 .top_post_title {
-    font-family: 'Poppins',sans-serif; 
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -51,7 +44,11 @@
     margin-bottom: 15px; 
     object-fit: cover;
     overflow: hidden; 
-    border-radius: 15px;
+    border-radius: 2px;
+}
+
+.hidden {
+    display: none;
 }
 
 .top_post_image {
@@ -93,26 +90,30 @@
     margin-right: 1%; 
     margin-top: 9px; 
     height: 485px;
+    box-shadow: 0px 0px 30px -10px;
 }
 
 .user_menu {
     z-index: 9999; 
-    position: fixed; 
+    display: none;
+  /*   position: fixed;
+    
     margin-left: 80%; 
     background-color: #fff; 
     margin-top: 110px; 
     border: 2px solid;
     border-radius: 5px; 
     padding: 20px; 
-    display: none;
+     */
 }
-.user-image {
+.user_image {
     border:3px solid;
     border-radius: 100px; 
     position:relative;
     object-fit: cover;
     overflow: hidden;
     cursor: pointer;
+    margin-top: 2%; 
 }
 body{
     display: flex;
@@ -121,7 +122,7 @@ body{
 }
 
 .page-header {
-    background-color:#329D9C;
+    background-color:#3e72a0;
     margin-top:-10px; 
     margin-bottom: 5px;
     padding: 20px 20px 20px 40px;
@@ -179,15 +180,21 @@ h1, h2, h3, h4 {
     font-family: 'Poppins', sans-serif;
 }
 
-.text-input {
+.text_input, .hidden_text_input{
     overflow: auto;
-    width: 120vh;
-    height : 50vh;
     border:1px solid #ccc; 
     border-radius: 5px; 
     margin-bottom: 20px;  
     resize: none; 
     font-size:18px
+}
+
+.hidden_text_input {
+    display: none;
+}
+
+.text_input {
+    display: block;
 }
 
 .post-form textarea, .post-form input {
@@ -249,6 +256,19 @@ h1, h2, h3, h4 {
     margin-right: -180px;
 }
 
+.post_detailed {
+    margin-bottom: 40px;
+    display: absolute; 
+    margin-bottom: 20px;
+    background-color: #f2f2f2; 
+    border-radius: 5px; 
+    margin-right: -180px; 
+    padding-left: 15px; 
+    padding-top: 1px;
+    padding-bottom: 8px;
+    box-shadow: 0px 0px 30px -10px;
+}
+
 .post_date {
     max-height: :5px; 
     margin-top: -10px; 
@@ -280,9 +300,12 @@ h1, h2, h3, h4 {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis; 
+    margin-top: 15px;
 }
 
 .post_image {
+    width: 185px;
+    height: 185px;
     border:1px solid #ccc;
     position:relative;
     margin-top: 10px; 
@@ -293,7 +316,7 @@ h1, h2, h3, h4 {
 }
 
 .post {
-    margin-bottom: 70px;
+    margin-bottom: 40px;
     display: absolute; 
     margin-bottom: 20px;
     background-color: #f2f2f2; 
@@ -301,6 +324,8 @@ h1, h2, h3, h4 {
     margin-right: -180px; 
     padding-left: 15px; 
     padding-top: 1px;
+    padding-bottom: 8px;
+    box-shadow: 0px 0px 30px -10px;
 }
 
 .post h1 a, .post h1 a:visited {

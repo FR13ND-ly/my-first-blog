@@ -3,39 +3,57 @@
 
 
 {% block content %}
- 
-    <div onmouseover="make_visible_tools_of_big_image()" onmouseout="make_hidden_tools_of_big_image()">
-    {% if bigimage %}
-    {% for post in posts %}
-        <div style="position: initial;" id="post{{post.index}}">
-        <a href="{% url 'post_detail' pk=post.pk %}">
-        <img width="930px" height="485px" class="big_image_photo" src='http://127.0.0.1:8000/media/{{post.cover}}'>
-        <h1 class="big_image_title" >{{ post.title }}</h1></a>
+{% if bigimage %}
+    <div class="row">
+    <div class="col s12 valign-wrapper" style="width: 100%;">
+        {% for post in posts %}
+      <div class="big-image card hide" id="post{{post.index}}" style="height: 546px" onmouseover="visible_big_image_change({{post.index}})" onmouseout="hidden_big_image_change({{post.index}})">
+        <div class="card-image " style="height: 460px">
+          <a href="{% url 'post_detail' pk=post.pk %}"><img src="http://127.0.0.1:8000/media/{{post.cover}}" style="object-fit: cover; overflow: hidden;height:460px"></a>
+          <span class="card-title">{{ post.title }}</span>
+          <span onclick="next_big_image({{post.index}})" id="previous_big_image{{post.index}}" style="display: none;"><i class="material-icons large" style="color:#fff;font-size: 900%; cursor: pointer; right: 2%; position: absolute; top:40%" >arrow_forward</i></span>
+          <span onclick="previous_big_image({{post.index}})" id="next_big_image{{post.index}}" style="display: none; "><i class="material-icons large" style="color:#fff;font-size: 900%; cursor: pointer; left: 2%; position: absolute; top:40%" >arrow_back</i></span>
+        {% if user.is_staff %}  <a href="{% url 'post_edit' pk=post.pk %}" class="btn-floating btn-large halfway-fab waves-effect waves-light "><i class="material-icons">edit</i></a>  {% endif %}
         </div>
-    {% endfor %}
-     <a class="change_big_image_button" style="left: 50;" id="previous_big_image" onclick="previous_big_image()"><</a>
-        <a class="change_big_image_button" style="right: -120;" id="next_big_image" onclick="next_big_image()">></a>
-    </div>
-    {% endif %}
-        {% for post in posts %} 
-            <div class="post">
-            <img width="185px"; height="185px" class="post_image" align="left" src='http://127.0.0.1:8000/media/{{post.cover}}'> 
-            <h1 class="post_title" style=""><a style="margin-left: 10px;color:#56C596;" href="{% url 'post_detail' pk=post.pk %}">{% if post.status %}<mark>Schiță: </mark>{% endif %}{{ post.title }}</a></h1>
-            <hr size="2" align="left" width="300" class="post_line"></hr>
-            <p id="paragraph" class="post_text">{{ post.text|striptags|linebreaksbr|truncatewords:50 }} <a href="{% url 'post_detail' pk=post.pk %}">Read More</a></p>
-            
-            <hr size="2" align="left" width="300" class="post_line" ></hr>
-            <p class="date" class="post_date">
+       <a href="{% url 'post_detail' pk=post.pk %}"> <div class="card-content">
+          <p style="color:#000">{{ post.text|striptags|linebreaksbr|truncatewords:30 }}</p>
+        </div></a>
 
-                {{ post.published_date }} | {{post.author}} | views: {{post.count_of_views}}
-            </p>
+      </div>
+        {% endfor %}
+    </div>
+    
+  </div>
+{% endif %}
+    {% for post in posts %}
+    <div class="col s12 m12">
+            <div class="card horizontal hoverable">
+                <div class="card-image valign-wrapper">
+                    <img src="http://127.0.0.1:8000/media/{{post.cover}}" style="width: 150px; height: 250px; object-fit: cover; overflow: hidden;">
+                </div>
+                <div class="card-stacked">
+                    <div class="card-content " >
+                        <a href="{% url 'post_detail' pk=post.pk %}" style="color:#000">
+                        <div class="section">
+                        <h5>{{ post.title }}</h5>
+                        <p>{{ post.text|striptags|linebreaksbr|truncatewords:40 }}</p>
+                    </div>
+                        <div class="divider"></div>
+                        <div class="section">
+                        <p style="display: flex"><i class="material-icons red-text tiny black-text" style="line-height: inherit;padding-right: 0.5rem">access_time</i> {{ post.published_date }} |<i class="material-icons red-text tiny black-text" style="line-height: inherit;padding-right: 0.5rem;padding-left: 0.5rem">contacts</i> {{post.author}} |  {{post.count_of_views}} <i class="material-icons red-text tiny black-text" style="line-height: inherit;padding-left: 0.5rem">remove_red_eye</i></p></div>
+                        </a>
+                    </div>
+                </div>
+                {% if user.is_staff%}  
+                {% endif %}
             </div>
-
-        {% endfor %}
-    <div class="list_of_pages">
+        
+    </div> 
+    {% endfor %}
+    <ul class="list_of_pages pagination">
         {% for i in number_of_pages %}
-            <a href="{% url 'choose_page' lk=i %}"> {{i}} </a>
+            <li class="waves-effect {% if i == current_page %} active blue darken-3{% endif %}"><a href="{% url 'choose_page' lk=i %}"> {{i}} </a></li>
         {% endfor %}
-    </div>
+    </ul>
     <script type="text/javascript" src="{% static 'js/post_list.js' %}"></script>
 {% endblock %}

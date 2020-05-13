@@ -1,77 +1,135 @@
 {% load static %}
+<!DOCTYPE html>
 <html>
     <head>
-        <title>Est-Curier</title>
-        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
-        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
         <link href="https://fonts.googleapis.com/css?family=Poppins&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+        <link type="text/css" rel="stylesheet" href="{% static 'css/materialize.min.css' %}"  media="screen,projection"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        {% if profile.darktheme %} 
+        <link rel="stylesheet" href="{% static 'css/darkblog.css' %}"> 
+        {% else %}
         <link rel="stylesheet" href="{% static 'css/blog.css' %}">
-
+        {% endif %}
+        <title>Est-Curier</title>
     </head>
 
-    <body {% if profile.darktheme %} class="body_dark_theme" {% endif %} onload=" {% if post_new %} putrandomsurvey() {% endif %}" onscroll ="document.getElementById('usermenu').style.display = 'none'">
-     <div style="flex-grow: 1;">
-
-        <div class="page-header">
-            {% if user.is_staff %}
-            <a href="{% if ads_page %} {% url 'new_ad' %} {% else %} {% url 'post_new' %} {% endif %}" class="top-menu"><span class="glyphicon glyphicon-plus"></span></a>
-            {% endif %}
-            {% if user.is_active %}
-            <img width="90" height="90" align="right" class="user_image" src='http://127.0.0.1:8000/media/{{profile.photo|default:"/blog/static/media/746199.jpg"}}' onclick="makevisibleusermenu()">
-            <div id='usermenu' class="user_menu" style="">
-                <h2 align="center">{{user.username}}</h2>
-                <p>Temă:
-            {% if profile.darktheme %}
-                <a href="{% url 'setusertheme' theme=0 %}"><button >De zi</button></a>
-            {% else%}
-                <a href="{% url 'setusertheme' theme=1 %}"><button>De noapte</button></a></p> 
-            {% endif %}    
-                <br><a href="{% url 'logout' %}" >Deloghează-te</a>
-                
-            </div>
-            {% else %}
-            <img width="90" height="90" align="right" class="user_image" src='http://127.0.0.1:8000/media/{{profile.photo|default:"/blog/static/media/2446756_0.jpg"}}' onclick="makevisibleusermenu()">
-            <div id='usermenu' class="user_menu">
-                <h2 align="center">Oaspete</h2>
-                <form method="POST" action="/login/">
-                    {% csrf_token %}
-                <input type="" name="logininput" placeholder="Login-ul"><br>
-                <input type="password" name="passwordinput" placeholder="Parola"><br>
-                <button type="submit">Loghează-te</button>
-                </form>
-                <a href="/register">Înregistrează-te</a>
-            </div>
-            {% endif %}
-
-            <h1><a {% if ads_page %} href="/ads">Est-Curier<div style="color:red; display: inline;">Ads</div>{% else %}href="/">Est-Curier{% endif %}</a></h1>
-        </div>
-        {% if tposts %}
-        <div class="top_posts" >
-                        <h1 class="top_posts_title">Top articole</h1>
-                        <hr style="margin-top: 10px; margin-bottom: 30px;" />
-                        {% for tpost in tposts %}
-                        <div class="top_post_container">
-                        <img align="left" class="top_post_image" src='http://127.0.0.1:8000/media/{{tpost.cover}}'>
-                        <h2 align="left" class="top_post_title" style=""><a href="{% url 'post_detail' pk=tpost.pk %}">
-                        {{ tpost.title }}</a></h2>
-                        <p>{{ tpost.count_of_views}} views</p>
-                      </div>
-                        {% endfor %}
-                        </div>{% endif %}    
-        <div class="content container">
-
-            <div class="row">
-                
-                    <div class="col-md-8">
-                         
-                        {% block content %}
-                        {% endblock %}
+    <body onload=" {% if post_new %} putrandomsurvey() {% endif %}" style="display: flex">
+    <header><div>
+       <nav class="nav-extended" >
+    <div class="nav-wrapper light-blue darken-4">
+        <a href="/" class="brand-logo center">Est Curier</a>
+        <ul id="nav-mobile" class="left hide-on-med-and-down ">
+            <li><i class="material-icons" style="font-size: 60px; cursor: pointer; margin-left: 12%" onclick="makevisibleusermenu()">account_circle</i></li>
+        </ul>
+      <ul class="right hide-on-med-and-down white-text flow-text ">
+        <li>{% if user.is_staff %} <a class="btn waves-effect waves-light green darken-1" href="{% if ads_page %}{% url 'new_ad' %} {% else %} /post/new {% endif %}">
+        <i class="material-icons">add</i></a> {% endif %}</li>
+        <li><a href="/ads">Publicitate</a></li>
+      </ul>
+    </div>
+  </nav></div></header>
+    <div class="row user_menu pinned" id="usermenu">
+        <div class="col s6 m12">
+            <div class="card">
+                {% if user.is_active %}
+                <div class="card-content">
+                    <div class="row">
+                        <h3 class="center-align">{{ user.username }}</h3>
+                        <p class="center-align">{% if user.is_staff %}Administrator{% else %}Utilizator{% endif %}</p>
                     </div>
+                </div>
+                    <div class="card-action">
+                        <a href="{% url 'logout' %}" class="yellow-text text-darken-4"><button type="button" class="btn-flat btn waves-effect waves-light white yellow-text text-darken-4">Deloghează-te</button></a>
+                    </div>
+                {% else %}
+                <form method="POST" action="/login/">
+                    <div class="card-content">
+                        <h4>Conectare</h4>
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="input-field col s10">
+                                <input name="logininput" type="text" >
+                                <label class="active" for="first_name2">Nume de utilizator</label>
+                            </div>
+                            <div class="input-field col s10">
+                                <input name="passwordinput" type="password">
+                                <label class="active" for="first_name2">First Name</label>
+                            </div>
+                        </div>
+                    </div>
+                        <div class="card-action">
+                            <button class="btn-flat btn waves-effect waves-light white yellow-text text-darken-4" type="submit" name="action">Loghează-te</button>
+                            <a href="/register" class="yellow-text text-darken-4"><button type="button" class="btn-flat btn waves-effect waves-light white yellow-text text-darken-4">Înregistrează-te</button></a>
+                        </div>
+                </form>
+                {% endif %}
             </div>
         </div>
     </div>
-        <div id="footer" class="footer">© Est-Curier LLC, Toate drepturile sunt privatizate </div>
+    {% if tposts %}
+    <ul class="collection show-on-large card" style="border:none;position: absolute; right: 1%; width:25%; height: 88%; padding:10px; margin-top: 5.5%">
+        <div class="section" style="margin-bottom: 5%">
+        <li><h3 class="collection-item" align="center" style="padding-top: 10%;">Top Articole</h3></li>
+    </div>
+    {% for post in tposts %}
+        <li style="margin:2%"><a href="{% url 'post_detail' pk=post.pk %}">
+    <div class="card horizontal valign-wrapper hoverable" style="height: 130px">
+      <div class="card-image">
+        <img src="http://127.0.0.1:8000/media/{{post.cover}}" style="width: 60px; height: 130px; max-height: 146px; object-fit: cover; overflow: hidden;">
+      </div>
+      <div class="card-stacked">
+        <div class="card-content" style="color:#000">
+        <div class="section">
+          <p style="font-size: 16px;" >{{ post.title }}</p>
+      </div>
+          <div class="divider"></div>
+          <div class="section">
+          <p class="right" style="display: flex;">{{post.count_of_views}} <i class="material-icons red-text tiny black-text" style="line-height: inherit;padding-left: 0.3rem">remove_red_eye</i></p></div>
+        </div>
+      </div>
+    </div>
+        </a></li>
+    {% endfor %}
+        
+    </ul>
+    {% endif %}
+        <div class="content container">
+                
+                    <div class="col-md-8">
+                        {% block content %}
+                        {% endblock %}
+                    </div>
+        </div>
+    </div>
+    <footer class="page-footer  light-blue darken-4">
+          <div class="container">
+            <div class="row">
+              <div class="col l6 s12">
+                <h5 class="white-text">Est Curier</h5>
+                <p class="grey-text text-lighten-4">Ziarul cu care stai de vorbă și în care poți avea încredere</p>
+              </div>
+              <div class="col l4 offset-l2 s12">
+                <h5 class="white-text">Rețele Sociale</h5>
+                <ul>
+                  <li><a class="grey-text text-lighten-3" href="https://www.facebook.com/Est-Curier-Criuleni-1498073250508795/">Facebook</a></li>
+                  <li><a class="grey-text text-lighten-3" href="https://www.youtube.com/channel/UCflgGBMYMLcveK-xoX_RipA">YouTube</a></li>
+                  <li><a class="grey-text text-lighten-3" href="https://www.instagram.com/estcurier/">Instagram</a></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div class="footer-copyright">
+            <div class="container">
+            © 2020 Est Curier. All Rights Reserved.
+            <p class="grey-text text-lighten-4 right" href="#!">Support: estcuriercriuleni@gmail.com</p>
+            </div>
+          </div>
+        </footer>
     </body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
+
     <script type="text/javascript" src="{% static 'js/base.js' %}"></script>
-    
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script type="text/javascript" src="{% static 'js/materialize.min.js' %}"></script>
 </html>

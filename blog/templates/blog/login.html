@@ -1,17 +1,21 @@
 {% extends 'blog/base.html' %}
 {% block title %}Log-in{% endblock %}
 {% block content %}
-    <h1>Log-in</h1>
-    <p>Please, use the following form to log-in:</p>
-    {% if incorrect_login_or_password %}
-    <p>Incorrect login or password</p>
-    {% endif %}
+    <h3>Conectare</h3>
     <form action="." method="post">{% csrf_token %}
-        <input name="logininput" placeholder="Numele de profil" required><br>
-        <input type="password" name="passwordinput" placeholder="Parola">
-        
-        <p><input type="submit" value="Log-in"></p>
-        <a href="{% url 'social:begin' 'facebook' %}">Sign in with Facebook</a>
-        <a href="{% url 'social:begin' 'google' %}">Login with Google</a>
+        <div class="row">
+            <div class="input-field col s6">
+                <input name="logininput" type="text" {% if incorrect_login_or_password %} class="validate invalid {% endif %}">
+                <label class="active" for="first_name2">Numele de utilizator</label>
+            </div>
+        </div>
+        <div class="row">
+            <div class="input-field col s6">
+                <input name="passwordinput" type="password" {% if incorrect_login_or_password %} class="validate invalid" {% endif %}>
+                <label class="active" for="first_name2">Parola</label>
+            </div>
+        </div>
+        <button id="registersubmit" class="btn waves-effect waves-light" type="submit" value="Log-in" >Loghează-te
+        </button>
     </form>
 {% endblock %}

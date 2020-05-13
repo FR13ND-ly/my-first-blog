@@ -16,14 +16,14 @@ set_post_code_like_text();
 function set_text_or_code(type){
     set_text_or_code_btn = document.getElementById("set_text_or_code_btn");
     if (Boolean(Number(type))){
-        text_of_post_input.style.display = 'none';
-        code_part_of_post.style.display = 'block';
+        text_of_post_input.className = "hidden_text_input";
+        code_part_of_post.className= 'text_input';
         set_text_or_code_btn.innerHTML = "Text";
         set_text_or_code_btn.value = 0;
     }
     else {
-        text_of_post_input.style.display = 'block';
-        code_part_of_post.style.display = 'none';
+        text_of_post_input.className = "text_input";
+        code_part_of_post.className = "hidden_text_input";
         set_text_or_code_btn.innerHTML = "Cod";
         set_text_or_code_btn.value = 1;
     }
@@ -195,7 +195,7 @@ function edit_img_menu(edit_image=false){
             img_width = 150;
             img_height = 150;
         }
-         if(img_size_selector[img_size_selector.selectedIndex].value == 'normal'){
+        if(img_size_selector[img_size_selector.selectedIndex].value == 'normal'){
             img_width = 300;
             img_height= 200;
         }

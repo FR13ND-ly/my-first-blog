@@ -3,7 +3,7 @@ from django.utils import timezone
 from datetime import timedelta
 from .models import Post, Comment, Profile, Like, Survey, Vote, Ad, Image
 from django.http import HttpResponse
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, AnonymousUser
 from django.shortcuts import render, get_object_or_404
 from django.shortcuts import redirect
 from django.contrib.auth.decorators import login_required
@@ -13,7 +13,7 @@ from django.contrib import messages
 from django.contrib.auth.hashers import make_password
 
 def set_dict_for_render(rdict, request):
-    rdict.update({'tposts' : Post.objects.filter(published_date__lte=timezone.now()).order_by('count_of_views').reverse().filter(status=False)[0:4]})
+    rdict.update({'tposts' : Post.objects.filter(published_date__lte=timezone.now()).order_by('count_of_views').reverse().filter(status=False)[0:3]})
     if request.user.is_active:
         profile = Profile.objects.get(user = request.user)
         rdict.update({'profile':profile})
@@ -35,7 +35,7 @@ def post_list(request):
     for i in range(8):
         if 1 + i < relative_number_of_pages + 2:
             number_of_pages.append(1+i)
-    rendertemplate = {'posts': posts, 'number_of_pages': number_of_pages, "bigimage": True}
+    rendertemplate = {'posts': posts, 'number_of_pages': number_of_pages, "bigimage": True, "current_page":1}
     return render(request, 'blog/post_list.html', set_dict_for_render(rendertemplate, request))
 
 def post_list_next(request, lk):
@@ -59,8 +59,8 @@ def post_list_next(request, lk):
     for i in range(4):
         if lk + i < relative_number_of_pages + 2:
             number_of_pages.append(lk+i)
-
-    rendertemplate = {'posts': posts, 'number_of_pages': number_of_pages}
+    print(lk)
+    rendertemplate = {'posts': posts, 'number_of_pages': number_of_pages, "current_page":lk}
     return render(request, 'blog/post_list.html', set_dict_for_render(rendertemplate, request))
 
 def post_detail(request, pk):
@@ -68,6 +68,10 @@ def post_detail(request, pk):
     post.count_of_views += 1
     post.save()
     user = request.user
+    if user.is_active:
+        liked = bool(Like.objects.filter(author=user, post=post))
+    else:
+        liked = False
     survey = Survey.objects.filter(post=post)
     uservoted = False
     for variant in survey:
@@ -85,7 +89,7 @@ def post_detail(request, pk):
             comment.text = request.POST.get('text_of_comment')
             comment.save()
             return redirect('post_detail', pk=post.pk)
-    rendertemplate = {'post': post, 'user':user, 'survey': survey, 'uservoted': uservoted}
+    rendertemplate = {'post': post, 'user':user, 'survey': survey, 'uservoted': uservoted, "liked":liked}
     return render(request, 'blog/post_detail.html', set_dict_for_render(rendertemplate, request))
 
 
@@ -303,3 +307,9 @@ def ad_delete(request, pk):
     ad = Ad.objects.get(pk=pk)
     ad.delete()
     return redirect('ads')
+
+def test_page(request):
+    if request.method == "POST":
+        new_image = Image.objects.create(image=request.FILES.get('file'))
+        new_image.save()
+    return render(request, 'blog/test.html')

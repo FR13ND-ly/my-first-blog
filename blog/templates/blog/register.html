@@ -1,23 +1,45 @@
 {% extends "blog/base.html" %}
-
+{% load static %}
 {% block title %}Create an account{% endblock %}
 
 {% block content %}
-    <h1>Creează un profil</h1>
+    <h3>Creează un profil</h3>
     <form action="." method="post" enctype="multipart/form-data".>
-        {% if error %}
-            <p>{{error}}}</p>
-        {% endif %}
-        <input name="username" placeholder="Numele de profil" required><br>
-    	<input name="firstname" placeholder="Numele real" required><br>
-    	<input type="email" name="email" placeholder="Email" required><br>
-    	<input type="password" name="password" id="passwordinput" placeholder="Parola" required><br>
-    	<input type="password" name="repeatedpassword" id="repeatpasswordinput" placeholder="Repetați parola" required>
-    	<input id="userphoto" type="file" accept=".jpg, .png, .jpeg" name="userphoto" style="display: none">
-        <label for="userphoto" class="file_input">Fotografie de profil</label>
-        {% csrf_token %}<br>
-        <input type="checkbox" oninput="document.getElementById('registersubmit').disabled = !this.checked">Sunt deacord cu Termenii de licență
-        <p><input type="submit" id="registersubmit" value="Continuă" disabled></p>
+        <div class="row">
+            <div class="input-field col s6">
+                <input name="username" id="first_name1" type="text" class="validate" required>
+                <label class="active" for="first_name1">Nume de utilizator</label>
+            </div>
+            <div class="input-field col s6">
+                <input name="firstname" id="first_name2" type="text" class="validate" required>
+                <label class="active" for="first_name2">Numele vostru</label>
+            </div>
+            <div class="input-field col s12">
+            <input name="email" id="email" type="email" class="validate">
+            <label for="email">Email</label>
+            </div>
+            <div class="input-field col s6">
+                <input name="password" id="password1" type="password" class="validate" required>
+                <label class="active" for="first_name2" data-error="Parola trebuie să conțină cel puțin 6 simboluri">Parola</label>
+            </div>
+            <div class="input-field col s6">
+                <input name="repeatedpassword" id="password2" type="password" class="validate" required>
+                <label class="active" for="first_name2" data-error="Parola nu coincide">Repetați parola</label>
+            </div>
+        
+    <!--	<input id="userphoto" type="file" accept=".jpg, .png, .jpeg" name="userphoto" style="display: none">
+        <label for="userphoto" class="file_input">Fotografie de profil</label> -->
+        {% csrf_token %}
+        </div>
+        <p>
+      <input type="checkbox" class="filled-in" id="filled-in-box" oninput="document.getElementById('registersubmit').disabled = !this.checked" required/>
+      <label for="filled-in-box">Sunt deacord cu Termenii de licență</label>
+    </p>
+        <input type="checkbox" ><br>
+        <button id="registersubmit" class="btn waves-effect waves-light" type="submit" name="action" disabled>Submit
+            <i class="material-icons right">send</i>
+        </button>
     </form>
+    <script type="text/javascript" src="{% static 'js/register.js' %}"></script>
     	
 {% endblock %}

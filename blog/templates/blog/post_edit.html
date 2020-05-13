@@ -2,15 +2,9 @@
 {% load static %}
 {% block content %}
 
-    <h1 style="font-family: 'Poppins', sans-serif;">New post</h1>
+    <h3 style="font-family: 'Poppins', sans-serif;">New post</h3>
         <button style="padding: 5px; border-radius: 5px; border: 1px solid #ccc; background-color: #f2f2f2;color: #666; font-family: 'Poppins', sans-serif;" onclick="f('bold')"><b>bold</b></button>
         <button style="padding: 5px; border-radius: 5px; border: 1px solid #ccc; background-color: #f2f2f2;color: #666; font-family: 'Poppins', sans-serif;" onclick="f('italic')"><i>cursiv</i></button>
-        <select style="padding: 4px; border-radius: 5px; border: 1px solid #ccc; background-color: #f2f2f2;color: #666; font-family: 'Poppins', sans-serif;"onchange="f('fontsize',this[this.selectedIndex].value);this.selectedIndex=0;">
-        <option selected hidden>font size</option>
-        <option style="background-color: #f2f2f2;color: #666; font-family: 'Poppins', sans-serif;" value="2">small</option>
-        <option style="background-color: #f2f2f2;color: #666; font-family: 'Poppins', sans-serif;" value="4">normal</option>
-        <option style="background-color: #f2f2f2;color: #666; font-family: 'Poppins', sans-serif;" value="6">big</option>
-        </select>
         <select style="padding: 4px; border-radius: 5px; border: 1px solid #ccc; background-color: #f2f2f2;color: #666; font-family: 'Poppins', sans-serif;"onchange="f('forecolor',this[this.selectedIndex].value);this.selectedIndex=0;">
         <option selected hidden>color</option>
         <option style="background-color: #f2f2f2;color: #666; font-family: 'Poppins', sans-serif;color: red;" value="red">Red</option>
@@ -80,16 +74,58 @@
         <input id="file-in-article-input" class="photoinpost" type="file" accept=".jpg, .png, .jpeg" name="inpostphoto" style="display: none" oninput="edit_img_menu(false)" >
         <label for="file-in-article-input" id="coverforinput" style="padding: 5px; border-radius: 5px; border: 1px solid #ccc; background-color: #f2f2f2;color: #666; font-family: 'Poppins', sans-serif;">Add photo</label>
         </div>
+         <!--   <button type="button" value="1" class="btn" id="set_text_or_code_btn" align='right' onclick="set_text_or_code(this.value)">Cod</button> -->
         
         {{ form.as_p }}
-        
-        <h2>Text</h2>
         {% autoescape off %}
-        <input type="" name="title" placeholder="Titlu" value="{{post_title}}">
-        <button type="button" value="1" id="set_text_or_code_btn" align='right' onclick="set_text_or_code(this.value)">Cod</button>
-        <textarea id="code_part_of_post" name="posttext" onchange="set_post_text_like_code()" class="text_input"></textarea>
-        
-        <div id="visual_part_of_post" contenteditable="True" name="div" id="post_text" class="text_input" oninput="set_post_code_like_text(); " required>{{post_text}}</div>
+    <div class="row">
+        <div class="input-field col s11">
+            <input name="title" type="text" value="{{post_title}}">
+            <label class="active" for="first_name2">Title</label>
+        </div>
+        <div class="input-field col s11">
+            <textarea id="code_part_of_post" name="posttext" onchange="set_post_text_like_code()" class="hidden_text_input"></textarea>
+        </div>
+  
+    
+     <div class="row">
+        <div class="input-field col s2">
+            <select onchange="f('fontsize',this[this.selectedIndex].value);this.selectedIndex=0;">
+                <option selected hidden>font size</option>
+                <option value="2">small</option>
+                <option value="4">normal</option>
+                <option value="6">big</option>
+            </select>
+        </div>
+        <a class="waves-effect waves-light btn col" onclick="f('bold')"><i class="material-icons">format_bold</i></a>
+        <a class="waves-effect waves-light btn col" onclick="f('italic')"><i class="material-icons">format_italic</i></a>
+        <a class="waves-effect waves-light btn col" onclick="f('underline')"><i class="material-icons">format_underlined</i></a>
+        <a class="waves-effect waves-light btn col" onclick="f('strikethrough')"><i class="material-icons">format_strikethrough</i></a>
+        <a class="waves-effect waves-light btn col" onclick="f('removeFormat')"><i class="material-icons">format_clear</i></a>
+        <a class="waves-effect waves-light btn col" onclick="f('justifyLeft')"><i class="material-icons">format_align_left</i></a>
+        <a class="waves-effect waves-light btn col" onclick="f('justifyCenter')"><i class="material-icons">format_align_center</i></a>
+        <a class="waves-effect waves-light btn col" onclick="f('justifyRight')"><i class="material-icons">format_align_right</i></a>
+        <a class="waves-effect waves-light btn col" onclick="f('justifyFull')"><i class="material-icons">format_align_justify</i></a>
+        <a class="waves-effect waves-light btn col" onclick="f('insertUnorderedList')"><i class="material-icons">format_list_bulleted</i></a>
+        <a class="waves-effect waves-light btn col" onclick="f('insertOrderedList')"><i class="material-icons">format_list_numbered</i></a>
+        <a class="waves-effect waves-light btn col" onclick="f('outdent')"><i class="material-icons">format_quote</i></a>
+        <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
+         <textarea id="mytextarea">Hello, World!</textarea>
+    </div>
+        <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+        <script>
+      tinymce.init({
+        selector: '#mytextarea'
+      });
+    </script>
+        <script type="text/javascript">
+             $(document).ready(function() {
+                $('select').material_select();
+            });
+        </script>
+        <textarea id="code_part_of_post" name="posttext" onchange="set_post_text_like_code()" class="hidden_text_input"></textarea>
+        <div class="input-field col s11">
+        <div id="visual_part_of_post s11" contenteditable="True" name="div" id="post_text" class="text_input" oninput="set_post_code_like_text(); " style="height: 25rem" required>{{post_text}}</div></div>
         {% endautoescape %}
         
 
@@ -119,5 +155,6 @@
     	<h3 >Current Cover:</h3>
     	<img id = "post_cover" width="185px"; height="185px" align="left" class="post_representative_img" src=" http://127.0.0.1:8000/media/{{post_cover}} ">
     	</section>
+    </div>
         <script type="text/javascript" src="{% static 'js/post_edit.js' %}"></script>
 {% endblock %}
