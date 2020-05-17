@@ -14,9 +14,9 @@
         <title>Est-Curier</title>
     </head>
 
-    <body onload=" {% if post_new %} putrandomsurvey() {% endif %}" style="display: flex">
+    <body style="display: flex">
     <header><div>
-       <nav class="nav-extended" >
+       <nav>
     <div class="nav-wrapper light-blue darken-4">
         <a href="/" class="brand-logo center">Est Curier</a>
         <ul id="nav-mobile" class="left hide-on-med-and-down ">
@@ -29,8 +29,8 @@
       </ul>
     </div>
   </nav></div></header>
-    <div class="row user_menu pinned" id="usermenu">
-        <div class="col s6 m12">
+    <div class="row pinned hide" style="z-index:100;margin-top: 4.9%" id="usermenu">
+        <div class="col s12 m12">
             <div class="card">
                 {% if user.is_active %}
                 <div class="card-content">

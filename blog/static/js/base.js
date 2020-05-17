@@ -1,9 +1,9 @@
 function makevisibleusermenu(){
     var usermenu = document.getElementById('usermenu');
-    if (usermenu.style.display != 'none'){
-        usermenu.style.display = 'none';
+    if (usermenu.className == 'row pinned hide'){
+        usermenu.className = 'row pinned ';
     }
     else{
-        usermenu.style.display = 'block';
+        usermenu.className = 'row pinned hide';
     }
 }

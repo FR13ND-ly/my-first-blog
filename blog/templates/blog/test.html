@@ -144,26 +144,11 @@
     	</div>
     <div class="modal-footer">
     	<a class="waves-effect waves-light btn left red" onclick="$('#modal2').modal('close')"><i class="material-icons">close</i></a>
-    	<a class="waves-effect waves-light btn green" onclick="second_stage_add_image();$('#modal2').modal('close')"><i class="material-icons">check</i></a>
+    	<a class="waves-effect waves-light btn green" id="add_img" onclick="second_stage_add_image();$('#modal2').modal('close')"><i class="material-icons">check</i></a>
+    	<a class="waves-effect waves-light btn green" id="edit_img" onclick="second_stage_edit_img(this.value)" value=''><i class="material-icons">check</i></a>
   </button>
     </div>
   </div>
-        
-        <style type="text/css">
-        	.img_tools_container {
-        		position: absolute;
-  				top: 0;
-  				bottom: 0;
-  				left: 0;
-  				right: 0;
-  				text-align: center;
-        	}
-        	.img_tools_container:before{
-        		content:'';
-        		display: block;
-        	}
-        </style>
-
         
 	<div class="col s12">
     <iframe class="text_input s12 z-depth-1" id="post_text" style="width: 100%; height: 400px">
@@ -173,7 +158,11 @@
 </div>
 
 
+<style type="text/css">
+	.responsive-img::before{
 
+	}
+</style>
 
 
 
@@ -229,6 +218,8 @@
 	iframe_head.appendChild(materialize_script);
 	width_container = document.getElementById('width_container');
 	height_container = document.getElementById('height_container');
+	var add_img = document.getElementById('add_img');
+	var edit_img = document.getElementById('edit_img');
 	function size_change(){
 		if(img_size_selector[img_size_selector.selectedIndex].value == 'custom'){
 			width_container.className = "input-field col s6";
@@ -253,27 +244,27 @@
 	img_title  = document.getElementById("image_title")
 	function first_stage_add_image(){
 		document.getElementById('representative-img').src= URL.createObjectURL(document.getElementById('file-input').files[0]);
+		add_img.className = 'waves-effect waves-light btn green';
+		edit_img.className = 'waves-effect waves-light btn green hide';
 	}
 	function reset_add_image_menu(){
 		img_size_selector.selectedIndex = 1;
 		size_change();
 		img_title.value = '';
 		$('#add_image_form').trigger("reset");
-		document.querySelector('input[name="image_align"][value ="left"]').checked = true;
-		
+		document.querySelector('input[name="image_align"][value ="left"]').checked = true;	
 	}
 
 	function second_stage_add_image(){
 		img_name = document.getElementById('file-input').files[0].name
         if(img_size_selector[img_size_selector.selectedIndex].value != 'custom'){
         	size = img_size_selector[img_size_selector.selectedIndex].value;
-			code = "<img class='responsive-img' id='" + img_name + "' title='" + img_title.value +"' align='"+ document.querySelector('input[name="image_align"]:checked').value + "' style='position:relative;z-index:-5;width:" + size + "%'  src='http://127.0.0.1:8000/media//blog/static/media/" + img_name + "'/>";
+			code = "<img class='responsive-img' id='" + img_name + "' title='" + img_title.value +"' align='"+ document.querySelector('input[name="image_align"]:checked').value + "' style='position:relative; width:" + size + "%'  src='http://127.0.0.1:8000/media//blog/static/media/" + img_name + "'/>";
 		}
 		else{
 			code = "<img style='object-fit: cover; overflow: hidden;' id='" + img_name + "' title='" + img_title.value +"' align='"+ document.querySelector('input[name="image_align"]:checked').value + "' width='"+ document.getElementById('width_input').value + "' height='"+ document.getElementById('height_input').value+"' src='http://127.0.0.1:8000/media//blog/static/media/" + img_name + "'/>";
 		}
 		format('insertHTML', code);
-		console.log(code);
 		reset_add_image_menu()
 	}
 	function remove_img_tools(img){
@@ -283,14 +274,31 @@
     	img_container.insertAdjacentElement("beforebegin", image);
     	img_container.remove();
 	}
-	function edit_img(img){
+	function first_stage_edit_img(img){
 		image = window.frames[0].document.getElementById(img)
 		document.getElementById('representative-img').src= image.src;
 		img_title.value = image.title;
 		document.querySelector('input[name="image_align"][value ="'+ image.align+ '"]').checked = true;
 		$('#modal2').modal('open');
+		add_img.className = 'waves-effect waves-light btn green hide';
+		edit_img.value = img;
+		edit_img.className = 'waves-effect waves-light btn green';
 	}
 
+	function second_stage_edit_img(img){
+		image = window.frames[0].document.getElementById(img);
+		image.align = document.querySelector('input[name="image_align"]:checked').value;
+		image.title = img_title.value;
+		if (img_size_selector[img_size_selector.selectedIndex].value != 'custom') {
+			image.style.width = img_size_selector[img_size_selector.selectedIndex].value + '%';
+		}
+		else{
+			image.style.width = width_input.value;
+			image.style.height = height_input.value;
+		}
+		$('#modal2').modal('close');
+		reset_add_image_menu()
+	}
 	function create_img_tools(img){
         var img_container = document.createElement('div');
         img_container.id = img + 'container';
@@ -300,7 +308,7 @@
         }
         img_tools_container = document.createElement('div');
         img_tools_container.id = img + 'tools_container';
-        img_tools_container.style = "position:absolute; z-index: 10"
+        img_tools_container.style = "position:absolute; z-index: 10;"
         img_tools_container.className = "img_tools_container"
         var remove_img_icon = document.createElement('i');
         remove_img_icon.className = "material-icons";
@@ -320,7 +328,7 @@
         edit_img_tool.id = img + 'edit';
         edit_img_tool.style = 'position:relative'
         edit_img_tool.onclick= function(){
-        	edit_img(img);
+        	first_stage_edit_img(img);
         }
         edit_img_tool.appendChild(edit_img_icon)
         remove_img_tool.appendChild(remove_img_icon)
