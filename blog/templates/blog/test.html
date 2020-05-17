@@ -124,18 +124,18 @@
       			<label for="align_right"><i class="material-icons">format_align_right</i></label>
       		<h5>Mărime</h5>
       		<div class="input-field col s3">
-            	<select id="img_size_selector">
+            	<select id="img_size_selector" onchange="size_change()">
 	                <option value="30">Mică</option>
     	            <option value="60" selected>Medie</option>
     	            <option value="100">Întreg ecranul</option>
         	        <option value="custom">Personalizată</option>
             	</select>
-            	<div class="input-field col s6 hide">
-                	<input name="username" id="first_name1" type="text" class="validate">
+            	<div class="input-field col s6 hide" id="width_container">
+                	<input id="width_input" type="text" >
                 	<label class="active" for="first_name1">Lungimea</label>
             	</div>
-            	<div class="input-field col s6 hide">
-                	<input name="username" id="first_name1" type="text" class="validate">
+            	<div class="input-field col s6 hide" id="height_container">
+                	<input id="height_input" type="text" >
                 	<label class="active" for="first_name1">Înălțimea</label>
             	</div>
         	</div>
@@ -149,16 +149,24 @@
     </div>
   </div>
         
-        
+        <style type="text/css">
+        	.img_tools_container {
+        		position: absolute;
+  				top: 0;
+  				bottom: 0;
+  				left: 0;
+  				right: 0;
+  				text-align: center;
+        	}
+        	.img_tools_container:before{
+        		content:'';
+        		display: block;
+        	}
+        </style>
 
         
 	<div class="col s12">
     <iframe class="text_input s12 z-depth-1" id="post_text" style="width: 100%; height: 400px">
-    	<!DOCTYPE html>
-    	<html>
-    	<head><link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"></head>
-    	<body></body>
-    	</html>
     </iframe>
 </div>
 
@@ -219,6 +227,19 @@
 	iframe_head.appendChild(material_icons);
 	iframe_head.appendChild(materialize);
 	iframe_head.appendChild(materialize_script);
+	width_container = document.getElementById('width_container');
+	height_container = document.getElementById('height_container');
+	function size_change(){
+		if(img_size_selector[img_size_selector.selectedIndex].value == 'custom'){
+			width_container.className = "input-field col s6";
+			height_container.className = "input-field col s6"
+		}
+		else {
+			width_container.className = "input-field col s6 hide";
+			height_container.className = "input-field col s6 hide"
+		}
+	}
+
 	post_text.oninput = function(){
 		images = post_text.querySelectorAll('img[class="responsive-img"]');
 		for (i = 0; i<images.length; i++){
@@ -235,6 +256,7 @@
 	}
 	function reset_add_image_menu(){
 		img_size_selector.selectedIndex = 1;
+		size_change();
 		img_title.value = '';
 		$('#add_image_form').trigger("reset");
 		document.querySelector('input[name="image_align"][value ="left"]').checked = true;
@@ -242,41 +264,72 @@
 	}
 
 	function second_stage_add_image(){
+		img_name = document.getElementById('file-input').files[0].name
         if(img_size_selector[img_size_selector.selectedIndex].value != 'custom'){
         	size = img_size_selector[img_size_selector.selectedIndex].value;
-        	img_name = document.getElementById('file-input').files[0].name
-			code = "<img class='responsive-img' id='" + img_name + "' title='" + img_title.value +"' align='"+ document.querySelector('input[name="image_align"]:checked').value + "' style='width:"+ size + "%'  src='http://127.0.0.1:8000/media//blog/static/media/" + img_name + "'/>";
+			code = "<img class='responsive-img' id='" + img_name + "' title='" + img_title.value +"' align='"+ document.querySelector('input[name="image_align"]:checked').value + "' style='position:relative;z-index:-5;width:" + size + "%'  src='http://127.0.0.1:8000/media//blog/static/media/" + img_name + "'/>";
+		}
+		else{
+			code = "<img style='object-fit: cover; overflow: hidden;' id='" + img_name + "' title='" + img_title.value +"' align='"+ document.querySelector('input[name="image_align"]:checked').value + "' width='"+ document.getElementById('width_input').value + "' height='"+ document.getElementById('height_input').value+"' src='http://127.0.0.1:8000/media//blog/static/media/" + img_name + "'/>";
 		}
 		format('insertHTML', code);
 		console.log(code);
 		reset_add_image_menu()
 	}
-	
+	function remove_img_tools(img){
+		window.frames[0].document.getElementById(img + 'tools_container').remove();
+    	img_container = window.frames[0].document.getElementById(img + 'container');
+    	image = window.frames[0].document.getElementById(img);
+    	img_container.insertAdjacentElement("beforebegin", image);
+    	img_container.remove();
+	}
+	function edit_img(img){
+		image = window.frames[0].document.getElementById(img)
+		document.getElementById('representative-img').src= image.src;
+		img_title.value = image.title;
+		document.querySelector('input[name="image_align"][value ="'+ image.align+ '"]').checked = true;
+		$('#modal2').modal('open');
+	}
+
 	function create_img_tools(img){
         var img_container = document.createElement('div');
         img_container.id = img + 'container';
         img_container.style = "position: relative;"
+        img_container.onmouseleave=function(){
+        	remove_img_tools(img);
+        }
+        img_tools_container = document.createElement('div');
+        img_tools_container.id = img + 'tools_container';
+        img_tools_container.style = "position:absolute; z-index: 10"
+        img_tools_container.className = "img_tools_container"
         var remove_img_icon = document.createElement('i');
         remove_img_icon.className = "material-icons";
         remove_img_icon.innerHTML = 'delete';
         var remove_img_tool = document.createElement('a');
         remove_img_tool.className = "btn"
         remove_img_tool.id = img + 'remove';
-        remove_img_tool.style = "position:absolute; top:1%; right:1%;"
+        remove_img_tool.style = 'position:relative'
+        remove_img_tool.onclick = function(){
+        	img_container.remove();
+        }
         var edit_img_icon = document.createElement('i');
         edit_img_icon.className = "material-icons"
         edit_img_icon.innerHTML = 'edit'
         var edit_img_tool = document.createElement('a');
         edit_img_tool.className="btn"
         edit_img_tool.id = img + 'edit';
-        edit_img_tool.style = "position:absolute; top:1%; right:1%;"
+        edit_img_tool.style = 'position:relative'
+        edit_img_tool.onclick= function(){
+        	edit_img(img);
+        }
         edit_img_tool.appendChild(edit_img_icon)
         remove_img_tool.appendChild(remove_img_icon)
         image = window.frames[0].document.getElementById(img);
         image.insertAdjacentElement("beforebegin", img_container);
+        img_container.appendChild(img_tools_container);
+        img_tools_container.appendChild(remove_img_tool);
+        img_tools_container.appendChild(edit_img_tool);
         img_container.appendChild(image);
-        img_container.appendChild(remove_img_tool);
-        img_container.appendChild(edit_img_tool);
     }
 	function add_video(){
 		var video = prompt("Inserează link-ul la video");
