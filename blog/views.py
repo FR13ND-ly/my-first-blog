@@ -15,7 +15,7 @@ from django.contrib.auth.hashers import make_password
 def set_dict_for_render(rdict, request):
     rdict.update({'tposts' : Post.objects.filter(published_date__lte=timezone.now()).order_by('count_of_views').reverse().filter(status=False)[0:3]})
     if request.user.is_active:
-        profile = Profile.objects.get(user = request.user)
+        profile = Profile.objects.get_or_create(user = request.user)
         rdict.update({'profile':profile})
     return rdict
     
@@ -103,31 +103,30 @@ def comment_remove(request, pk):
 
 @login_required
 def post_new(request):
-    if not request.user.is_staff:
-        return HttpResponse(status=404)
-    if request.method == "POST":
-        if request.POST.get("mybtn"):
-            image = Image.objects.create(image = request.FILES.get('inpostphoto'))
-            if request.POST.get('status') == "on":
-                status = True;
+    if request.method == "POST" and request.POST.get("save_post"):
+        post = Post.objects.create(author = request.user)
+        post.title = request.POST.get("title", "Fără Titlu")
+        post.published_date = timezone.now()
+        post.cover = request.FILES.get('coverphoto')
+        if request.POST.get('status') == "on":
+            post.status = True;
+        else:
+            post.status = False;
+        if request.POST.get('survey_is_present') == "on":
+            post.question = request.POST.get('survey_question')
+            post.survey_is_present = True
+            if request.POST.get('type_of_vote') == "on":
+                post.type_of_vote = True
             else:
-                status = False;
-            rendertemplate = {"post_new": True, 'post_cover':request.FILES.get('coverphoto'), 'post_text':request.POST.get("posttext"), "post_title":request.POST.get("title"), 'post_status':status}
-            return render(request, 'blog/post_edit.html', set_dict_for_render(rendertemplate, request))
-        else: 
-            if request.POST.get("save_post"):
-                post = Post.objects.create(author = request.user)
-                post.title = request.POST.get("title", "Fără Titlu")
-                post.published_date = timezone.now()
-                post.cover = request.FILES.get('coverphoto')
-                if request.POST.get('status') == "on":
-                    post.status = True;
-                else:
-                    post.status = False;
-                post.text = request.POST.get("posttext")
-                post.question = request.POST.get("question")
-                post.save()
-                return redirect('post_detail', pk=post.pk)
+                post.type_of_vote = False
+            for i in request.POST.getlist('variant_of_survey'):
+                if i != '':
+                    survey = Survey.objects.create(post=post, variant=i)
+                    survey.save()
+
+            post.text = request.POST.get("posttext")
+            post.save()
+            return redirect('post_detail', pk=post.pk)
     rendertemplate = {"post_new": True}
     return render(request, 'blog/post_edit.html', set_dict_for_render(rendertemplate, request))
 
@@ -142,16 +141,7 @@ def post_edit(request, pk):
         surveys.update({i.variant:a})
         a += 1
     if request.method == "POST":
-        if request.POST.get("mybtn"):
-            image = Image.objects.create(image = request.FILES.get('inpostphoto'))
-            if request.POST.get('status') == "on":
-                status = True;
-            else:
-                status = False;
-            rendertemplate = {"post_new": True, 'post_cover':request.FILES.get('coverphoto', post.cover), 'post_text':request.POST.get("posttext"), "post_title":request.POST.get("title"), 'post_status':status}
-            return render(request, 'blog/post_edit.html', set_dict_for_render(rendertemplate, request))
-        else: 
-            if request.POST.get("save_post"):
+        if request.POST.get("save_post"):
                 post.title = request.POST.get("title", "Fără Titlu")
                 post.author = request.user
                 post.cover = request.FILES.get('coverphoto', post.cover)
@@ -178,7 +168,7 @@ def post_edit(request, pk):
                     post.status = False;
                 post.save()
                 return redirect('post_detail', pk=post.pk)
-    rendertemplate = {'post_cover':post.cover, 'post_question':post.question, "post_text":post.text, "post_status" :post.status,'post_title':post.title,'surveys': surveys,'surveytype':Survey.objects.filter(post=post)[0].typeofvote}
+    rendertemplate = {'post':post,'surveys': surveys,'surveytype':Survey.objects.filter(post=post)[0].typeofvote}
     return render(request, 'blog/post_edit.html', set_dict_for_render(rendertemplate, request))
 
 @login_required
@@ -246,21 +236,35 @@ def add_like(request, pk):
 @login_required
 def vote(request,pk):
     post = Post.objects.get(pk=pk)
-    surveyofpost = Survey.objects.filter(post=post)
-    if surveyofpost[0].typeofvote:
-        survey = Survey.objects.get(post = post, variant = request.GET.get('value'))
+    survey_of_post = Survey.objects.filter(post=post)
+    if post.type_of_vote:
+        survey = Survey.objects.get(post = post, variant = request.POST.get('variant'))
         vote = Vote.objects.create(variant = survey, user = request.user)
-        survey.count = (len(Vote.objects.filter(variant= survey)))
-        survey.save()
         vote.save()
+        survey.count = (len(Vote.objects.filter(variant= survey)));
+        survey.save()
     else:
-        for i in surveyofpost:
-            if request.GET.get(i.variant) == 'on':
-                survey = Survey.objects.get(post = post, variant = i.variant)
-                vote = Vote.objects.create(variant = survey, user = request.user)
-                survey.count = (len(Vote.objects.filter(variant= survey)))
-                survey.save()
-                vote.save()
+        for i in request.POST.getlist('variant'):
+            survey = Survey.objects.get(post = post, variant = i)
+            vote = Vote.objects.create(variant = survey, user = request.user)
+            vote.save()
+            survey.count = (len(Vote.objects.filter(variant= survey)));
+            survey.save()
+ #   surveyofpost = Survey.objects.filter(post=post)
+  #  if surveyofpost[0].typeofvote:
+   #     survey = Survey.objects.get(post = post, variant = request.GET.get('value'))
+    #    vote = Vote.objects.create(variant = survey, user = request.user)
+    #    survey.count = (len(Vote.objects.filter(variant= survey)))
+    #    survey.save()
+    #    vote.save()
+  #  else:
+   #     for i in surveyofpost:
+    #        if request.GET.get(i.variant) == 'on':
+     #           survey = Survey.objects.get(post = post, variant = i.variant)
+      #          vote = Vote.objects.create(variant = survey, user = request.user)
+       #         survey.count = (len(Vote.objects.filter(variant= survey)))
+        #        survey.save()
+         #       vote.save()
     return redirect('post_detail', pk=pk)
 
 @login_required

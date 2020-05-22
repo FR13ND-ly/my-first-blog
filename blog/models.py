@@ -15,7 +15,9 @@ class Post(models.Model):
     inpostphotos = models.ImageField(upload_to="blog/static/media/",null=True, blank=True)
     created_date = models.DateTimeField(default=timezone.now)
     published_date = models.DateTimeField(blank=True, null=True)
-    question = models.CharField(max_length=200, default=True)
+    survey_is_present = models.BooleanField(default=False)
+    question = models.CharField(max_length=200, blank=True, null=True)
+    type_of_vote = models.BooleanField(default=True)
 
     def publish(self):
         self.published_date = timezone.now()
@@ -49,7 +51,6 @@ class Like(models.Model):
 
 class Survey(models.Model):
     post = models.ForeignKey('blog.Post', on_delete=models.CASCADE, related_name='survey', null=True)
-    typeofvote = models.BooleanField(default=False)
     variant = models.CharField(max_length=200)
     count = models.PositiveIntegerField(default=0)
 

@@ -1,160 +1,474 @@
 {% extends 'blog/base.html' %}
 {% load static %}
 {% block content %}
+<form method="POST" class="post-form" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="card">
+        <div class="card-content" style="padding: 2%;">
+            <div class="row">
+                <h3 class="col">Adaugă un articol</h3>
+                <div class="input-field col s12">
+                    <input name="title" type="text" value="{{post_title}}" required>
+                    <label class="active" for="first_name2">Titlu</label>
+                </div>
+                <div class="col s12">
+                    <a class="btn col" style="margin-right: 0.5%; width: 7.1%" onclick="format('bold')"><i class="material-icons">format_bold</i></a>
+                    <a class="btn col" style="margin-right: 0.5%; width: 7.1%" onclick="format('italic')"><i class="material-icons">format_italic</i></a>
+                    <a class="btn col" style="margin-right: 0.5%; width: 7.1%" onclick="format('underline')"><i class="material-icons">format_underlined</i></a>
+                    <a class="btn col" style="margin-right: 0.5%; width: 7.1%" onclick="format('strikethrough')"><i class="material-icons">format_strikethrough</i></a>
+                    <a class="btn col" style="margin-right: 0.5%; width: 7.1%" onclick="format('justifyLeft')"><i class="material-icons">format_align_left</i></a>
+                    <a class="btn col" style="margin-right: 0.5%; width: 7.1%" onclick="format('justifyCenter')"><i class="material-icons">format_align_center</i></a>
+                    <a class="btn col" style="margin-right: 0.5%; width: 7.1%" onclick="format('justifyRight')"><i class="material-icons">format_align_right</i></a>
+                    <a class="btn col" style="margin-right: 0.5%; width: 7.1%" onclick="format('justifyFull')"><i class="material-icons">format_align_justify</i></a>
+                    <a class="btn col" style="margin-right: 0.5%; width: 7.1%" onclick="format('insertUnorderedList')"><i class="material-icons">format_list_bulleted</i></a>
+                    <a class="btn col" style="margin-right: 0.5%; width: 7.1%" onclick="format('insertOrderedList')"><i class="material-icons">format_list_numbered</i></a>
+                    <a class="btn col" style="margin-right: 0.5%; width: 7.1%" onclick="format('undo')"><i class="material-icons">undo</i></a>
+                    <a class="btn col" style="margin-right: 0.5%; width: 7.1%" onclick="format('redo')"><i class="material-icons">redo</i></a>
+                    <a class="btn col" style="margin-right: 0.5%; width: 7.1%" onclick="format('removeFormat')"><i class="material-icons">format_clear</i></a>
+                </div>
 
-    <h3 style="font-family: 'Poppins', sans-serif;">New post</h3>
-        <button style="padding: 5px; border-radius: 5px; border: 1px solid #ccc; background-color: #f2f2f2;color: #666; font-family: 'Poppins', sans-serif;" onclick="f('bold')"><b>bold</b></button>
-        <button style="padding: 5px; border-radius: 5px; border: 1px solid #ccc; background-color: #f2f2f2;color: #666; font-family: 'Poppins', sans-serif;" onclick="f('italic')"><i>cursiv</i></button>
-        <select style="padding: 4px; border-radius: 5px; border: 1px solid #ccc; background-color: #f2f2f2;color: #666; font-family: 'Poppins', sans-serif;"onchange="f('forecolor',this[this.selectedIndex].value);this.selectedIndex=0;">
-        <option selected hidden>color</option>
-        <option style="background-color: #f2f2f2;color: #666; font-family: 'Poppins', sans-serif;color: red;" value="red">Red</option>
-        <option style="background-color: #f2f2f2;color: #666; font-family: 'Poppins', sans-serif;color: blue;" value="blue">Blue</option>
-        <option style="background-color: #f2f2f2;color: #666; font-family: 'Poppins', sans-serif;color: green;" value="green">Green</option>
-        </select>
-        <select style="padding: 4px; border-radius: 5px; border: 1px solid #ccc; background-color: #f2f2f2;color: #666; font-family: 'Poppins', sans-serif;"onchange="f('fontname',this[this.selectedIndex].value);this.selectedIndex=0;">
-        <option selected hidden>font name</option>
-        <option style="background-color: #f2f2f2;color: #666; font-family: 'Arial', sans-serif;" value="Arial">Arial</option>
-        <option style="background-color: #f2f2f2;color: #666; font-family: 'Poppins', sans-serif;" value="Poppins">Poppins</option>
-        <option style="background-color: #f2f2f2;color: #666; font-family: 'Impact', sans-serif;" value="Impact">Impact</option>
-        <option style="background-color: #f2f2f2;color: #666; font-family: 'Times New Roman', sans-serif;" value="Times New Roman">Times New Roman</option>
-        <option style="background-color: #f2f2f2;color: #666; font-family: 'Courier New', sans-serif;" value="Courier New">Courier New</option>
-        <option style="background-color: #f2f2f2;color: #666; font-family: 'Verdana', sans-serif;" value="Verdana">Verdana</option>
-        <option style="background-color: #f2f2f2;color: #666; font-family: 'Calibri', sans-serif;" value="Calibri">Calibri</option>
-        </select>
-        <select style="padding: 4px; border-radius: 5px; border: 1px solid #ccc; background-color: #f2f2f2;color: #666; font-family: 'Poppins', sans-serif;"onchange="f('backcolor',this[this.selectedIndex].value);this.selectedIndex=0;">
-        <option selected hidden>font size</option>
-        <option style="background-color: #f2f2f2;color: #666; font-family: 'Poppins', sans-serif;" value="black">black</option>
-        <option style="background-color: #f2f2f2;color: #666; font-family: 'Poppins', sans-serif;" value="white">white</option>
-        <option style="background-color: #f2f2f2;color: #666; font-family: 'Poppins', sans-serif;" value="green">green</option>
-        </select>
-        <select style="padding: 4px; border-radius: 5px; border: 1px solid #ccc; background-color: #f2f2f2;color: #666; font-family: 'Poppins', sans-serif;"onchange="f('formatblock',this[this.selectedIndex].value);this.selectedIndex=0;">
-        <option selected hidden>Format</option>
-        <option style="background-color: #f2f2f2;color: #666; font-family: 'Poppins', sans-serif;font-size:36px" value="h1"><h1>Title 1</h1></option>
-        <option style="background-color: #f2f2f2;color: #666; font-family: 'Poppins', sans-serif;font-size:24px" value="h2"><h2>Title 2</h2></option>
-        <option style="background-color: #f2f2f2;color: #666; font-family: 'Poppins', sans-serif;font-size:18px" value="h3"><h3>Title 3</h3></option>
-        <option style="background-color: #f2f2f2;color: #666; font-family: 'Poppins', sans-serif;" value="h4"><h4>Title 4</h4></option>
-        <option style="background-color: #f2f2f2;color: #666; font-family: 'Poppins', sans-serif;font-size:13px" value="h5"><h5>Title 5</h5></option>
-        <option style="background-color: #f2f2f2;color: #666; font-family: 'Poppins', sans-serif;font-size:10px" value="h6"><h6>Title 6</h6></option>
-         <option style="background-color: #f2f2f2;color: #666; font-family: 'Poppins', sans-serif;" value="p"><p>Paragraph</p></option>
-        <option style="background-color: #f2f2f2;color: #666; font-family: 'Poppins', sans-serif;" value="pre"><pre>Preformatat</pre></option>
-        </select>
-        <button style="padding: 5px; border-radius: 5px; border: 1px solid #ccc; background-color: #f2f2f2;color: #666; font-family: 'Poppins', sans-serif;" onclick="f('underline')"><u>lined</u></button>
-        <button style="padding: 5px; border-radius: 5px; border: 1px solid #ccc; background-color: #f2f2f2;color: #666; font-family: 'Poppins', sans-serif;" onclick="f('removeFormat')">clear</button>
-        <button style="padding: 5px; border-radius: 5px; border: 1px solid #ccc; background-color: #f2f2f2;color: #666; font-family: 'Poppins', sans-serif;" onclick="f('strikethrough')"><strike>deleted</strike></button>
-        <button style="padding: 5px; border-radius: 5px; border: 1px solid #ccc; background-color: #f2f2f2;color: #666; font-family: 'Poppins', sans-serif;" onclick="f('insertOrderedList')">list</button>
-        <button style="padding: 5px; border-radius: 5px; border: 1px solid #ccc; background-color: #f2f2f2;color: #666; font-family: 'Poppins', sans-serif;" onclick="f('insertUnorderedList')">ulist</button>
-        <button style="padding: 5px; border-radius: 5px; border: 1px solid #ccc; background-color: #f2f2f2;color: #666; font-family: 'Poppins', sans-serif;" onclick="f('justifyLeft')">left</button>
-        <button style="padding: 5px; border-radius: 5px; border: 1px solid #ccc; background-color: #f2f2f2;color: #666; font-family: 'Poppins', sans-serif;" onclick="f('justifyCenter')">center</button>
-        <button style="padding: 5px; border-radius: 5px; border: 1px solid #ccc; background-color: #f2f2f2;color: #666; font-family: 'Poppins', sans-serif;" onclick="f('justifyRight')"><div>right</button>
-        
-        <form method="POST" class="post-form" enctype="multipart/form-data">{% csrf_token %}
-        <div id= "edit_image_menu"style="min-width: 1000px;min-height: 450px; position: fixed;  border: 1px solid #ccc; z-index: 9999; background-color: #f2f2f2; display:none; margin-top: -200px ">
-            <div style="font-size: 32px">Edit Image<a id='close_editmenu_btn' align="right" style="border:0 ;font-size: 16px">x</a></div>
-            <hr size= "2" />
-            <h3>Align</h3>
-            Right <input type="radio" name="image_align" tag='image_align' value="right"> 
-            Left <input type="radio" name="image_align"tag="image_align" value="left"checked>  
-            Center <input type="radio" name="image_align" tag="image_align" value="center">
-            <h3>Size</h3>
-            <select id="img_size_selector">
-                <option selected hidden>Size</option>
-                <option value="small">Small</option>
-                <option value="normal">Normal</option>
-                <option value="big">Big</option>
-                <option value="custom">Personalizat</option>
-            </select>
-            <input id="custom_width_input" style="display: none" placeholder="width">
-            <input id="custom_height_input" style="display: none" placeholder="height">
-            <img id="representative_img" width="200" height="150" align="right" src="sa" class="editimage">
-            <input id='img_title' style="display: block" placeholder="Legend">
-            <input id="save_img_btn" name="mybtn" type="submit" value="Save Image">
-         </div>
-        
-        <div id="file-in-article-div">
-        <input id="file-in-article-input" class="photoinpost" type="file" accept=".jpg, .png, .jpeg" name="inpostphoto" style="display: none" oninput="edit_img_menu(false)" >
-        <label for="file-in-article-input" id="coverforinput" style="padding: 5px; border-radius: 5px; border: 1px solid #ccc; background-color: #f2f2f2;color: #666; font-family: 'Poppins', sans-serif;">Add photo</label>
+                <div class="col s12">
+                    <div class="input-field col s2" style="padding-left: 0">
+                        <select onchange="format('forecolor',this[this.selectedIndex].value);this.selectedIndex=0;">
+                            <option selected hidden disabled>Culoarea Textului</option>
+                            <option value="red">Roșu</option>
+                            <option value="blue">Albastru</option>
+                            <option value="green">Verde</option>
+                        </select>
+                    </div>
+
+                    <div class="input-field col s2">
+                        <select onchange="format('fontname',this[this.selectedIndex].value);this.selectedIndex=0;">
+                            <option selected hidden>Font</option>
+                            <option value="Arial">Arial</option>
+                            <option value="Poppins">Poppins</option>
+                            <option value="Impact">Impact</option>
+                            <option value="Times New Roman">Times New Roman</option>
+                            <option value="Courier New">Courier New</option>
+                            <option value="Verdana">Verdana</option>
+                            <option value="Calibri">Calibri</option>
+                            <option value="Roboto">Roboto</option>
+                        </select>
+                    </div>
+
+                    <div class="input-field col s3">
+                        <select onchange="format('backcolor',this[this.selectedIndex].value);this.selectedIndex=0;">
+                            <option selected hidden>Culoarea Fundalului</option>
+                            <option value="black">Negru</option>
+                            <option value="white">Alb</option>
+                            <option value="green">Verde</option>
+                        </select>
+                    </div>
+
+                    <div class="input-field col s2">
+                        <select onchange="format('formatblock',this[this.selectedIndex].value);this.selectedIndex=0;">
+                            <option selected hidden>Format</option>
+                            <option value="h1"><h1>Title 1</h1></option>
+                            <option value="h2"><h2>Title 2</h2></option>
+                            <option value="h3"><h3>Title 3</h3></option>
+                            <option value="h4"><h4>Title 4</h4></option>
+                            <option value="h5"><h5>Title 5</h5></option>
+                            <option value="h6"><h6>Title 6</h6></option>
+                            <option value="p"><p>Paragraph</p></option>
+                            <option value="pre"><pre>Preformatat</pre></option>
+                        </select>
+                    </div>
+
+                    <div class="input-field col s3">
+                        <select onchange="format('fontsize',this[this.selectedIndex].value);this.selectedIndex=0;">
+                            <option selected hidden>Mărime Font</option>
+                            <option value="2">Mic</option>
+                            <option value="4">Normal</option>
+                            <option value="6">Mare</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col s12 content">
+                    <a class="btn modal-trigger" onclick="format('removeFormat')" href="#modal1"><i class="material-icons">add_a_photo</i></a>
+                    <a class="btn" onclick="add_video()"><i class="material-icons">video_call</i></a>
+                    <a class="btn right" onclick="set_code_or_visual(Boolean(Number(this.id)));this.id = -1*(Number(this.id)-1)" id='1'><i class="material-icons" id="set_code_or_visual_icon">code</i></a>
+                </div>
+            </div>
+            <div class="col s12">
+                <iframe class="text_input s12 z-depth-1" id="post_text" style="width: 100%; height: 400px"></iframe>
+                <textarea class="text_input s12 z-depth-1 hide" name="posttext" id="post_code" style="width: 100%; height: 400px">{{ post.text }}</textarea>
+            </div>
+            <div class="card-action">
+                <button class="btn col s12 right" type="submit" name="save_post" id="save_post" onclick="add_variant()" value="Save Post">Publică</button>
+                <input type="checkbox" id="post_status" class="filled-in" oninput="set_save_button_text(this.checked)" name="status" {% if post_status %} checked {% endif %}/>
+                <label for="post_status">Schiță</label>
+                <h5>Imagine de copertă</h5>
+                <input type="file" name="coverphoto" class="hide" id="cover_upload" oninput="set_representative_cover_img(this.files[0])">
+                 <a class="btn tooltipped" data-position="bottom" data-delay="50" html="true" data-tooltip="<b>auf</b>">Hover me!</a>
+                <label for="cover_upload"><img class="card" style="min-width: 100%;min-height: 400px; height:auto"src="http://127.0.0.1:8000/media/{{post.cover}}" id="representative_cover" /></label>
+            </div>
         </div>
-         <!--   <button type="button" value="1" class="btn" id="set_text_or_code_btn" align='right' onclick="set_text_or_code(this.value)">Cod</button> -->
-        
-        {{ form.as_p }}
-        {% autoescape off %}
-    <div class="row">
-        <div class="input-field col s11">
-            <input name="title" type="text" value="{{post_title}}">
-            <label class="active" for="first_name2">Title</label>
-        </div>
-        <div class="input-field col s11">
-            <textarea id="code_part_of_post" name="posttext" onchange="set_post_text_like_code()" class="hidden_text_input"></textarea>
-        </div>
-  
-    
-     <div class="row">
-        <div class="input-field col s2">
-            <select onchange="f('fontsize',this[this.selectedIndex].value);this.selectedIndex=0;">
-                <option selected hidden>font size</option>
-                <option value="2">small</option>
-                <option value="4">normal</option>
-                <option value="6">big</option>
-            </select>
-        </div>
-        <a class="waves-effect waves-light btn col" onclick="f('bold')"><i class="material-icons">format_bold</i></a>
-        <a class="waves-effect waves-light btn col" onclick="f('italic')"><i class="material-icons">format_italic</i></a>
-        <a class="waves-effect waves-light btn col" onclick="f('underline')"><i class="material-icons">format_underlined</i></a>
-        <a class="waves-effect waves-light btn col" onclick="f('strikethrough')"><i class="material-icons">format_strikethrough</i></a>
-        <a class="waves-effect waves-light btn col" onclick="f('removeFormat')"><i class="material-icons">format_clear</i></a>
-        <a class="waves-effect waves-light btn col" onclick="f('justifyLeft')"><i class="material-icons">format_align_left</i></a>
-        <a class="waves-effect waves-light btn col" onclick="f('justifyCenter')"><i class="material-icons">format_align_center</i></a>
-        <a class="waves-effect waves-light btn col" onclick="f('justifyRight')"><i class="material-icons">format_align_right</i></a>
-        <a class="waves-effect waves-light btn col" onclick="f('justifyFull')"><i class="material-icons">format_align_justify</i></a>
-        <a class="waves-effect waves-light btn col" onclick="f('insertUnorderedList')"><i class="material-icons">format_list_bulleted</i></a>
-        <a class="waves-effect waves-light btn col" onclick="f('insertOrderedList')"><i class="material-icons">format_list_numbered</i></a>
-        <a class="waves-effect waves-light btn col" onclick="f('outdent')"><i class="material-icons">format_quote</i></a>
-        <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
-         <textarea id="mytextarea">Hello, World!</textarea>
     </div>
-        <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-        <script>
-      tinymce.init({
-        selector: '#mytextarea'
-      });
-    </script>
+
+    <div class="col s12 m6" >
+        <div class="card">
+            <div class="card-content">
+                <input type="checkbox" name="survey_is_present" class="filled-in" id="test5" oninput="activate_survey(this.checked)" />
+                <label for="test5">Activează chestionarele</label>
+                <div class="col hide s8" id="survey_container">
+                    <div class="switch" style="padding: 2%">
+                        <label>
+                            Multivot
+                            <input type="checkbox" name="type_of_vote" id="one_or_multi_vote">
+                            <span class="lever"></span>
+                            Univot
+                        </label>
+                    </div>
+                    <div class="input-field col s12" >
+                        <input id="image_title" type="text" name="survey_question">
+                        <label class="active" for="image_title">Întrebarea chestionarului</label>
+                    </div>
+                </div>
+            </div>
+            <div class="card-action hide" id="card-action">
+                <a class="btn col s12" id="add_variant_button" onclick="add_variant()">Adaugă o Variantă de vot</a>
+            </div>
+        </div>
+    </div>
+</form>
+<script type="text/javascript">
+    var save_button = document.getElementById('save_post');
+    var iframe = document.getElementById('post_text')
+    var post_code = document.getElementById('post_code');
+    var code_or_visual_icon = document.getElementById('set_code_or_visual_icon');
+
+    function set_save_button_text(draw){
+        if (draw){
+            save_button.innerHTML = 'Salvează';
+        }
+        else {
+            save_button.innerHTML = "Publică";
+        }
+    }
+    function set_representative_cover_img(image){
+        document.getElementById('representative_cover').src = URL.createObjectURL(image)
+    }
+    function set_code_or_visual(value){
+        if (value){
+            post_code.className = 'text_input s12 z-depth-1';
+            iframe.className = 'hide text_input s12 z-depth-1'
+            code_or_visual_icon.innerHTML = 'title'
+        }
+        else {
+            post_code.className = 'hide text_input s12 z-depth-1';
+            iframe.className = 'text_input s12 z-depth-1'
+            code_or_visual_icon.innerHTML = 'code'
+        }
+        
+    }
+</script>
+<form method="POST" enctype="multipart/form-data" target="hidden-iframe" id="add_image_form" onsubmit ="$('#modal1').modal('close'); $('#modal2').modal('open')">
+    {% csrf_token %}
+    <div id="modal1" class="modal">
+        <div class="modal-content">
+            
+            <h4>Adaugă o fotografie</h4>
+            <div class="file-field input-field">
+                <div class="btn">
+                    <span >File</span>
+                    <input type="file" name="file" accept="image/*" oninput="first_stage_add_image()" id="file-input" required>
+                </div>
+            <div class="file-path-wrapper">
+                <input class="file-path validate" type="text">
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <a class="waves-effect waves-light btn left red" onclick="$('#modal1').modal('close')"><i class="material-icons">close</i></a>
+        <button class="btn waves-effect waves-light"  type="submit" name="action">Submit
+    <i class="material-icons right">send</i></button>
+  </button>
+    </div>
+  </div>
+</form>
+
+<div id="modal2" class="modal modal-fixed-footer">
+        <div class="modal-content">
+            <h4>Ajustă imaginea</h4>
+            <img class="responsive-img" id="representative-img">
+            <div class="input-field col s6">
+                <input id="image_title" type="text">
+                <label class="active" for="image_title">Titlu</label>
+            </div>
+            <h5>Aliniere</h5>
+                <input class="with-gap" name="image_align" type="radio" value="left" id="align_left" checked />
+                <label for="align_left"><i class="material-icons">format_align_left</i></label>
+                <input class="with-gap" name="image_align" type="radio" value="center" id="align_center" />
+                <label for="align_center"><i class="material-icons">format_align_center</i></label>
+                <input class="with-gap" name="image_align" type="radio" value="right" id="align_right" />
+                <label for="align_right"><i class="material-icons">format_align_right</i></label>
+            <h5>Mărime</h5>
+            <div class="input-field col s3">
+                <select id="img_size_selector" onchange="size_change()">
+                    <option value="30">Mică</option>
+                    <option value="60" selected>Medie</option>
+                    <option value="100">Întreg ecranul</option>
+                    <option value="custom">Personalizată</option>
+                </select>
+                <div class="input-field col s6 hide" id="width_container">
+                    <input id="width_input" type="text" >
+                    <label class="active" for="first_name1">Lungimea</label>
+                </div>
+                <div class="input-field col s6 hide" id="height_container">
+                    <input id="height_input" type="text" >
+                    <label class="active" for="first_name1">Înălțimea</label>
+                </div>
+            </div>
+
+            
+        </div>
+    <div class="modal-footer">
+        <a class="waves-effect waves-light btn left red" onclick="$('#modal2').modal('close')"><i class="material-icons">close</i></a>
+        <a class="waves-effect waves-light btn green" id="add_img" onclick="second_stage_add_image();$('#modal2').modal('close')"><i class="material-icons">check</i></a>
+        <a class="waves-effect waves-light btn green" id="edit_img" onclick="second_stage_edit_img(this.value)" value=''><i class="material-icons">check</i></a>
+  </button>
+    </div>
+  </div>
+
+
+<script type="text/javascript">
+    var add_variant_button = document.getElementById('add_variant_button')
+    var survey_container = document.getElementById('survey_container');
+    var card_action = document.getElementById('card-action');
+    var variant_index = 0
+
+    function activate_survey(approved){
+        if (approved){
+            survey_container.className = 'col s10';
+            card_action.className = "card-action"
+        }
+        else {
+            survey_container.className = 'col hide s10';
+            card_action.className = "card-action hide"
+        }
+    }
+    function delete_variant(number){
+        document.getElementById('variant_container'+number).remove();
+    }
+    function add_variant(){
+        var variant_container = document.createElement('div');
+        variant_container.className = 'input-field col';
+        variant_container.id = 'variant_container' + String(variant_index);
+        variant_container.setAttribute("name","variant_container");
+        var variant_input = document.createElement('input');
+        variant_input.id =  'variant_input' + String(variant_index);
+        variant_input.type = 'text';
+        variant_input.name = 'variant_of_survey';
+        variant_input.style = 'width:97%'
+        var variant_label = document.createElement('label');
+        variant_label.htmlFor = 'variant_input' + String(variant_index);
+        variant_label.innerHTML = 'Variantă';
+        var variant_remove_button = document.createElement('i');
+        variant_remove_button.className = "material-icons prefix teal-text";
+        variant_remove_button.innerHTML = 'delete'
+        variant_remove_button.id= variant_index;
+        variant_remove_button.style = 'margin-top:2.5%; cursor:pointer'
+        variant_remove_button.addEventListener('click', function(){delete_variant(this.id)});
+        survey_container.insertAdjacentElement("beforeend", variant_container);
+        variant_container.appendChild(variant_input);
+        variant_container.appendChild(variant_label);
+        variant_container.appendChild(variant_remove_button);
+        variant_index = variant_index + 1;
+    }
+</script>
+
+
+
+
+
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
         <script type="text/javascript">
-             $(document).ready(function() {
+            $(document).ready(function() {
                 $('select').material_select();
             });
+            $(document).ready(function(){
+                $('.modal').modal();
+            });
+            $('.modal').modal({
+                dismissible: false
+            });
+            $(document).ready(function(){
+                $('.tooltipped').tooltip({html:true});
+            });
         </script>
-        <textarea id="code_part_of_post" name="posttext" onchange="set_post_text_like_code()" class="hidden_text_input"></textarea>
-        <div class="input-field col s11">
-        <div id="visual_part_of_post s11" contenteditable="True" name="div" id="post_text" class="text_input" oninput="set_post_code_like_text(); " style="height: 25rem" required>{{post_text}}</div></div>
-        {% endautoescape %}
-        
 
-        <button type="submit" name="save_post" class="save" value="Save Post" style="">Save</button>
+<script type="text/javascript">
+    $(function(){
+        $('#add_image_form').on('submit', function(e){
+            e.preventDefault();
+            $.ajax({
+                url: $(this).attr('action'),
+                method: $(this).attr('method'),
+                data: new FormData(this),
+                cache: false,
+                processData: false,
+                contentType: false,
+                success: function(data){ $('#target').html(data);}
+            });
+        });
+    });
+</script>
 
-        <input id="file-input" type="file" accept=".jpg, .png, .jpeg" name="coverphoto" style="display: none; font-family: 'Poppins', sans-serif" oninput ="set_representative_cover_of_post()">
+<script type="text/javascript">
+    var post_code = document.getElementById('post_code');
+    var post_text = window.frames[0].document.getElementsByTagName("body")[0];
+    var iframe_head = window.frames[0].document.getElementsByTagName("head")[0];
+    var material_icons = document.createElement('link');
+    var materialize = document.createElement('link');
+    var materialize_script = document.createElement('script');
+    materialize_script.src = "https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"
+    materialize.href = "https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css";
+    material_icons.href = "https://fonts.googleapis.com/icon?family=Material+Icons";
+    materialize.rel = 'stylesheet';
+    material_icons.rel = 'stylesheet';
+    iframe_head.appendChild(material_icons);
+    iframe_head.appendChild(materialize);
+    iframe_head.appendChild(materialize_script);
+    width_container = document.getElementById('width_container');
+    height_container = document.getElementById('height_container');
+    var add_img = document.getElementById('add_img');
+    var edit_img = document.getElementById('edit_img');
+    function size_change(){
+        if(img_size_selector[img_size_selector.selectedIndex].value == 'custom'){
+            width_container.className = "input-field col s6";
+            height_container.className = "input-field col s6"
+        }
+        else {
+            width_container.className = "input-field col s6 hide";
+            height_container.className = "input-field col s6 hide"
+        }
+    }
 
-        <label for="file-input" class="file_input">Select file</label>
-    	
-        
-        <div>Schiță<input type="checkbox" id="status" name="status" {% if post_status %} checked {% endif %}></div>
-        <input style="display: none" id="numberofquestions" name="numberofvariants" value="2">
-         <div id="Customsurvey" >
-            <div>Radio<input type="radio" name="typeofcheck" value="radio" id="radioinsurvey" onclick="typeofcheckinsurvey(this.value)" {% if surveytype or post_new %}checked {% endif %}><input type="radio" name="typeofcheck" onclick="typeofcheckinsurvey(this.value)" value="checkbox" id="checkinsurvey" {% if not surveytype %} checked {% endif %}>Check buttons</div>
-            <div id="surveyvariants">
-            <input name="question" placeholder="question" id="survey_question" value="{{post_question}}">
-            {% if not post_new %}
-            {% for variant, index  in surveys.items %}
-                <input class="variantcheck" type={% if surveytype %}"radio" {% else %} "checkbox" {% endif %} id="input{{index}}" name="d"><input id="textinput{{index}}" class="variantinput" name="textofvariant{{index}}" value="{{variant}}" required><button class="variantmbtn" value="{{index}}" id="minusquestion{{index}}" onclick="deletequestion(this.value)">-</button><br class="variantbr" id="br{{index}}">
-            {% endfor %}
-            {% endif %}
-         </div>
-        </form>
-        <button type="button" onclick="addquestion()">+1 Întrebare</button>
-        <button type="button" onclick="putrandomsurvey(); ">Șablon de chestionar</button>
-    	<section style="background-color: #f2f2f2">
-    	<h3 >Current Cover:</h3>
-    	<img id = "post_cover" width="185px"; height="185px" align="left" class="post_representative_img" src=" http://127.0.0.1:8000/media/{{post_cover}} ">
-    	</section>
-    </div>
-        <script type="text/javascript" src="{% static 'js/post_edit.js' %}"></script>
+    post_text.oninput = function(){
+        post_code.value = document.createTextNode(post_text.innerHTML).wholeText
+        images = post_text.querySelectorAll('img[class="responsive-img"]');
+        for (i = 0; i<images.length; i++){
+            images[i].addEventListener("click", function(e){create_img_tools(e.target.id)}, 
+                true)
+        }
+    }
+    post_code.oninput =function(){
+        post_text.innerHTML = post_code.value;
+    }
+    post_text.innerHTML = post_code.value;
+    window.frames[0].document.getElementsByTagName("body")[0].contentEditable = true;
+    img_size_selector = document.getElementById("img_size_selector");
+    img_title  = document.getElementById("image_title")
+    function first_stage_add_image(){
+        document.getElementById('representative-img').src= URL.createObjectURL(document.getElementById('file-input').files[0]);
+        add_img.className = 'waves-effect waves-light btn green';
+        edit_img.className = 'waves-effect waves-light btn green hide';
+    }
+    function reset_add_image_menu(){
+        img_size_selector.selectedIndex = 1;
+        size_change();
+        img_title.value = '';
+        $('#add_image_form').trigger("reset");
+        document.querySelector('input[name="image_align"][value ="left"]').checked = true;  
+    }
+
+    function second_stage_add_image(){
+        img_name = document.getElementById('file-input').files[0].name
+        if(img_size_selector[img_size_selector.selectedIndex].value != 'custom'){
+            size = img_size_selector[img_size_selector.selectedIndex].value;
+            code = "<img class='responsive-img tooltipped' data-position='top' data-delay='' id='" + img_name + "' align='"+ document.querySelector('input[name="image_align"]:checked').value + "' style='position:relative; width:" + size + "%'  src='http://127.0.0.1:8000/media//blog/static/media/" + img_name + "'/>";
+        }
+        else{
+            code = "<img style='object-fit: cover; overflow: hidden;' id='" + img_name + "' title='" + img_title.value +"' align='"+ document.querySelector('input[name="image_align"]:checked').value + "' width='"+ document.getElementById('width_input').value + "' height='"+ document.getElementById('height_input').value+"' src='http://127.0.0.1:8000/media//blog/static/media/" + img_name + "'/>";
+        }
+        format('insertHTML', code);
+        reset_add_image_menu()
+    }
+    function remove_img_tools(img){
+        window.frames[0].document.getElementById(img + 'tools_container').remove();
+        img_container = window.frames[0].document.getElementById(img + 'container');
+        image = window.frames[0].document.getElementById(img);
+        img_container.insertAdjacentElement("beforebegin", image);
+        img_container.remove();
+    }
+    function first_stage_edit_img(img){
+        image = window.frames[0].document.getElementById(img)
+        document.getElementById('representative-img').src= image.src;
+        img_title.value = image.title;
+        document.querySelector('input[name="image_align"][value ="'+ image.align+ '"]').checked = true;
+        $('#modal2').modal('open');
+        add_img.className = 'waves-effect waves-light btn green hide';
+        edit_img.value = img;
+        edit_img.className = 'waves-effect waves-light btn green';
+    }
+
+    function second_stage_edit_img(img){
+        image = window.frames[0].document.getElementById(img);
+        image.align = document.querySelector('input[name="image_align"]:checked').value;
+        image.title = img_title.value;
+        if (img_size_selector[img_size_selector.selectedIndex].value != 'custom') {
+            image.style.width = img_size_selector[img_size_selector.selectedIndex].value + '%';
+        }
+        else{
+            image.style.width = width_input.value;
+            image.style.height = height_input.value;
+        }
+        $('#modal2').modal('close');
+        reset_add_image_menu()
+    }
+    function create_img_tools(img){
+        var img_container = document.createElement('div');
+        img_container.id = img + 'container';
+        img_container.style = "position: relative;"
+        img_container.onmouseleave=function(){
+            remove_img_tools(img);
+        }
+        img_tools_container = document.createElement('div');
+        img_tools_container.id = img + 'tools_container';
+        img_tools_container.style = "position:absolute; z-index: 10;"
+        img_tools_container.className = "img_tools_container"
+        var remove_img_icon = document.createElement('i');
+        remove_img_icon.className = "material-icons";
+        remove_img_icon.innerHTML = 'delete';
+        var remove_img_tool = document.createElement('a');
+        remove_img_tool.className = "btn"
+        remove_img_tool.id = img + 'remove';
+        remove_img_tool.style = 'position:relative'
+        remove_img_tool.onclick = function(){
+            img_container.remove();
+        }
+        var edit_img_icon = document.createElement('i');
+        edit_img_icon.className = "material-icons"
+        edit_img_icon.innerHTML = 'edit'
+        var edit_img_tool = document.createElement('a');
+        edit_img_tool.className="btn"
+        edit_img_tool.id = img + 'edit';
+        edit_img_tool.style = 'position:relative'
+        edit_img_tool.onclick= function(){
+            first_stage_edit_img(img);
+        }
+        edit_img_tool.appendChild(edit_img_icon)
+        remove_img_tool.appendChild(remove_img_icon)
+        image = window.frames[0].document.getElementById(img);
+        image.insertAdjacentElement("beforebegin", img_container);
+        img_container.appendChild(img_tools_container);
+        img_tools_container.appendChild(remove_img_tool);
+        img_tools_container.appendChild(edit_img_tool);
+        img_container.appendChild(image);
+    }
+    function add_video(){
+        var video = prompt("Inserează link-ul la video");
+        alert(video)
+        if (video == null) {
+            Materialize.toast('Acest link nu este valid');
+        }
+        else {
+            format('insertHTML', video);
+        }
+    }
+    function format(a,b){
+        window.frames[0].document.execCommand(a, false,b);
+        window.frames[0].focus();
+    }
+</script>
 {% endblock %}

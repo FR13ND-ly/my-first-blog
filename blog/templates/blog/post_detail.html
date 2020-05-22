@@ -24,32 +24,75 @@
         <i class="material-icons">delete</i></a>
 {% endif %}
         </div>
-   <!--     {% if user.is_active %}
-        <div class="col">
-        <div class="card">
-            <form method="GET" action="vote">
-            <p>{{post.question}}</p>
-            {% for i in survey %}
-                <input {% if i.typeofvote %} type="radio" required value="{{i.variant}}" name="value"{% else %} type="checkbox" name="{{i.variant}}" {% endif %}  {% if uservoted %} disabled {% endif %} >{{i.variant}} {{i.count}}<br>
-                
+       {% if post.survey_is_present %}
+            <div class="col s12 m6" style="width: 100%">
+                <div class="card-content">
+                    <div class="row">
+                        <form method="POST" action="vote">
+                            {% csrf_token %}
+                            <div class="collection with-header">
+                                <div class="collection-header "><h5>{{ post.question }}</h5></div>
+                                    {% for i in survey %}
+                                        <a class="collection-item" name="variant_container" id="{{i.variant}}" {% if not uservoted %} onclick="{% if post.type_of_vote %} select_one_variant(this) {% else %}select_multi_variant(this) {% endif %}" {% endif %}>
+                                            <div>
+                                                {% if uservoted %}<span class="new badge" data-badge-caption="voturi">{{ i.count }}</span>{% endif %} 
+                                                {{i.variant}}
+                                                <div class="hide secondary-content">
+                                                    <input {% if post.type_of_vote %} name="variant" {% endif %}value="{{ i.variant }}" type="{% if post.type_of_vote %} radio {% else %} check {% endif %}" id="{{ i.variant }}"/>
+                                          <!--  <label for="{{ i.variant }}"></label> -->
+                                                </div>
+                                            </div>
+                                        </a>
+                                    {% endfor %}
+                                    {% if uservoted %}
+                                        <div class="collection-item"><button class="btn" disabled>Ai votat deja!</button></div>
+                                    {% else %}
+                                        <div class="collection-item"><button class="btn btn-default center" type="submit">Votează!</button></div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+        <script type="text/javascript">
+            function select_one_variant(variant){
+                variants = document.querySelectorAll('a[name="variant_container"]');
+                for (i = 0; i<variants.length; i++){
+                    variants[i].className = "collection-item";
+                    document.querySelector('input[id="'+variants[i].id +'"]').checked = false
+                }
+                variant.className = "collection-item active";
+                document.querySelector('input[id="'+variant.id +'"]').checked = true;
 
-            {% endfor %}
-            {% if uservoted %}
-                <p>You already voted</p>
-            {% else %}
-                <button class="btn btn-default" type="submit">Vote</button>
-                </form>
-            {% endif %}
+            }
+            function select_multi_variant(variant) {
+                variant_input = document.querySelector('input[id="'+variant.id +'"]');
+                if (variant.className == "collection-item"){
+                    variant.className = "collection-item active";
+                    variant_input.name = 'variant';
+                }
+                else {
+                    variant.className = "collection-item";
+                    variant_input.setAttribute("name","none");
+                }
+            }
+        </script>
+                      <!--  <input {% if i.typeofvote %} type="radio" required value="{{i.variant}}" name="value"{% else %} type="checkbox" name="{{i.variant}}" {% endif %}  {% if uservoted %} disabled {% endif %} />{{i.variant}} {{i.count}} 
+                      
+        <
+
+            
+            
+            
         </div>
         
-        {% else %}
-        <p>{{post.question}}</p>
-        {% for i in survey %}
+        <p>{{post.question}}</p
         <input type="radio" value="{{i.variant}}" name="value" disabled>{{i.variant}} {{i.count}} <br>
-        {% endfor %}
         <p>You already voted</p>
         <button class="btn btn-default" type="submit">Login</button>
-        {% endif %}
+        </ul>
     </form> -->
 <p>{{ post.comments.count }} Comentarii</p> 
 <a class="btn center-align" id="add_comment" onclick="add_comment()">Lasă un comentariu</a>
@@ -67,7 +110,7 @@
                             <h4 style="margin-left: 1.5%">{{ user.username }}</h4>
                             <div class="input-field col s10">
                                 <input name="text_of_comment" id="author_of_comment" type="text" required>
-                                <label class="active" for="first_name2">Nume de utilizator</label>
+                                <label class="active" for="first_name2">Comentariu</label>
                             </div>
                         </div>
                     </div>
@@ -95,57 +138,6 @@
         </div>
     </div>
 </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<!-- <div style="display: none" id="comment_form">
-<form method="POST" >{% csrf_token %}
-<div class="card">
-    <div class="card-content">
-{% if not user.is_active %}
-<p>{{user.username}}</p>
-{% else %}
-<div class="input-field col s12">
-                <input name="logininput" id="author_of_comment" name="author_of_comment" type="text" {% if incorrect_login_or_password %} class="validate invalid {% endif %}">
-                <label class="active" for="first_name2">Numele de utilizator</label>
-            </div>
-{% endif %}
-
-         <div class="input-field col s12">
-          <textarea id="text_of_comment" name="text_of_comment" id="textarea1" class="materialize-textarea"></textarea>
-          <label for="textarea1">Comentariu</label>
-        </div>   </div>
-        <div class="card-action">
-        <button class="btn waves-effect waves-light" type="submit" name="add_comment" value="add_comment"><i class="material-icons right">send</i></button>
-    </div>
-</form>
-</div>
-</div> -->
 
 {% for comment in post.comments.all %}
 <div class="col s12">

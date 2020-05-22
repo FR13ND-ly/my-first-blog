@@ -9,13 +9,12 @@
         {% if profile.darktheme %} 
         <link rel="stylesheet" href="{% static 'css/darkblog.css' %}"> 
         {% else %}
-        <link rel="stylesheet" href="{% static 'css/blog.css' %}">
+        <link rel="stylesheet" href="{% static 'css/blog.css' %}">  
         {% endif %}
         <title>Est-Curier</title>
     </head>
 
     <body style="display: flex">
-    <header style="width: 100%"><div>
        <nav>
     <div class="nav-wrapper light-blue darken-4">
         <a href="/" class="brand-logo center">Est Curier</a>
@@ -28,7 +27,7 @@
         <li><a href="/ads">Publicitate</a></li>
       </ul>
     </div>
-  </nav></div></header>
+  </nav>
     <div class="row pinned hide" style="z-index:100;margin-top: 4.9%" id="usermenu">
         <div class="col s12 m12">
             <div class="card">
@@ -68,7 +67,7 @@
         </div>
     </div>
     {% if tposts %}
-    <ul class="collection show-on-large card" style="border:none;position: absolute; right: 1%; width:25%; height: 88%; padding:10px; margin-top: 5.5%">
+    <ul class="collection show-on-large card" style="position: absolute; right: 1%; width:25%; height: 88%; padding:10px; margin-top: 5.5%">
         <div class="section" style="margin-bottom: 5%">
         <li><h3 class="collection-item" align="center" style="padding-top: 10%;">Top Articole</h3></li>
     </div>
@@ -102,8 +101,8 @@
                     </div>
         </div>
     </div>
-    <footer class="page-footer  light-blue darken-4" style="width: 100%">
-          <div class="container">
+    <footer class="page-footer  light-blue darken-4">
+          <div class="container ">
             <div class="row">
               <div class="col l6 s12">
                 <h5 class="white-text">Est Curier</h5>

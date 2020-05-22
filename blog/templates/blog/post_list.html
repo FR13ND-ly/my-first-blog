@@ -4,10 +4,10 @@
 
 {% block content %}
 {% if bigimage %}
-    <div class="row">
+    <div class="row" >
     <div class="col s12 valign-wrapper" style="width: 100%;">
         {% for post in posts %}
-      <div class="big-image card hide" id="post{{post.index}}" style="height: 546px" onmouseover="visible_big_image_change({{post.index}})" onmouseout="hidden_big_image_change({{post.index}})">
+      <div class="big-image card hide" id="post{{post.index}}" style="height: 88%" onmouseover="visible_big_image_change({{post.index}})" onmouseout="hidden_big_image_change({{post.index}})">
         <div class="card-image " style="height: 460px">
           <a href="{% url 'post_detail' pk=post.pk %}"><img src="http://127.0.0.1:8000/media/{{post.cover}}" style="object-fit: cover; overflow: hidden;height:460px"></a>
           <span class="card-title">{{ post.title }}</span>
@@ -50,7 +50,7 @@
         
     </div> 
     {% endfor %}
-    <ul class="list_of_pages pagination">
+    <ul class="pagination center">
         {% for i in number_of_pages %}
             <li class="waves-effect {% if i == current_page %} active blue darken-3{% endif %}"><a href="{% url 'choose_page' lk=i %}"> {{i}} </a></li>
         {% endfor %}
