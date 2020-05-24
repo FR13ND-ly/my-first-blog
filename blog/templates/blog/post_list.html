@@ -9,7 +9,7 @@
         {% for post in posts %}
       <div class="big-image card hide" id="post{{post.index}}" style="height: 88%" onmouseover="visible_big_image_change({{post.index}})" onmouseout="hidden_big_image_change({{post.index}})">
         <div class="card-image " style="height: 460px">
-          <a href="{% url 'post_detail' pk=post.pk %}"><img src="http://127.0.0.1:8000/media/{{post.cover}}" style="object-fit: cover; overflow: hidden;height:460px"></a>
+          <a href="{% url 'post_detail' pk=post.pk %}"><img src="/media/{{post.cover}}" style="object-fit: cover; overflow: hidden;height:460px"></a>
           <span class="card-title" style="background-color: rgba(1, 87, 155, 0.5); margin:2%; max-width: 80%">{{ post.title }}</span>
 
           <span onclick="next_big_image({{post.index}})" id="previous_big_image{{post.index}}" style="display: none;"><i class="material-icons large" style="color:#fff;font-size: 900%; cursor: pointer; right: 2%; position: absolute; top:40%" >arrow_forward</i></span>
@@ -30,7 +30,7 @@
     <div class="col s12 m12">
             <div class="card horizontal hoverable {% if profile.darktheme %}  blue-grey darken-3 {% endif%}">
                 <div class="card-image valign-wrapper">
-                    <img src="http://127.0.0.1:8000/media/{{post.cover}}" style="width: 150px; height: 250px; object-fit: cover; overflow: hidden;">
+                    <img src="/media/{{post.cover}}" style="width: 150px; height: 250px; object-fit: cover; overflow: hidden;">
                 </div>
                 <div class="card-stacked">
                     <div class="card-content" >

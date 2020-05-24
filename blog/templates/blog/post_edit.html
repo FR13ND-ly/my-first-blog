@@ -379,10 +379,10 @@
         img_name = document.getElementById('file-input').files[0].name
         if(img_size_selector[img_size_selector.selectedIndex].value != 'custom'){
             size = img_size_selector[img_size_selector.selectedIndex].value;
-            code = "<img class='responsive-img tooltipped' data-position='top' data-delay='' id='" + img_name + "' align='"+ document.querySelector('input[name="image_align"]:checked').value + "' style='position:relative; width:" + size + "%'  src='http://127.0.0.1:8000/media//blog/static/media/" + img_name + "'/>";
+            code = "<img class='responsive-img tooltipped' data-position='top' data-delay='' id='" + img_name + "' align='"+ document.querySelector('input[name="image_align"]:checked').value + "' style='position:relative; width:" + size + "%'  src='/media/blog/static/media/" + img_name + "'/>";
         }
         else{
-            code = "<img style='object-fit: cover; overflow: hidden;' id='" + img_name + "' title='" + img_title.value +"' align='"+ document.querySelector('input[name="image_align"]:checked').value + "' width='"+ document.getElementById('width_input').value + "' height='"+ document.getElementById('height_input').value+"' src='http://127.0.0.1:8000/media//blog/static/media/" + img_name + "'/>";
+            code = "<img style='object-fit: cover; overflow: hidden;' id='" + img_name + "' title='" + img_title.value +"' align='"+ document.querySelector('input[name="image_align"]:checked').value + "' width='"+ document.getElementById('width_input').value + "' height='"+ document.getElementById('height_input').value+"' src='/media//blog/static/media/" + img_name + "'/>";
         }
         format('insertHTML', code);
         reset_add_image_menu()
