@@ -6,40 +6,44 @@
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css">
         <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-        {% if profile.darktheme %} 
-        <link rel="stylesheet" href="{% static 'css/darkblog.css' %}"> 
-        {% else %}
         <link rel="stylesheet" href="{% static 'css/blog.css' %}">  
-        {% endif %}
         <title>Est-Curier</title>
     </head>
 
-    <body style="display: flex">
+    <body style="display: flex; min-height: 100vh; flex-direction: column;" {% if profile.darktheme %} class=" blue-grey darken-4" {% endif%} >
+        <header>
        <nav>
-    <div class="nav-wrapper light-blue darken-4">
+    <div class="nav-wrapper {% if profile.darktheme %} blue-grey darken-3 {% else%}light-blue darken-4{% endif %}">
         <a href="/" class="brand-logo center">Est Curier</a>
         <ul id="nav-mobile" class="left hide-on-med-and-down ">
             <li><i class="material-icons" style="font-size: 60px; cursor: pointer; margin-left: 12%" onclick="makevisibleusermenu()">account_circle</i></li>
         </ul>
       <ul class="right hide-on-med-and-down white-text flow-text ">
-        <li>{% if user.is_staff %} <a class="btn waves-effect waves-light green darken-1" href="{% if ads_page %}{% url 'new_ad' %} {% else %} /post/new {% endif %}">
+        <li>{% if user.is_staff %} <a class="btn waves-effect waves-light " href="{% if ads_page %}{% url 'new_ad' %} {% else %} /post/new {% endif %}">
         <i class="material-icons">add</i></a> {% endif %}</li>
         <li><a href="/ads">Publicitate</a></li>
       </ul>
     </div>
   </nav>
-    <div class="row pinned hide" style="z-index:100;margin-top: 4.9%" id="usermenu">
+  </header>
+  <main style="flex: 1 0 auto">
+    <div class="row pinned hide" style="z-index:100;" id="usermenu">
         <div class="col s12 m12">
-            <div class="card">
+            <div class="card {% if profile.darktheme %}  blue-grey darken-3 {% endif%}">
                 {% if user.is_active %}
-                <div class="card-content">
+                <div class="card-content s12">
                     <div class="row">
-                        <h3 class="center-align">{{ user.username }}</h3>
-                        <p class="center-align">{% if user.is_staff %}Administrator{% else %}Utilizator{% endif %}</p>
+                        <a href="{% url 'logout' %}" class="yellow-text text-darken-4 right"><i class="material-icons">logout</i></a><br>
+                        <h3 class="center-align {% if profile.darktheme %} white-text {% endif %}">{{ user.username }}</h3>
+                        <p class="center-align {% if profile.darktheme %} white-text {% endif %}">{% if user.is_staff %}Administrator{% else %}Utilizator{% endif %}</p>
                     </div>
                 </div>
                     <div class="card-action">
-                        <a href="{% url 'logout' %}" class="yellow-text text-darken-4"><button type="button" class="btn-flat btn waves-effect waves-light white yellow-text text-darken-4">Deloghează-te</button></a>
+                        {% if profile.darktheme %}
+                            <a href="{% url 'setusertheme' theme=0 %}"><button class="btn-flat white-text">Treci la tema luminoasă!</button></a>
+                        {% else %}
+                            <a href="{% url 'setusertheme' theme=1 %}"><button class="btn-flat yellow-text text-darken-4">Treci la tema întunecată!</button></a>
+                        {% endif %}
                     </div>
                 {% else %}
                 <form method="POST" action="/login/">
@@ -67,24 +71,24 @@
         </div>
     </div>
     {% if tposts %}
-    <ul class="collection show-on-large card" style="position: absolute; right: 1%; width:25%; height: 88%; padding:10px; margin-top: 5.5%">
+    <ul class="collection show-on-large card {% if profile.darktheme %} blue-grey darken-3 {% endif %}" style="position: absolute; right: 1%; width:25%; height: 88%; padding:10px;border:0.1px solid #000">
         <div class="section" style="margin-bottom: 5%">
-        <li><h3 class="collection-item" align="center" style="padding-top: 10%;">Top Articole</h3></li>
+        <li><h3 class="collection-item {% if profile.darktheme %}blue-grey darken-3  white-text {% endif %}" align="center" style="padding-top: 10%;">Top Articole</h3></li>
     </div>
     {% for post in tposts %}
         <li style="margin:2%"><a href="{% url 'post_detail' pk=post.pk %}">
-    <div class="card horizontal valign-wrapper hoverable" style="height: 130px">
+    <div class="card horizontal valign-wrapper hoverable {% if profile.darktheme %} blue-grey darken-2 {% endif %}" style="height: 130px">
       <div class="card-image">
         <img src="http://127.0.0.1:8000/media/{{post.cover}}" style="width: 60px; height: 130px; max-height: 146px; object-fit: cover; overflow: hidden;">
       </div>
       <div class="card-stacked">
-        <div class="card-content" style="color:#000">
-        <div class="section">
-          <p style="font-size: 16px;" >{{ post.title }}</p>
+        <div class="card-content">
+        <div class="section " >
+          <p style="font-size: 16px;" class="{% if profile.darktheme %}  white-text {% else %} black-text {% endif %}">{{ post.title }}</p>
       </div>
           <div class="divider"></div>
           <div class="section">
-          <p class="right" style="display: flex;">{{post.count_of_views}} <i class="material-icons red-text tiny black-text" style="line-height: inherit;padding-left: 0.3rem">remove_red_eye</i></p></div>
+          <p class="right {% if profile.darktheme %}  white-text {% else %} black-text {% endif %}" style="display: flex;">{{post.count_of_views}} <i class="material-icons red-text tiny {% if profile.darktheme %}  white-text {% else %} black-text {% endif %}" style="line-height: inherit;padding-left: 0.3rem">remove_red_eye</i></p></div>
         </div>
       </div>
     </div>
@@ -92,6 +96,16 @@
     {% endfor %}
         
     </ul>
+    {% endif %}
+    {% if ads_list %}
+        <div class="card {% if profile.darktheme %} white-text blue-grey darken-3 {% endif %}" style="position: absolute; right: 1%; width:25%; ">
+            <div class="card-content">
+                <div class="row">
+                    <h5>Anunț</h5>
+                    <p>Dacă doriți ca publicitatea voastră să apară aici, contactaține pe estcurier@gmail.com sau veniți la redacția Est-Curier</p>
+                </div>
+            </div>
+        </div>
     {% endif %}
         <div class="content container">
                 
@@ -101,7 +115,8 @@
                     </div>
         </div>
     </div>
-    <footer class="page-footer  light-blue darken-4">
+</main>
+    <footer class="page-footer {% if profile.darktheme %} blue-grey darken-3 {% else%} light-blue darken-4 {% endif %}" >
           <div class="container ">
             <div class="row">
               <div class="col l6 s12">
@@ -130,341 +145,3 @@
     <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
 </html>
-<style type="text/css">
-    .big_image_title {
-    white-space: nowrap;overflow: 
-    hidden;text-overflow: ellipsis;
-    margin-left: 10px;color:#fff;
-    position: absolute;
-    display: inline-block; 
-    top:350; 
-    left: 50
-}
-
-.change_big_image_button {
-    font-family: 'Poppins',sans-serif; 
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    margin-left: 10px;
-    color:#fff;
-    position: absolute;
-    font-size: 128px; 
-    display: inline-block; 
-    top:160;
-    cursor: pointer;
-    visibility: hidden;
-}
-
-.footer {
-    background-color: #3e72a0;
-    color: #fff;
-    flex-shrink: 0; 
-    padding: 5px;
-}
-
-.top_post_title {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    padding-top: 10px
-}
-
-.big_image_photo {
-    border:1px solid #ccc;
-    position:relative;
-    margin-top: 10px; 
-    margin-bottom: 15px; 
-    object-fit: cover;
-    overflow: hidden; 
-    border-radius: 2px;
-}
-
-.hidden {
-    display: none;
-}
-
-.top_post_image {
-    display: block;
-    width: 75px;
-    height: 75px;
-    border:1px solid #ccc;
-    position:relative;
-    margin-top: 10px; 
-    margin-bottom: 15px; 
-    object-fit: cover;
-    overflow: hidden; 
-    border-radius: 5px; 
-    margin-left: 5px;
-    margin-top: 5px
-}
-
-.top_post_container {
-    min-height: 85px; 
-    max-width: 290px; 
-    min-width: 280px;
-    margin-top: -20px; 
-    margin-bottom: 40px; 
-    background-color: #f2f2f2; 
-    border-radius: 5px; 
-    margin-right: 5px; 
-    margin-left: 5px;
-}
-
-.top_posts_title {
-    padding: 5px; 
-    margin-bottom: -10px; 
-    margin-top: 10px;
-}
-.top_posts {
-    float: right;
-    border-radius: 15px; 
-    border: 3px solid #ccc; 
-    margin-right: 1%; 
-    margin-top: 9px; 
-    height: 485px;
-    box-shadow: 0px 0px 30px -10px;
-}
-
-.user_menu {
-    z-index: 9999; 
-    display: none;
-  /*   position: fixed;
-    
-    margin-left: 80%; 
-    background-color: #fff; 
-    margin-top: 110px; 
-    border: 2px solid;
-    border-radius: 5px; 
-    padding: 20px; 
-     */
-}
-.user_image {
-    border:3px solid;
-    border-radius: 100px; 
-    position:relative;
-    object-fit: cover;
-    overflow: hidden;
-    cursor: pointer;
-    margin-top: 2%; 
-}
-body{
-    display: flex;
-    flex-direction: column; 
-    min-height: 100vh;
-}
-
-.page-header {
-    background-color:#3e72a0;
-    margin-top:-10px; 
-    margin-bottom: 5px;
-    padding: 20px 20px 20px 40px;
-}
-
-.page-header h1, .page-header h1 a, .page-header h1 a:visited, .page-header h1 a:active {
-    color: #ffffff;
-    font-size: 36pt;
-    text-decoration: none;
-    font-family: 'Poppins', sans-serif;
-}
-
-.content {
-    margin-left: 40px;
-}
-
-h1, h2, h3, h4 {
-    font-family: 'Poppins', sans-serif;
-    color: #000;
-}
-
-.date {
-    color: #828282;
-}
-
-.save {
-    float: right;
-    padding: 5px; 
-    border-radius: 5px; 
-    border: 1px solid #ccc; 
-    background-color: #f2f2f2; 
-    font-family: 'Poppins', sans-serif;
-    display: inline-block;
-}
-
-.list_of_pages {
-    font-size: 24px; 
-    margin-left: 50%;
-}
-
-.post_representative_image {
-    border:1px solid #ccc;
-    position:relative;
-    object-fit: cover;
-    overflow: hidden; 
-    border-radius: 5px;
-}
-
-.file_input {
-    padding: 5px; 
-    border-radius: 5px; 
-    border: 1px solid #ccc; 
-    background-color: #f2f2f2;
-    color: #666; 
-    font-family: 'Poppins', sans-serif;
-}
-
-.text_input, .hidden_text_input{
-    overflow: auto;
-    border:1px solid #ccc; 
-    border-radius: 5px; 
-    margin-bottom: 20px;  
-    resize: none; 
-    font-size:18px
-}
-
-.hidden_text_input {
-    display: none;
-}
-
-.text_input {
-    display: block;
-}
-
-.post-form textarea, .post-form input {
-    width: 100%;
-}
-
-.top-menu, .top-menu:hover, .top-menu:visited {
-    color: #ffffff;
-    float: right;
-    font-size: 26pt;
-    margin-right: 20px;
-}
-
-.comment_image_author{
-    border:1px solid #ccc;
-    position:relative;
-    margin-top: 10px; 
-    margin-bottom: 15px; 
-    object-fit: cover;
-    overflow: hidden; 
-    border-radius: 5px
-}
-
-.post_detailed_text {
-    margin-right: 15px; 
-    padding-left: 15px; 
-    padding-top: 5px; 
-    padding-bottom: 5px; 
-    border-radius: 5px; 
-    font-size: 18px;
-}
-
-.post_detailed_info {
-    padding-left: 15px; 
-    padding-top: 5px; 
-    padding-bottom: 5px; 
-    border-radius: 5px
-}
-
-.post_detailed_line {
-    border: 1px solid #ccc; 
-    margin-left: 15px; 
-    border-radius: 5px; 
-    margin-top: -5px; 
-    margin-bottom: 0px; 
-    margin-right: 15px
-}
-
-.post_detailed_title {
-    padding-left: 15px; 
-    padding-top: 15px; 
-    padding-bottom: 5px; 
-    border-radius: 5px;
-}
-
-.post_detailed_container {
-    border-radius: 5px; 
-    padding-bottom: 15px;
-    margin-right: -180px;
-}
-
-.post_detailed {
-    margin-bottom: 40px;
-    display: absolute; 
-    margin-bottom: 20px;
-    background-color: #f2f2f2; 
-    border-radius: 5px; 
-    margin-right: -180px; 
-    padding-left: 15px; 
-    padding-top: 1px;
-    padding-bottom: 8px;
-    box-shadow: 0px 0px 30px -10px;
-}
-
-.post_date {
-    max-height: :5px; 
-    margin-top: -10px; 
-    margin-left: 200px; 
-    padding-bottom: 15px; 
-    padding-right: 15px; 
-    color:#205072;
-}
-
-.post_text {
-    height: 70px; 
-    font-size: 16px;
-    margin-left: 200px;
-    color:#666;
-    margin-right: 5px; 
-    margin-top:15px
-}
-
-.post_line {
-    margin-left: 200px;
-    margin-top:0px;
-    margin-bottom:5px;
-    color: #ccc; 
-    border:1px solid
-}
-
-.post_title {
-    font-family: 'Poppins',sans-serif; 
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis; 
-    margin-top: 15px;
-}
-
-.post_image {
-    width: 185px;
-    height: 185px;
-    border:1px solid #ccc;
-    position:relative;
-    margin-top: 10px; 
-    margin-bottom: 15px; 
-    object-fit: cover;
-    overflow: hidden; 
-    border-radius: 5px
-}
-
-.post {
-    margin-bottom: 40px;
-    display: absolute; 
-    margin-bottom: 20px;
-    background-color: #f2f2f2; 
-    border-radius: 5px; 
-    margin-right: -180px; 
-    padding-left: 15px; 
-    padding-top: 1px;
-    padding-bottom: 8px;
-    box-shadow: 0px 0px 30px -10px;
-}
-
-.post h1 a, .post h1 a:visited {
-    color: #000000;
-}
-.upload_button{
-    color:#fff;
-}
-</style>

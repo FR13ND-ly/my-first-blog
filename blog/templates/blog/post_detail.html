@@ -1,14 +1,15 @@
 {% extends 'blog/base.html' %}
 {% load static %}
 {% block content %}
-<div class="row" >
-    <div class="col s12 ">
-    <div class="card" style="padding: 2%;">
+<div class="row">
+    <div class="col s12" >
+    <div class="card {% if profile.darktheme %} blue-grey darken-3 white-text {% endif %}" >
+        <div class="card-content">
         <div class="section">
-            <h4 >{{ post.title }}</h4>
-            <div class="divider"></div>
-            <p style="display: flex"><i class="material-icons tiny " style="line-height: inherit;padding-right: 0.5rem">access_time</i> {{ post.published_date }} |<i class="material-icons tiny" style="line-height: inherit;padding-right: 0.5rem;padding-left: 0.5rem">contacts</i> {{post.author}} |  {{post.count_of_views}} <i class="material-icons tiny " style="line-height: inherit;padding-left: 0.5rem">remove_red_eye</i></p>
-            <div class="divider"></div>
+            <h4 class=" {% if profile.darktheme %} darken-3 white-text {% endif %}">{{ post.title }}</h4>
+            <div class="divider" style="margin-bottom: 1%"></div>
+            <p style="display: flex" ><i class="material-icons tiny " style="line-height: inherit;padding-right: 0.5rem">access_time</i> {{ post.published_date }} |<i class="material-icons tiny" style="line-height: inherit;padding-right: 0.5rem;padding-left: 0.5rem">contacts</i> {{post.author}} |  {{post.count_of_views}} <i class="material-icons tiny " style="line-height: inherit;padding-left: 0.5rem">remove_red_eye</i></p>
+            <div class="divider" style="margin-top: 1%"></div>
         </div>{% autoescape off %}
         <div id="post_text">{{ post.text|linebreaksbr }} </div>
         {% endautoescape %}
@@ -18,22 +19,22 @@
         <div style="font-size: 28px; display: flex;"><i class="material-icons red-text small" style="line-height: inherit;" onclick="Materialize.toast('Need to login', 4000)">favorite_border</i>{{ post.likes.count }}</div>
         {% endif %}
         {% if user.is_staff %}
-        <a class="btn waves-effect waves-light  indigo darken-1" href="{% url 'post_edit' pk=post.pk %}">
+        <a class="btn waves-effect waves-light" href="{% url 'post_edit' pk=post.pk %}">
         <i class="material-icons">edit</i></a>
-        <a class="btn waves-effect waves-light  red darken-2" href="{% url 'post_remove' pk=post.pk %}">
+        <a class="btn waves-effect waves-light red darken-2" href="{% url 'post_remove' pk=post.pk %}">
         <i class="material-icons">delete</i></a>
+    </div>
 {% endif %}
         </div>
        {% if post.survey_is_present %}
             <div class="col s12 m6" style="width: 100%">
-                <div class="card-content">
                     <div class="row">
                         <form method="POST" action="vote">
                             {% csrf_token %}
-                            <div class="collection with-header">
-                                <div class="collection-header "><h5>{{ post.question }}</h5></div>
+                            <div class="collection with-header z-depth-1" style="border:0.1px solid #000">
+                                <div class="collection-header {% if profile.darktheme %} white-text blue-grey darken-3 {% endif %}"><h5>{{ post.question }}</h5></div>
                                     {% for i in survey %}
-                                        <a class="collection-item" name="variant_container" id="{{i.variant}}" {% if not uservoted %} onclick="{% if post.type_of_vote %} select_one_variant(this) {% else %}select_multi_variant(this) {% endif %}" {% endif %}>
+                                        <a class="collection-item {% if profile.darktheme %} white-text blue-grey darken-3 {% else %} black-text {% endif %}" name="variant_container" id="{{i.variant}}" {% if not uservoted %} onclick="{% if post.type_of_vote %} select_one_variant(this) {% else %}select_multi_variant(this) {% endif %}" {% endif %}>
                                             <div>
                                                 {% if uservoted %}<span class="new badge" data-badge-caption="voturi">{{ i.count }}</span>{% endif %} 
                                                 {{i.variant}}
@@ -45,15 +46,14 @@
                                         </a>
                                     {% endfor %}
                                     {% if uservoted %}
-                                        <div class="collection-item"><button class="btn" disabled>Ai votat deja!</button></div>
+                                        <div class="collection-item {% if profile.darktheme %} blue-grey darken-3 {% endif %}"><button class="btn" disabled>Ai votat deja!</button></div>
                                     {% else %}
-                                        <div class="collection-item"><button class="btn btn-default center" type="submit">Votează!</button></div>
+                                        <div class="collection-item {% if profile.darktheme %} blue-grey darken-3 {% endif %}"><button class="btn btn-default center" type="submit">Votează!</button></div>
                                     {% endif %}
                                 </div>
                             </div>
                         </form>
                     </div>
-                </div>
             </div>
         {% endif %}
         <script type="text/javascript">
@@ -61,10 +61,10 @@
                 variants = document.querySelectorAll('a[name="variant_container"]');
                 for (i = 0; i<variants.length; i++){
                     variants[i].className = "collection-item";
-                    document.querySelector('input[id="'+variants[i].id +'"]').checked = false
+                    document.querySelector('input[id="'+variants[i].id +'"]').setAttribute("name","none");
                 }
                 variant.className = "collection-item active";
-                document.querySelector('input[id="'+variant.id +'"]').checked = true;
+                document.querySelector('input[id="'+variant.id +'"]').name = 'variant';
 
             }
             function select_multi_variant(variant) {
@@ -79,37 +79,22 @@
                 }
             }
         </script>
-                      <!--  <input {% if i.typeofvote %} type="radio" required value="{{i.variant}}" name="value"{% else %} type="checkbox" name="{{i.variant}}" {% endif %}  {% if uservoted %} disabled {% endif %} />{{i.variant}} {{i.count}} 
-                      
-        <
-
-            
-            
-            
-        </div>
-        
-        <p>{{post.question}}</p
-        <input type="radio" value="{{i.variant}}" name="value" disabled>{{i.variant}} {{i.count}} <br>
-        <p>You already voted</p>
-        <button class="btn btn-default" type="submit">Login</button>
-        </ul>
-    </form> -->
-<p>{{ post.comments.count }} Comentarii</p> 
+<span class="new badge right" data-badge-caption="comentarii">{{ post.comments.count }}</span>
 <a class="btn center-align" id="add_comment" onclick="add_comment()">Lasă un comentariu</a>
 
 
 
     <div class="row">
         <div class="col s12" >
-            <div class="card" id="comment_form" style="display: none">
+            <div class="card {% if profile.darktheme %} blue-grey darken-3 {% endif %}" id="comment_form" style="display: none">
                 <form method="POST">
                 {% if user.is_active %}
                 <div class="card-content">
                         {% csrf_token %}
                         <div class="row">
-                            <h4 style="margin-left: 1.5%">{{ user.username }}</h4>
+                            <h4 style="margin-left: 1%" class="{% if profile.darktheme %}  white-text {% endif %}">{{ user.username }}</h4>
                             <div class="input-field col s10">
-                                <input name="text_of_comment" id="author_of_comment" type="text" required>
+                                <input name="text_of_comment" class="{% if profile.darktheme %}  white-text {% endif %}" id="author_of_comment" type="text" required>
                                 <label class="active" for="first_name2">Comentariu</label>
                             </div>
                         </div>
@@ -131,7 +116,7 @@
                     </div>                
                 {% endif %}
                     <div class="card-action">
-                            <button class="btn-flat btn waves-effect waves-light white yellow-text text-darken-4" type="submit" value="add_comment" name="add_comment">Trimite <i class="material-icons right">send</i></button>
+                            <button class="btn-flat btn waves-effect waves-light  {% if profile.darktheme %} blue-grey darken-2 white-text {% else %} yellow-text text-darken-4 white {% endif %}" type="submit" value="add_comment" name="add_comment">Trimite <i class="material-icons right">send</i></button>
                         </div>
                 </form>
             </div>

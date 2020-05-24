@@ -13,9 +13,10 @@ from django.contrib import messages
 from django.contrib.auth.hashers import make_password
 
 def set_dict_for_render(rdict, request):
-    rdict.update({'tposts' : Post.objects.filter(published_date__lte=timezone.now()).order_by('count_of_views').reverse().filter(status=False)[0:3]})
+    if 'tposts' in rdict:
+       rdict.update({'tposts' : Post.objects.filter(published_date__lte=timezone.now()).order_by('count_of_views').reverse().filter(status=False)[0:3]})
     if request.user.is_active:
-        profile = Profile.objects.get_or_create(user = request.user)
+        profile,exist = Profile.objects.get_or_create(user = request.user)
         rdict.update({'profile':profile})
     return rdict
     
@@ -35,7 +36,7 @@ def post_list(request):
     for i in range(8):
         if 1 + i < relative_number_of_pages + 2:
             number_of_pages.append(1+i)
-    rendertemplate = {'posts': posts, 'number_of_pages': number_of_pages, "bigimage": True, "current_page":1}
+    rendertemplate = {'posts': posts, 'number_of_pages': number_of_pages, "bigimage": True, "current_page":1, 'tposts':True}
     return render(request, 'blog/post_list.html', set_dict_for_render(rendertemplate, request))
 
 def post_list_next(request, lk):
@@ -59,8 +60,7 @@ def post_list_next(request, lk):
     for i in range(4):
         if lk + i < relative_number_of_pages + 2:
             number_of_pages.append(lk+i)
-    print(lk)
-    rendertemplate = {'posts': posts, 'number_of_pages': number_of_pages, "current_page":lk}
+    rendertemplate = {'posts': posts, 'number_of_pages': number_of_pages, "current_page":lk, 'tposts':True}
     return render(request, 'blog/post_list.html', set_dict_for_render(rendertemplate, request))
 
 def post_detail(request, pk):
@@ -89,7 +89,7 @@ def post_detail(request, pk):
             comment.text = request.POST.get('text_of_comment')
             comment.save()
             return redirect('post_detail', pk=post.pk)
-    rendertemplate = {'post': post, 'user':user, 'survey': survey, 'uservoted': uservoted, "liked":liked}
+    rendertemplate = {'post': post, 'user':user, 'survey': survey, 'uservoted': uservoted, "liked":liked, 'tposts':True}
     return render(request, 'blog/post_detail.html', set_dict_for_render(rendertemplate, request))
 
 
@@ -105,7 +105,7 @@ def comment_remove(request, pk):
 def post_new(request):
     if request.method == "POST" and request.POST.get("save_post"):
         post = Post.objects.create(author = request.user)
-        post.title = request.POST.get("title", "Fără Titlu")
+        post.title = request.POST.get("title")
         post.published_date = timezone.now()
         post.cover = request.FILES.get('coverphoto')
         if request.POST.get('status') == "on":
@@ -136,39 +136,32 @@ def post_edit(request, pk):
         return HttpResponse(status=404)
     post = Post.objects.get(pk=pk)
     surveys = dict()
-    a = 1
+    a = 0
     for i in Survey.objects.filter(post=post):
         surveys.update({i.variant:a})
         a += 1
-    if request.method == "POST":
-        if request.POST.get("save_post"):
-                post.title = request.POST.get("title", "Fără Titlu")
-                post.author = request.user
-                post.cover = request.FILES.get('coverphoto', post.cover)
-                post.text = request.POST.get("posttext", "")
-                a = 1
-                nowadaysvariants = []
-                while a < int(request.POST.get("numberofvariants"))+1:
-                    if request.POST.get("textofvariant" + str(a)) != None:
-                        survey, exist = Survey.objects.get_or_create(post=post, variant = request.POST.get("textofvariant" + str(a)))
-                        if request.POST.get("typeofcheck") == 'radio':
-                            survey.typeofvote = True
-                        elif request.POST.get("typeofcheck") == "checkbox":
-                            survey.typeofvote = False
-                        survey.save()
-                    nowadaysvariants.append(survey)
-                    a +=1
-                for i in Survey.objects.filter(post = post):
-                    if i not in nowadaysvariants:
-                        i.delete()
-                post.question = request.POST.get("question")
-                if request.POST.get('status') == "on":
-                    post.status = True;
-                else:
-                    post.status = False;
-                post.save()
-                return redirect('post_detail', pk=post.pk)
-    rendertemplate = {'post':post,'surveys': surveys,'surveytype':Survey.objects.filter(post=post)[0].typeofvote}
+    if request.method == "POST" and request.POST.get("save_post"):
+        post.title = request.POST.get("title")
+        post.cover = request.FILES.get('coverphoto', post.cover)
+        post.text = request.POST.get("posttext", "")
+        if request.POST.get('status') == "on":
+            post.status = True
+        else:
+            post.status = False
+        if request.POST.get('survey_is_present') == "on":
+            post.question = request.POST.get('survey_question')
+            post.survey_is_present = True
+            for i in Survey.objects.filter(post=post):
+                i.delete()
+            for i in request.POST.getlist('variant_of_survey'):
+                if i != '':
+                    survey = Survey.objects.create(post=post, variant=i)
+                    survey.save()
+        else:
+            post.survey_is_present = False
+        post.save()
+        return redirect('post_detail', pk=post.pk)
+    rendertemplate = {'post':post,'surveys':surveys}
     return render(request, 'blog/post_edit.html', set_dict_for_render(rendertemplate, request))
 
 @login_required
@@ -250,21 +243,6 @@ def vote(request,pk):
             vote.save()
             survey.count = (len(Vote.objects.filter(variant= survey)));
             survey.save()
- #   surveyofpost = Survey.objects.filter(post=post)
-  #  if surveyofpost[0].typeofvote:
-   #     survey = Survey.objects.get(post = post, variant = request.GET.get('value'))
-    #    vote = Vote.objects.create(variant = survey, user = request.user)
-    #    survey.count = (len(Vote.objects.filter(variant= survey)))
-    #    survey.save()
-    #    vote.save()
-  #  else:
-   #     for i in surveyofpost:
-    #        if request.GET.get(i.variant) == 'on':
-     #           survey = Survey.objects.get(post = post, variant = i.variant)
-      #          vote = Vote.objects.create(variant = survey, user = request.user)
-       #         survey.count = (len(Vote.objects.filter(variant= survey)))
-        #        survey.save()
-         #       vote.save()
     return redirect('post_detail', pk=pk)
 
 @login_required
@@ -276,9 +254,26 @@ def setusertheme(request, theme):
 
 def ads_list(request):
     for i in Ad.objects.all():
-        if timedelta(days=7*i.remove_date) + i.published_date < timezone.now():
+        if timedelta(days=7 * i.remove_date) + i.published_date < timezone.now():
             i.delete()
-    return render(request, 'blog/ads.html', {'ads_page':True, 'ads': Ad.objects.all()})
+    ads = dict()
+    a = 1
+    for i in Ad.objects.all():
+        if a == 4:
+            a = 1
+        ads.update({i:a})
+        a += 1
+    first_column, second_column, third_column = [], [], []
+    for i in ads:
+        if ads[i] == 1:
+            first_column.append(i)
+        if ads[i] == 2:
+            second_column.append(i)
+        if ads[i] == 3:
+            third_column.append(i)
+    ads = [first_column, second_column, third_column]
+    rendertemplate = {'ads_page':True, 'ads_list':True, 'ads': ads}
+    return render(request, 'blog/ads.html',set_dict_for_render(rendertemplate, request))
 
 def ad_new(request):
     if not request.user.is_staff:
@@ -291,7 +286,8 @@ def ad_new(request):
         ad.remove_date = int(request.POST.get('count_of_days'))
         ad.save()
         return redirect('ads')
-    return render(request, 'blog/ad_edit.html', {'ads_page':True, 'ad_new':True})
+    rendertemplate = {'ads_page':True, 'ad_new':True}
+    return render(request, 'blog/ad_edit.html', set_dict_for_render(rendertemplate, request))
 
 def ad_edit(request, pk):
     if not request.user.is_staff:
@@ -303,7 +299,8 @@ def ad_edit(request, pk):
         ad.remove_date = int(request.POST.get('count_of_days'))
         ad.save()
         return redirect('ads')
-    return render(request, 'blog/ad_edit.html', {'ads_page':True, 'ad':ad})
+    rendertemplate = {'ads_page':True, 'ad':ad}
+    return render(request, 'blog/ad_edit.html', set_dict_for_render(rendertemplate, request))
 
 def ad_delete(request, pk):
     if not request.user.is_staff:

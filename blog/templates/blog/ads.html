@@ -1,14 +1,32 @@
 {% extends 'blog/base.html' %}
 {% block title %}Ads{% endblock %}
 {% block content %}
-{% for ad in ads %}
-<h3>Ad</h3>
-<p>{{ ad.published_date }}</p>
-<p>{{ ad.text|linebreaksbr }}</p>
-<b>{{ ad.contact }}</b>
-{% if user.is_staff %}
-     <a class="btn btn-default" href="{% url 'ad_edit' pk=ad.pk %}"><span class="glyphicon glyphicon-pencil"></span></a>
-     <a class="btn btn-default" href="{% url 'ad_delete' pk=ad.pk %}">Remove</a>
-{% endif %}
+<div class="card {% if profile.darktheme %} blue-grey darken-3 {% endif %}">
+	<div class="card-content">
+	<div class="row">
+		<div class="col s12">
+<div class="row">
+	{% for column in ads%}
+	<div class="col s4">
+		{% for ad in column %}
+		<div class="row">
+        <div class="col">
+          <div class="card hoverable {% if profile.darktheme %} blue-grey darken-2 white-text {% endif %}">
+            <div class="card-content">
+              <p>{{ ad.text| linebreaksbr }}</p>
+              <b>{{ ad.contact }}</b>
+            </div>
+            {% if user.is_staff %}
+            <a class="btn-floating halfway-fab waves-effect waves-light" href="{% url 'ad_edit' pk=ad.pk %}"><i class="material-icons">edit</i></a>
+            {% endif %}
+          </div>
+        </div>
+    </div>
+    {% endfor %}
+    </div>
 {% endfor %}
+</div>
+</div>
+</div>
+</div>
 {% endblock %}

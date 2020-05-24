@@ -10,13 +10,14 @@
       <div class="big-image card hide" id="post{{post.index}}" style="height: 88%" onmouseover="visible_big_image_change({{post.index}})" onmouseout="hidden_big_image_change({{post.index}})">
         <div class="card-image " style="height: 460px">
           <a href="{% url 'post_detail' pk=post.pk %}"><img src="http://127.0.0.1:8000/media/{{post.cover}}" style="object-fit: cover; overflow: hidden;height:460px"></a>
-          <span class="card-title">{{ post.title }}</span>
+          <span class="card-title" style="background-color: rgba(1, 87, 155, 0.5); margin:2%; max-width: 80%">{{ post.title }}</span>
+
           <span onclick="next_big_image({{post.index}})" id="previous_big_image{{post.index}}" style="display: none;"><i class="material-icons large" style="color:#fff;font-size: 900%; cursor: pointer; right: 2%; position: absolute; top:40%" >arrow_forward</i></span>
           <span onclick="previous_big_image({{post.index}})" id="next_big_image{{post.index}}" style="display: none; "><i class="material-icons large" style="color:#fff;font-size: 900%; cursor: pointer; left: 2%; position: absolute; top:40%" >arrow_back</i></span>
         {% if user.is_staff %}  <a href="{% url 'post_edit' pk=post.pk %}" class="btn-floating btn-large halfway-fab waves-effect waves-light "><i class="material-icons">edit</i></a>  {% endif %}
         </div>
-       <a href="{% url 'post_detail' pk=post.pk %}"> <div class="card-content">
-          <p style="color:#000">{{ post.text|striptags|linebreaksbr|truncatewords:30 }}</p>
+       <a href="{% url 'post_detail' pk=post.pk %}"> <div class="card-content {% if profile.darktheme %}  blue-grey darken-3 {% endif%}">
+          <p class="{% if profile.darktheme %} white-text{% else %} black-text {% endif %}">{{ post.text|striptags|linebreaksbr|truncatewords:30 }}</p>
         </div></a>
 
       </div>
@@ -27,32 +28,30 @@
 {% endif %}
     {% for post in posts %}
     <div class="col s12 m12">
-            <div class="card horizontal hoverable">
+            <div class="card horizontal hoverable {% if profile.darktheme %}  blue-grey darken-3 {% endif%}">
                 <div class="card-image valign-wrapper">
                     <img src="http://127.0.0.1:8000/media/{{post.cover}}" style="width: 150px; height: 250px; object-fit: cover; overflow: hidden;">
                 </div>
                 <div class="card-stacked">
-                    <div class="card-content " >
-                        <a href="{% url 'post_detail' pk=post.pk %}" style="color:#000">
+                    <div class="card-content" >
+                        <a href="{% url 'post_detail' pk=post.pk %}" class="{% if profile.darktheme %}  white-text {% else %} black-text {% endif %}">
                         <div class="section">
                         <h5>{{ post.title }}</h5>
                         <p>{{ post.text|striptags|linebreaksbr|truncatewords:40 }}</p>
                     </div>
                         <div class="divider"></div>
                         <div class="section">
-                        <p style="display: flex"><i class="material-icons red-text tiny black-text" style="line-height: inherit;padding-right: 0.5rem">access_time</i> {{ post.published_date }} |<i class="material-icons red-text tiny black-text" style="line-height: inherit;padding-right: 0.5rem;padding-left: 0.5rem">contacts</i> {{post.author}} |  {{post.count_of_views}} <i class="material-icons red-text tiny black-text" style="line-height: inherit;padding-left: 0.5rem">remove_red_eye</i></p></div>
+                        <p style="display: flex" ><i class="material-icons red-text tiny {% if profile.darktheme %}  white-text {% else %} black-text {% endif %}" style="line-height: inherit;padding-right: 0.5rem">access_time</i> {{ post.published_date }} |<i class="material-icons red-text tiny {% if profile.darktheme %}  white-text {% else %} black-text {% endif %}" style="line-height: inherit;padding-right: 0.5rem;padding-left: 0.5rem">contacts</i> {{post.author}} |  {{post.count_of_views}} <i class="material-icons red-text tiny {% if profile.darktheme %}  white-text {% else %} black-text {% endif %}" style="line-height: inherit;padding-left: 0.5rem">remove_red_eye</i></p></div>
                         </a>
                     </div>
                 </div>
-                {% if user.is_staff%}  
-                {% endif %}
             </div>
         
     </div> 
     {% endfor %}
     <ul class="pagination center">
         {% for i in number_of_pages %}
-            <li class="waves-effect {% if i == current_page %} active blue darken-3{% endif %}"><a href="{% url 'choose_page' lk=i %}"> {{i}} </a></li>
+            <li class="waves-effect {% if i == current_page %} active {% if profile.darktheme %} blue-grey darken-2{% else %} blue {% endif %}darken-3{% endif %}" ><a class="{% if profile.darktheme %} white-text {% endif %}" href="{% url 'choose_page' lk=i %}"> {{i}} </a></li>
         {% endfor %}
     </ul>
     <script type="text/javascript" src="{% static 'js/post_list.js' %}"></script>

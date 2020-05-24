@@ -3,12 +3,12 @@
 {% block content %}
 <form method="POST" class="post-form" enctype="multipart/form-data">
     {% csrf_token %}
-    <div class="card">
+    <div class="card {% if profile.darktheme %} white-text blue-grey darken-3 {% endif %}">
         <div class="card-content" style="padding: 2%;">
             <div class="row">
-                <h3 class="col">Adaugă un articol</h3>
+                <h3 class="col {% if profile.darktheme %} white-text {% endif %}">Adaugă un articol</h3>
                 <div class="input-field col s12">
-                    <input name="title" type="text" value="{{post_title}}" required>
+                    <input name="title" type="text" value="{{post.title}}" required>
                     <label class="active" for="first_name2">Titlu</label>
                 </div>
                 <div class="col s12">
@@ -28,7 +28,7 @@
                 </div>
 
                 <div class="col s12">
-                    <div class="input-field col s2" style="padding-left: 0">
+                    <div class="input-field col s2 " style="padding-left: 0">
                         <select onchange="format('forecolor',this[this.selectedIndex].value);this.selectedIndex=0;">
                             <option selected hidden disabled>Culoarea Textului</option>
                             <option value="red">Roșu</option>
@@ -94,38 +94,44 @@
                 <textarea class="text_input s12 z-depth-1 hide" name="posttext" id="post_code" style="width: 100%; height: 400px">{{ post.text }}</textarea>
             </div>
             <div class="card-action">
-                <button class="btn col s12 right" type="submit" name="save_post" id="save_post" onclick="add_variant()" value="Save Post">Publică</button>
+                <button class="btn col s12 right" type="submit" name="save_post" id="save_post" onclick="add_variant()" value="Save Post">{% if post_status %}Salvează{% else %}Publică {% endif %}</button>
                 <input type="checkbox" id="post_status" class="filled-in" oninput="set_save_button_text(this.checked)" name="status" {% if post_status %} checked {% endif %}/>
                 <label for="post_status">Schiță</label>
                 <h5>Imagine de copertă</h5>
                 <input type="file" name="coverphoto" class="hide" id="cover_upload" oninput="set_representative_cover_img(this.files[0])">
-                 <a class="btn tooltipped" data-position="bottom" data-delay="50" html="true" data-tooltip="<b>auf</b>">Hover me!</a>
-                <label for="cover_upload"><img class="card" style="min-width: 100%;min-height: 400px; height:auto"src="http://127.0.0.1:8000/media/{{post.cover}}" id="representative_cover" /></label>
+                <label for="cover_upload"><img class="card" style="min-width: 100%;max-width:100%;min-height: 400px; height:auto"src="http://127.0.0.1:8000/media/{{post.cover}}" id="representative_cover" /></label>
             </div>
         </div>
     </div>
 
     <div class="col s12 m6" >
-        <div class="card">
+        <div class="card {% if profile.darktheme %} white-text blue-grey darken-3 {% endif %}">
             <div class="card-content">
-                <input type="checkbox" name="survey_is_present" class="filled-in" id="test5" oninput="activate_survey(this.checked)" />
+                <input type="checkbox" name="survey_is_present" class="filled-in" id="test5" oninput="activate_survey(this.checked)" {% if post.survey_is_present %} checked {% endif %}/>
                 <label for="test5">Activează chestionarele</label>
-                <div class="col hide s8" id="survey_container">
+                <div class="col {% if not post.survey_is_present %} hide {% endif %} s8" id="survey_container">
                     <div class="switch" style="padding: 2%">
                         <label>
                             Multivot
-                            <input type="checkbox" name="type_of_vote" id="one_or_multi_vote">
+                            <input type="checkbox" name="type_of_vote" id="one_or_multi_vote" {% if not post.type_of_vote %} checked {% endif %}>
                             <span class="lever"></span>
                             Univot
                         </label>
                     </div>
                     <div class="input-field col s12" >
-                        <input id="image_title" type="text" name="survey_question">
+                        <input id="image_title" type="text" value="{{ post.question }}" name="survey_question">
                         <label class="active" for="image_title">Întrebarea chestionarului</label>
                     </div>
+                    {% for variant, index in surveys.items %}
+                        <div class="input-field col s12" id="variant_container{{ index }}" name="variant_container">
+                            <input id="variant_input{{ index }}" value="{{ variant }}" type="text" name="variant_of_survey" style="width: 97%">
+                            <label for="variant_input{{ index }}">Variantă</label>
+                            <i class="material-icons prefix teal-text" id="{{ index }}" onclick="delete_variant(this.id)" style="margin-top: 2.5%; cursor: pointer;">delete</i>
+                        </div>
+                    {% endfor %}
                 </div>
             </div>
-            <div class="card-action hide" id="card-action">
+            <div class="card-action {% if not post.survey_is_present %} hide {% endif %}" id="card-action">
                 <a class="btn col s12" id="add_variant_button" onclick="add_variant()">Adaugă o Variantă de vot</a>
             </div>
         </div>
@@ -232,10 +238,10 @@
 
 
 <script type="text/javascript">
-    var add_variant_button = document.getElementById('add_variant_button')
+    var add_variant_button = document.getElementById('add_variant_button');
     var survey_container = document.getElementById('survey_container');
     var card_action = document.getElementById('card-action');
-    var variant_index = 0
+    var variant_index = document.querySelectorAll('input[name="variant"]').length;
 
     function activate_survey(approved){
         if (approved){
@@ -291,9 +297,6 @@
             });
             $('.modal').modal({
                 dismissible: false
-            });
-            $(document).ready(function(){
-                $('.tooltipped').tooltip({html:true});
             });
         </script>
 
