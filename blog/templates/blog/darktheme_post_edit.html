@@ -1,12 +1,12 @@
-{% extends 'blog/base.html' %}
+{% extends 'blog/darktheme_base.html' %}
 {% load static %}
 {% block content %}
 <form method="POST" class="post-form" enctype="multipart/form-data">
     {% csrf_token %}
-    <div class="card">
+    <div class="card white-text blue-grey darken-3">
         <div class="card-content" style="padding: 2%;">
             <div class="row">
-                <h3 class="col">Adaugă un articol</h3>
+                <h3 class="col white-text">Adaugă un articol</h3>
                 <div class="input-field col s12">
                     <input name="title" type="text" value="{{post.title}}" required>
                     <label class="active" for="first_name2">Titlu</label>
@@ -105,7 +105,7 @@
     </div>
 
     <div class="col s12 m6" >
-        <div class="card">
+        <div class="card white-text blue-grey darken-3">
             <div class="card-content">
                 <input type="checkbox" name="survey_is_present" class="filled-in" id="test5" oninput="activate_survey(this.checked)" {% if post.survey_is_present %} checked {% endif %}/>
                 <label for="test5">Activează chestionarele</label>

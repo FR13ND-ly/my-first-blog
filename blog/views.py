@@ -19,7 +19,13 @@ def set_dict_for_render(rdict, request):
         profile,exist = Profile.objects.get_or_create(user = request.user)
         rdict.update({'profile':profile})
     return rdict
-    
+
+def check_dark_theme(request):
+    if request.user.is_active:
+        profile,exist = Profile.objects.get_or_create(user = request.user)
+        if profile.darktheme:
+            return 'darktheme_'
+        return ''
 
 def post_list(request):
     if request.user.is_staff:
@@ -37,7 +43,7 @@ def post_list(request):
         if 1 + i < relative_number_of_pages + 2:
             number_of_pages.append(1+i)
     rendertemplate = {'posts': posts, 'number_of_pages': number_of_pages, "bigimage": True, "current_page":1, 'tposts':True}
-    return render(request, 'blog/post_list.html', set_dict_for_render(rendertemplate, request))
+    return render(request, 'blog/' + check_dark_theme(request) + 'post_list.html', set_dict_for_render(rendertemplate, request))
 
 def post_list_next(request, lk):
     if lk == 1:
@@ -61,7 +67,7 @@ def post_list_next(request, lk):
         if lk + i < relative_number_of_pages + 2:
             number_of_pages.append(lk+i)
     rendertemplate = {'posts': posts, 'number_of_pages': number_of_pages, "current_page":lk, 'tposts':True}
-    return render(request, 'blog/post_list.html', set_dict_for_render(rendertemplate, request))
+    return render(request, 'blog/' + check_dark_theme(request) + 'post_list.html', set_dict_for_render(rendertemplate, request))
 
 def post_detail(request, pk):
     post = get_object_or_404(Post, pk=pk)
@@ -78,19 +84,18 @@ def post_detail(request, pk):
         for i in Vote.objects.filter(variant=variant):
             if i.user == request.user:
                 uservoted = True
-    if request.method == "POST":
-        if request.POST.get("add_comment"):
-            comment = Comment.objects.create(post = post)
-            if user.is_active:
-                comment.author = user.username
-                comment.photo_of_user = Profile.objects.get(user = request.user).photo
-            else:
-                comment.author =request.POST.get('author_of_comment')
-            comment.text = request.POST.get('text_of_comment')
-            comment.save()
-            return redirect('post_detail', pk=post.pk)
+    if request.method == "POST" and request.POST.get("add_comment"):
+        comment = Comment.objects.create(post = post)
+        if user.is_active:
+            comment.author = user.username
+            comment.photo_of_user = Profile.objects.get(user = request.user).photo
+        else:
+            comment.author =request.POST.get('author_of_comment')
+        comment.text = request.POST.get('text_of_comment')
+        comment.save()
+        return redirect('post_detail', pk=post.pk)
     rendertemplate = {'post': post, 'user':user, 'survey': survey, 'uservoted': uservoted, "liked":liked, 'tposts':True}
-    return render(request, 'blog/post_detail.html', set_dict_for_render(rendertemplate, request))
+    return render(request, 'blog/' + check_dark_theme(request) + 'post_detail.html', set_dict_for_render(rendertemplate, request))
 
 
 @login_required
@@ -123,12 +128,11 @@ def post_new(request):
                 if i != '':
                     survey = Survey.objects.create(post=post, variant=i)
                     survey.save()
-
-            post.text = request.POST.get("posttext")
-            post.save()
-            return redirect('post_detail', pk=post.pk)
+        post.text = request.POST.get("posttext")
+        post.save()
+        return redirect('post_detail', pk=post.pk)
     rendertemplate = {"post_new": True}
-    return render(request, 'blog/post_edit.html', set_dict_for_render(rendertemplate, request))
+    return render(request, 'blog/' + check_dark_theme(request) + 'post_edit.html', set_dict_for_render(rendertemplate, request))
 
 @login_required
 def post_edit(request, pk):
@@ -162,7 +166,7 @@ def post_edit(request, pk):
         post.save()
         return redirect('post_detail', pk=post.pk)
     rendertemplate = {'post':post,'surveys':surveys}
-    return render(request, 'blog/post_edit.html', set_dict_for_render(rendertemplate, request))
+    return render(request, 'blog/' + check_dark_theme(request) + 'post_edit.html', set_dict_for_render(rendertemplate, request))
 
 @login_required
 def post_remove(request, pk):
@@ -273,7 +277,7 @@ def ads_list(request):
             third_column.append(i)
     ads = [first_column, second_column, third_column]
     rendertemplate = {'ads_page':True, 'ads_list':True, 'ads': ads}
-    return render(request, 'blog/ads.html',set_dict_for_render(rendertemplate, request))
+    return render(request, 'blog/' + check_dark_theme(request) + 'ads.html',set_dict_for_render(rendertemplate, request))
 
 def ad_new(request):
     if not request.user.is_staff:
@@ -287,7 +291,7 @@ def ad_new(request):
         ad.save()
         return redirect('ads')
     rendertemplate = {'ads_page':True, 'ad_new':True}
-    return render(request, 'blog/ad_edit.html', set_dict_for_render(rendertemplate, request))
+    return render(request, 'blog/' + check_dark_theme(request) + 'ad_edit.html', set_dict_for_render(rendertemplate, request))
 
 def ad_edit(request, pk):
     if not request.user.is_staff:
@@ -300,7 +304,7 @@ def ad_edit(request, pk):
         ad.save()
         return redirect('ads')
     rendertemplate = {'ads_page':True, 'ad':ad}
-    return render(request, 'blog/ad_edit.html', set_dict_for_render(rendertemplate, request))
+    return render(request, 'blog/' + check_dark_theme(request) + 'ad_edit.html', set_dict_for_render(rendertemplate, request))
 
 def ad_delete(request, pk):
     if not request.user.is_staff:

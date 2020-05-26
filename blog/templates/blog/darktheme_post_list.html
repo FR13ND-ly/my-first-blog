@@ -1,4 +1,4 @@
-{% extends 'blog/base.html' %}
+{% extends 'blog/darktheme_base.html' %}
 {% load static %}
 
 
@@ -16,8 +16,8 @@
           <span onclick="previous_big_image({{post.index}})" id="next_big_image{{post.index}}" style="display: none; "><i class="material-icons large" style="color:#fff;font-size: 900%; cursor: pointer; left: 2%; position: absolute; top:40%" >arrow_back</i></span>
         {% if user.is_staff %}  <a href="{% url 'post_edit' pk=post.pk %}" class="btn-floating btn-large halfway-fab waves-effect waves-light "><i class="material-icons">edit</i></a>  {% endif %}
         </div>
-       <a href="{% url 'post_detail' pk=post.pk %}"> <div class="card-content {% if profile.darktheme %}  blue-grey darken-3 {% endif%}">
-          <p class="black-text">{{ post.text|striptags|linebreaksbr|truncatewords:30 }}</p>
+       <a href="{% url 'post_detail' pk=post.pk %}"> <div class="card-content blue-grey darken-3">
+          <p class="white-text">{{ post.text|striptags|linebreaksbr|truncatewords:30 }}</p>
         </div></a>
 
       </div>
@@ -28,20 +28,20 @@
 {% endif %}
     {% for post in posts %}
     <div class="col s12 m12">
-            <div class="card horizontal hoverable">
+            <div class="card horizontal hoverable blue-grey darken-3">
                 <div class="card-image valign-wrapper">
                     <img src="/media/{{post.cover}}" style="width: 150px; height: 250px; object-fit: cover; overflow: hidden;">
                 </div>
                 <div class="card-stacked">
                     <div class="card-content" >
-                        <a href="{% url 'post_detail' pk=post.pk %}" class="black-text">
+                        <a href="{% url 'post_detail' pk=post.pk %}" class="white-text">
                         <div class="section">
                         <h5>{{ post.title }}</h5>
                         <p>{{ post.text|striptags|linebreaksbr|truncatewords:40 }}</p>
                     </div>
                         <div class="divider"></div>
                         <div class="section">
-                        <p style="display: flex" ><i class="material-icons red-text tiny black-text" style="line-height: inherit;padding-right: 0.5rem">access_time</i> {{ post.published_date }} |<i class="material-icons red-text tiny black-text" style="line-height: inherit;padding-right: 0.5rem;padding-left: 0.5rem">contacts</i> {{post.author}} |  {{post.count_of_views}} <i class="material-icons red-text tiny black-text" style="line-height: inherit;padding-left: 0.5rem">remove_red_eye</i></p></div>
+                        <p style="display: flex" ><i class="material-icons red-text tiny white-text" style="line-height: inherit;padding-right: 0.5rem">access_time</i> {{ post.published_date }} |<i class="material-icons red-text tiny white-text" style="line-height: inherit;padding-right: 0.5rem;padding-left: 0.5rem">contacts</i> {{post.author}} |  {{post.count_of_views}} <i class="material-icons red-text tiny white-text" style="line-height: inherit;padding-left: 0.5rem">remove_red_eye</i></p></div>
                         </a>
                     </div>
                 </div>
@@ -51,7 +51,7 @@
     {% endfor %}
     <ul class="pagination center">
         {% for i in number_of_pages %}
-            <li class="waves-effect {% if i == current_page %} active blue darken-3{% endif %}" ><a href="{% url 'choose_page' lk=i %}"> {{i}} </a></li>
+            <li class="waves-effect {% if i == current_page %} active blue-grey darken-2 darken-3{% endif %}" ><a class="white-text" href="{% url 'choose_page' lk=i %}"> {{i}} </a></li>
         {% endfor %}
     </ul>
     <script type="text/javascript" src="{% static 'js/post_list.js' %}"></script>

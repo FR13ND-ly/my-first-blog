@@ -1,12 +1,12 @@
-{% extends 'blog/base.html' %}
+{% extends 'blog/darktheme_base.html' %}
 {% load static %}
 {% block content %}
 <div class="row">
     <div class="col s12" >
-    <div class="card" >
+    <div class="card blue-grey darken-3 white-text" >
         <div class="card-content">
         <div class="section">
-            <h4>{{ post.title }}</h4>
+            <h4 class="darken-3 white-text">{{ post.title }}</h4>
             <div class="divider" style="margin-bottom: 1%"></div>
             <p style="display: flex" ><i class="material-icons tiny " style="line-height: inherit;padding-right: 0.5rem">access_time</i> {{ post.published_date }} |<i class="material-icons tiny" style="line-height: inherit;padding-right: 0.5rem;padding-left: 0.5rem">contacts</i> {{post.author}} |  {{post.count_of_views}} <i class="material-icons tiny " style="line-height: inherit;padding-left: 0.5rem">remove_red_eye</i></p>
             <div class="divider" style="margin-top: 1%"></div>
@@ -32,23 +32,22 @@
                         <form method="POST" action="vote">
                             {% csrf_token %}
                             <div class="collection with-header z-depth-1" style="border:0.1px solid #000">
-                                <div class="collection-header"><h5>{{ post.question }}</h5></div>
+                                <div class="collection-header white-text blue-grey darken-3"><h5>{{ post.question }}</h5></div>
                                     {% for i in survey %}
-                                        <a class="collection-item black-text" name="variant_container" id="{{i.variant}}" {% if not uservoted %} onclick="{% if post.type_of_vote %} select_one_variant(this) {% else %}select_multi_variant(this) {% endif %}" {% endif %}>
+                                        <a class="collection-item white-text blue-grey darken-3" name="variant_container" id="{{i.variant}}" {% if not uservoted %} onclick="{% if post.type_of_vote %} select_one_variant(this) {% else %}select_multi_variant(this) {% endif %}" {% endif %}>
                                             <div>
                                                 {% if uservoted %}<span class="new badge" data-badge-caption="voturi">{{ i.count }}</span>{% endif %} 
                                                 {{i.variant}}
                                                 <div class="hide secondary-content">
                                                     <input {% if post.type_of_vote %} name="variant" {% endif %}value="{{ i.variant }}" type="{% if post.type_of_vote %} radio {% else %} check {% endif %}" id="{{ i.variant }}"/>
-                                          <!--  <label for="{{ i.variant }}"></label> -->
                                                 </div>
                                             </div>
                                         </a>
                                     {% endfor %}
                                     {% if uservoted %}
-                                        <div class="collection-item "><button class="btn" disabled>Ai votat deja!</button></div>
+                                        <div class="collection-item blue-grey darken-3"><button class="btn" disabled>Ai votat deja!</button></div>
                                     {% else %}
-                                        <div class="collection-item"><button class="btn btn-default center" type="submit">Votează!</button></div>
+                                        <div class="collection-item blue-grey darken-3"><button class="btn btn-default center" type="submit">Votează!</button></div>
                                     {% endif %}
                                 </div>
                             </div>
@@ -60,41 +59,42 @@
             function select_one_variant(variant){
                 variants = document.querySelectorAll('a[name="variant_container"]');
                 for (i = 0; i<variants.length; i++){
-                    variants[i].className = "collection-item";
+                    variants[i].className = "collection-item white-text blue-grey darken-3";
                     document.querySelector('input[id="'+variants[i].id +'"]').setAttribute("name","none");
                 }
-                variant.className = "collection-item active";
+                variant.className = "collection-item white-text active";
                 document.querySelector('input[id="'+variant.id +'"]').name = 'variant';
 
             }
             function select_multi_variant(variant) {
                 variant_input = document.querySelector('input[id="'+variant.id +'"]');
-                if (variant.className == "collection-item"){
-                    variant.className = "collection-item active";
+                if (variant.className == "collection-item white-text blue-grey darken-3"){
+                    variant.className = "collection-item white-text active";
                     variant_input.name = 'variant';
                 }
                 else {
-                    variant.className = "collection-item";
+                    variant.className = "collection-item white-text blue-grey darken-3";
                     variant_input.setAttribute("name","none");
                 }
             }
         </script>
+<div class="col s12">
 <span class="new badge right" data-badge-caption="comentarii">{{ post.comments.count }}</span>
 <a class="btn center-align" id="add_comment" onclick="add_comment()">Lasă un comentariu</a>
-
+</div>
 
 
     <div class="row">
         <div class="col s12" >
-            <div class="card" id="comment_form" style="display: none">
+            <div class="card blue-grey darken-3" id="comment_form" style="display: none">
                 <form method="POST">
                 {% if user.is_active %}
                 <div class="card-content">
                         {% csrf_token %}
                         <div class="row">
-                            <h4 style="margin-left: 1%">{{ user.username }}</h4>
+                            <h4 style="margin-left: 1%" class="white-text">{{ user.username }}</h4>
                             <div class="input-field col s10">
-                                <input name="text_of_comment" id="author_of_comment" type="text" required>
+                                <input name="text_of_comment" class="white-text" id="author_of_comment" type="text" required>
                                 <label class="active" for="first_name2">Comentariu</label>
                             </div>
                         </div>
@@ -116,7 +116,7 @@
                     </div>                
                 {% endif %}
                     <div class="card-action">
-                            <button class="btn-flat btn waves-effect waves-light  {% if profile.darktheme %} blue-grey darken-2 white-text {% else %} yellow-text text-darken-4 white {% endif %}" type="submit" value="add_comment" name="add_comment">Trimite <i class="material-icons right">send</i></button>
+                            <button class="btn-flat btn waves-effect waves-light blue-grey darken-2 white-text" type="submit" value="add_comment" name="add_comment">Trimite <i class="material-icons right">send</i></button>
                         </div>
                 </form>
             </div>
@@ -125,10 +125,10 @@
 </div>
 
 {% for comment in post.comments.all %}
-<div class="col s12">
+<div class="col s12" style="margin-bottom:3%">
     <div class="card horizontal">
         <div class="card-stacked">
-            <div class="card-content">
+            <div class="card-content white-text blue-grey darken-3">
                 <h5>{{ comment.author }}</h5>
                 <p>{{ comment.text|linebreaks }} </p>
                 <p class="right">{{ comment.created_date }}</p>
