@@ -25,7 +25,7 @@ def check_dark_theme(request):
         profile,exist = Profile.objects.get_or_create(user = request.user)
         if profile.darktheme:
             return 'darktheme_'
-        return ''
+    return ''
 
 def post_list(request):
     if request.user.is_staff:
@@ -108,6 +108,8 @@ def comment_remove(request, pk):
 
 @login_required
 def post_new(request):
+    if not request.user.is_staff:
+        return HttpResponse(status=404)
     if request.method == "POST" and request.POST.get("save_post"):
         post = Post.objects.create(author = request.user)
         post.title = request.POST.get("title")

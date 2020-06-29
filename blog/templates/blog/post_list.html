@@ -3,14 +3,24 @@
 
 
 {% block content %}
+<div class="row hide-on-med-and-up" style="margin-top:1%">
+<div class="col container s12">
+{% if user.is_active %}
+{% if user.is_staff %} <a class="col btn waves-effect waves-light s6" href="{% if ads_page %}{% url 'new_ad' %} {% else %} /post/new {% endif %}"><i class="material-icons">add</i></a></a>{% endif %}
+{% else %}
+<a class="col btn waves-effect waves-light s6" href="/login">Loghează-te</a>
+{% endif %}
+<a class="col btn waves-effect waves-light s6" style="left:1%" href="/ads">Publicitate</a>
+</div>
+</div>
+<div class="row" >
 {% if bigimage %}
-    <div class="row" >
     <div class="col s12 valign-wrapper" style="width: 100%;">
         {% for post in posts %}
       <div class="big-image card hide" id="post{{post.index}}" style="height: 88%" onmouseover="visible_big_image_change({{post.index}})" onmouseout="hidden_big_image_change({{post.index}})">
         <div class="card-image " style="height: 460px">
           <a href="{% url 'post_detail' pk=post.pk %}"><img src="/media/{{post.cover}}" style="object-fit: cover; overflow: hidden;height:460px"></a>
-          <span class="card-title" style="background-color: rgba(1, 87, 155, 0.5); margin:2%; max-width: 80%">{{ post.title }}</span>
+          <span class="card-title" style="background-color: rgba(1, 87, 155, 0.5); margin:2%; max-width: 80%;">{{ post.title }}</span>
 
           <span onclick="next_big_image({{post.index}})" id="previous_big_image{{post.index}}" style="display: none;"><i class="material-icons large" style="color:#fff;font-size: 900%; cursor: pointer; right: 2%; position: absolute; top:40%" >arrow_forward</i></span>
           <span onclick="previous_big_image({{post.index}})" id="next_big_image{{post.index}}" style="display: none; "><i class="material-icons large" style="color:#fff;font-size: 900%; cursor: pointer; left: 2%; position: absolute; top:40%" >arrow_back</i></span>
@@ -24,7 +34,6 @@
         {% endfor %}
     </div>
     
-  </div>
 {% endif %}
     {% for post in posts %}
     <div class="col s12 m12">
@@ -33,11 +42,11 @@
                     <img src="/media/{{post.cover}}" style="width: 150px; height: 250px; object-fit: cover; overflow: hidden;">
                 </div>
                 <div class="card-stacked">
-                    <div class="card-content" >
+                    <div class="card-content">
                         <a href="{% url 'post_detail' pk=post.pk %}" class="black-text">
                         <div class="section">
                         <h5>{{ post.title }}</h5>
-                        <p>{{ post.text|striptags|linebreaksbr|truncatewords:40 }}</p>
+                        <p class="flow-text">{{ post.text|striptags|linebreaksbr|truncatewords:40 }}</p>
                     </div>
                         <div class="divider"></div>
                         <div class="section">
@@ -47,12 +56,13 @@
                 </div>
             </div>
         
-    </div> 
+    </div>
     {% endfor %}
     <ul class="pagination center">
         {% for i in number_of_pages %}
             <li class="waves-effect {% if i == current_page %} active blue darken-3{% endif %}" ><a href="{% url 'choose_page' lk=i %}"> {{i}} </a></li>
         {% endfor %}
     </ul>
+    </div>
     <script type="text/javascript" src="{% static 'js/post_list.js' %}"></script>
 {% endblock %}

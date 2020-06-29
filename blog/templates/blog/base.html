@@ -71,7 +71,7 @@
         </div>
     </div>
     {% if tposts %}
-    <ul class="collection show-on-large card" style="position: absolute; right: 1%; width:25%; height: 88%; padding:10px;border:0.1px solid #000">
+    <ul class="collection hide-on-small-only card" style="position: absolute; right: 1%; width:25%; height: 88%; padding:10px;border:0.1px solid #000">
         <div class="section" style="margin-bottom: 5%">
         <li><h3 class="collection-item" align="center" style="padding-top: 10%;">Top Articole</h3></li>
     </div>
@@ -88,7 +88,7 @@
       </div>
           <div class="divider"></div>
           <div class="section">
-          <p class="right black-text" style="display: flex;">{{post.count_of_views}} <i class="material-icons red-text tiny black-text" style="line-height: inherit;padding-left: 0.3rem">remove_red_eye</i></p></div>
+            <p style="display: flex" class="black-text"><i class="material-icons red-text tiny black-text" style="line-height: inherit;padding-right: 0.5rem">access_time</i> {{ post.published_date }} |<i class="material-icons red-text tiny black-text" style="line-height: inherit;padding-right: 0.5rem;padding-left: 0.5rem">contacts</i> {{post.author}} |  {{post.count_of_views}} <i class="material-icons red-text tiny black-text" style="line-height: inherit;padding-left: 0.5rem">remove_red_eye</i></p></div>
         </div>
       </div>
     </div>
@@ -129,6 +129,7 @@
                   <li><a class="grey-text text-lighten-3" href="https://www.facebook.com/Est-Curier-Criuleni-1498073250508795/">Facebook</a></li>
                   <li><a class="grey-text text-lighten-3" href="https://www.youtube.com/channel/UCflgGBMYMLcveK-xoX_RipA">YouTube</a></li>
                   <li><a class="grey-text text-lighten-3" href="https://www.instagram.com/estcurier/">Instagram</a></li>
+                  <li><a class="grey-text text-lighten-3 hide-on-med-and-up">Support:estcuriercriuleni@gmail.com</a></li>
                 </ul>
               </div>
             </div>
@@ -136,7 +137,7 @@
           <div class="footer-copyright">
             <div class="container">
             © 2020 Est Curier. All Rights Reserved.
-            <p class="grey-text text-lighten-4 right" href="#!">Support: estcuriercriuleni@gmail.com</p>
+            <p class="grey-text text-lighten-4 right hide-on-small-only" href="#!">Support: estcuriercriuleni@gmail.com</p>
             </div>
           </div>
         </footer>
