@@ -6,22 +6,22 @@
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css">
         <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-        <link rel="stylesheet" href="{% static 'css/blog.css' %}">  
+        <link rel="stylesheet" href="{% static 'css/blog.css' %}">
         <title>Est-Curier</title>
     </head>
 
-    <body style="display: flex; min-height: 100vh; flex-direction: column;" {% if profile.darktheme %} class=" blue-grey darken-4" {% endif%} >
+    <body style="display: flex; min-height: 100vh; flex-direction: column;" class="grey lighten-3">
         <header>
        <nav>
-    <div class="nav-wrapper light-blue darken-4">
-        <a href="/" class="brand-logo center">Est Curier</a>
+    <div class="nav-wrapper white">
+        <a href="/" class="brand-logo center light-blue-text text-darken-2">Est Curier</a>
         <ul id="nav-mobile" class="left hide-on-med-and-down ">
-            <li><i class="material-icons" style="font-size: 60px; cursor: pointer; margin-left: 12%" onclick="makevisibleusermenu()">account_circle</i></li>
+            <li><i class="material-icons black-text" style="font-size: 60px; cursor: pointer; margin-left: 12%" onclick="makevisibleusermenu()">account_circle</i></li>
         </ul>
-      <ul class="right hide-on-med-and-down white-text flow-text ">
+      <ul class="right hide-on-med-and-down flow-text ">
         <li>{% if user.is_staff %} <a class="btn waves-effect waves-light " href="{% if ads_page %}{% url 'new_ad' %} {% else %} /post/new {% endif %}">
         <i class="material-icons">add</i></a> {% endif %}</li>
-        <li><a href="/ads">Publicitate</a></li>
+        <li><a href="/ads" class="black-text">Publicitate</a></li>
       </ul>
     </div>
   </nav>
@@ -33,7 +33,7 @@
                 {% if user.is_active %}
                 <div class="card-content s12">
                     <div class="row">
-                        <a href="{% url 'logout' %}" class="yellow-text text-darken-4 right"><i class="material-icons">logout</i></a><br>
+                        <a href="{% url 'logout' %}" class="light-blue-text text-darken-2 right"><i class="material-icons">logout</i></a><br>
                         <h3 class="center-align">{{ user.username }}</h3>
                         <p class="center-align">{% if user.is_staff %}Administrator{% else %}Utilizator{% endif %}</p>
                     </div>
@@ -42,7 +42,7 @@
                         {% if profile.darktheme %}
                             <a href="{% url 'setusertheme' theme=0 %}"><button class="btn-flat white-text">Treci la tema luminoasă!</button></a>
                         {% else %}
-                            <a href="{% url 'setusertheme' theme=1 %}"><button class="btn-flat yellow-text text-darken-4">Treci la tema întunecată!</button></a>
+                            <a href="{% url 'setusertheme' theme=1 %}"><button class="btn-flat light-blue-text text-darken-2">Treci la tema întunecată!</button></a>
                         {% endif %}
                     </div>
                 {% else %}
@@ -71,20 +71,20 @@
         </div>
     </div>
     {% if tposts %}
-    <ul class="collection hide-on-small-only card" style="position: absolute; right: 1%; width:25%; height: 88%; padding:10px;border:0.1px solid #000">
+    <ul class="collection hide-on-small-only card" style="position: absolute; right: 1%; width:25%; height: 56rem; padding:10px;">
         <div class="section" style="margin-bottom: 5%">
         <li><h3 class="collection-item" align="center" style="padding-top: 10%;">Top Articole</h3></li>
     </div>
     {% for post in tposts %}
         <li style="margin:2%"><a href="{% url 'post_detail' pk=post.pk %}">
-    <div class="card horizontal valign-wrapper hoverable" style="height: 130px">
+    <div class="card horizontal valign-wrapper hoverable" style="height: 14rem">
       <div class="card-image">
-        <img src="/media/{{post.cover}}" style="width: 60px; height: 130px; max-height: 146px; object-fit: cover; overflow: hidden;">
+        <img src="/media/{{post.cover}}" style="width:6rem; height: 14rem;  object-fit: cover; overflow: hidden;">
       </div>
       <div class="card-stacked">
         <div class="card-content">
         <div class="section " >
-          <p style="font-size: 16px;" class="black-text">{{ post.title }}</p>
+          <p class="black-text flow-text">{{ post.title }}</p>
       </div>
           <div class="divider"></div>
           <div class="section">
@@ -94,7 +94,7 @@
     </div>
         </a></li>
     {% endfor %}
-        
+
     </ul>
     {% endif %}
     {% if ads_list %}
@@ -108,36 +108,32 @@
         </div>
     {% endif %}
         <div class="content container">
-                
-                    <div class="col-md-8">
                         {% block content %}
                         {% endblock %}
-                    </div>
         </div>
     </div>
 </main>
-    <footer class="page-footer light-blue darken-4" >
+    <footer class="page-footer grey lighten-2" >
           <div class="container ">
             <div class="row">
               <div class="col l6 s12">
-                <h5 class="white-text">Est Curier</h5>
-                <p class="grey-text text-lighten-4">Ziarul cu care stai de vorbă și în care poți avea încredere</p>
+                <h5 class="black-text">Est Curier</h5>
+                <p class="black-text">Ziarul cu care stai de vorbă și în care poți avea încredere</p>
               </div>
               <div class="col l4 offset-l2 s12">
-                <h5 class="white-text">Rețele Sociale</h5>
+                <h5 class="black-text">Rețele Sociale</h5>
                 <ul>
-                  <li><a class="grey-text text-lighten-3" href="https://www.facebook.com/Est-Curier-Criuleni-1498073250508795/">Facebook</a></li>
-                  <li><a class="grey-text text-lighten-3" href="https://www.youtube.com/channel/UCflgGBMYMLcveK-xoX_RipA">YouTube</a></li>
-                  <li><a class="grey-text text-lighten-3" href="https://www.instagram.com/estcurier/">Instagram</a></li>
-                  <li><a class="grey-text text-lighten-3 hide-on-med-and-up">Support:estcuriercriuleni@gmail.com</a></li>
+                  <li><a class="black-text" href="https://www.facebook.com/Est-Curier-Criuleni-1498073250508795/">Facebook</a></li>
+                  <li><a class="black-text" href="https://www.youtube.com/channel/UCflgGBMYMLcveK-xoX_RipA">YouTube</a></li>
+                  <li><a class="black-text" href="https://www.instagram.com/estcurier/">Instagram</a></li>
                 </ul>
               </div>
             </div>
           </div>
           <div class="footer-copyright">
-            <div class="container">
+            <div class="container black-text">
             © 2020 Est Curier. All Rights Reserved.
-            <p class="grey-text text-lighten-4 right hide-on-small-only" href="#!">Support: estcuriercriuleni@gmail.com</p>
+            <div style="display:inline-block;float:right">Support:estcuriercriuleni@gmail.com</div>
             </div>
           </div>
         </footer>

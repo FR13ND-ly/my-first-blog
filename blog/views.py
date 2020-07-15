@@ -29,10 +29,10 @@ def check_dark_theme(request):
 
 def post_list(request):
     if request.user.is_staff:
-        relative_number_of_pages = (len(Post.objects.filter(published_date__lte=timezone.now()))//5)
+        relative_number_of_pages = ((len(Post.objects.filter(published_date__lte=timezone.now()))-1)//5)
         posts = Post.objects.filter(published_date__lte=timezone.now()).order_by('published_date').reverse()[0:5]
     else:
-        relative_number_of_pages = (len(Post.objects.filter(published_date__lte=timezone.now()).filter(status=False))//5)
+        relative_number_of_pages = ((len(Post.objects.filter(published_date__lte=timezone.now()).filter(status=False))-1)//5)
         posts = Post.objects.filter(published_date__lte=timezone.now()).order_by('published_date').reverse().filter(status=False)[0:5]
     number_of_pages = []
     index = 0
@@ -178,7 +178,7 @@ def post_remove(request, pk):
     post.delete()
     return redirect('post_list')
 
-    
+
 def user_login(request):
     if request.user.is_active:
         return redirect('post_list')

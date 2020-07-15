@@ -6,7 +6,7 @@
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css">
         <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-        <link rel="stylesheet" href="{% static 'css/blog.css' %}">  
+        <link rel="stylesheet" href="{% static 'css/blog.css' %}">
         <title>Est-Curier</title>
     </head>
 
@@ -71,20 +71,20 @@
         </div>
     </div>
     {% if tposts %}
-    <ul class="collection show-on-large card blue-grey darken-3" style="position: absolute; right: 1%; width:25%; height: 88%; padding:10px;border:0.1px solid #000">
+    <ul class="hide-on-small-only card blue-grey darken-3" style="position: absolute; right: 1%; width:25%; height: 56rem%; padding:10px;">
         <div class="section" style="margin-bottom: 5%">
-        <li><h3 class="collection-item blue-grey darken-3  white-text" align="center" style="padding-top: 10%;">Top Articole</h3></li>
+        <li><h3 class="collection-header blue-grey darken-3 white-text" align="center">Top Articole</h3></li>
     </div>
     {% for post in tposts %}
         <li style="margin:2%"><a href="{% url 'post_detail' pk=post.pk %}">
-    <div class="card horizontal valign-wrapper hoverable blue-grey darken-2" style="height: 130px">
+    <div class="card horizontal valign-wrapper hoverable blue-grey darken-2" style="height: 14rem">
       <div class="card-image">
-        <img src="http://127.0.0.1:8000/media/{{post.cover}}" style="width: 60px; height: 130px; max-height: 146px; object-fit: cover; overflow: hidden;">
+        <img src="/media/{{post.cover}}" style="width:6rem; height: 14rem;  object-fit: cover; overflow: hidden;">
       </div>
       <div class="card-stacked">
         <div class="card-content">
         <div class="section " >
-          <p style="font-size: 16px;" class="white-text">{{ post.title }}</p>
+          <p  class="white-text flow-text">{{ post.title }}</p>
       </div>
           <div class="divider"></div>
           <div class="section">
@@ -94,7 +94,7 @@
     </div>
         </a></li>
     {% endfor %}
-        
+
     </ul>
     {% endif %}
     {% if ads_list %}
@@ -108,7 +108,7 @@
         </div>
     {% endif %}
         <div class="content container">
-                
+
                     <div class="col-md-8">
                         {% block content %}
                         {% endblock %}
