@@ -1,145 +1,115 @@
 {% extends 'blog/darktheme_base.html' %}
 {% load static %}
 {% block content %}
-<div class="row">
-    <div class="col s12" >
-    <div class="card blue-grey darken-3 white-text" >
-        <div class="card-content">
-        <div class="section">
-            <h4 class="darken-3 white-text">{{ post.title }}</h4>
-            <div class="divider" style="margin-bottom: 1%"></div>
-            <p style="display: flex" ><i class="material-icons tiny " style="line-height: inherit;padding-right: 0.5rem">access_time</i> {{ post.published_date }} |<i class="material-icons tiny" style="line-height: inherit;padding-right: 0.5rem;padding-left: 0.5rem">contacts</i> {{post.author}} |  {{post.count_of_views}} <i class="material-icons tiny " style="line-height: inherit;padding-left: 0.5rem">remove_red_eye</i></p>
-            <div class="divider" style="margin-top: 1%"></div>
-        </div>{% autoescape off %}
-        <div id="post_text">{{ post.text|linebreaksbr }} </div>
-        {% endautoescape %}
-        {% if user.is_active %}
-        <div style="font-size: 28px; display: flex;"><a href="{% url 'add_like' pk=post.pk %}"><i class="material-icons red-text small" style="line-height: inherit;">favorite{% if not liked %}_border{% endif %}</i></a>{{ post.likes.count }}</div>
-        {% else %}
-        <div style="font-size: 28px; display: flex;"><i class="material-icons red-text small" style="line-height: inherit;" onclick="Materialize.toast('Need to login', 4000)">favorite_border</i>{{ post.likes.count }}</div>
-        {% endif %}
-        {% if user.is_staff %}
-        <a class="btn waves-effect waves-light" href="{% url 'post_edit' pk=post.pk %}">
-        <i class="material-icons">edit</i></a>
-        <a class="btn waves-effect waves-light red darken-2" href="{% url 'post_remove' pk=post.pk %}">
-        <i class="material-icons">delete</i></a>
-    </div>
-{% endif %}
-        </div>
-       {% if post.survey_is_present %}
-            <div class="col s12 m6" style="width: 100%">
-                    <div class="row">
-                        <form method="POST" action="vote">
-                            {% csrf_token %}
-                            <div class="collection with-header z-depth-1" style="border:0.1px solid #000">
-                                <div class="collection-header white-text blue-grey darken-3"><h5>{{ post.question }}</h5></div>
-                                    {% for i in survey %}
-                                        <a class="collection-item white-text blue-grey darken-3" name="variant_container" id="{{i.variant}}" {% if not uservoted %} onclick="{% if post.type_of_vote %} select_one_variant(this) {% else %}select_multi_variant(this) {% endif %}" {% endif %}>
-                                            <div>
-                                                {% if uservoted %}<span class="new badge" data-badge-caption="voturi">{{ i.count }}</span>{% endif %} 
-                                                {{i.variant}}
-                                                <div class="hide secondary-content">
-                                                    <input {% if post.type_of_vote %} name="variant" {% endif %}value="{{ i.variant }}" type="{% if post.type_of_vote %} radio {% else %} check {% endif %}" id="{{ i.variant }}"/>
-                                                </div>
-                                            </div>
-                                        </a>
-                                    {% endfor %}
-                                    {% if uservoted %}
-                                        <div class="collection-item blue-grey darken-3"><button class="btn" disabled>Ai votat deja!</button></div>
-                                    {% else %}
-                                        <div class="collection-item blue-grey darken-3"><button class="btn btn-default center" type="submit">Votează!</button></div>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-            </div>
-        {% endif %}
-        <script type="text/javascript">
-            function select_one_variant(variant){
-                variants = document.querySelectorAll('a[name="variant_container"]');
-                for (i = 0; i<variants.length; i++){
-                    variants[i].className = "collection-item white-text blue-grey darken-3";
-                    document.querySelector('input[id="'+variants[i].id +'"]').setAttribute("name","none");
-                }
-                variant.className = "collection-item white-text active";
-                document.querySelector('input[id="'+variant.id +'"]').name = 'variant';
-
-            }
-            function select_multi_variant(variant) {
-                variant_input = document.querySelector('input[id="'+variant.id +'"]');
-                if (variant.className == "collection-item white-text blue-grey darken-3"){
-                    variant.className = "collection-item white-text active";
-                    variant_input.name = 'variant';
-                }
-                else {
-                    variant.className = "collection-item white-text blue-grey darken-3";
-                    variant_input.setAttribute("name","none");
-                }
-            }
-        </script>
-<div class="col s12">
-<span class="new badge right" data-badge-caption="comentarii">{{ post.comments.count }}</span>
-<a class="btn center-align" id="add_comment" onclick="add_comment()">Lasă un comentariu</a>
-</div>
-
-
+    <link rel="stylesheet" href="{% static 'css/post_detail.css' %}">
     <div class="row">
         <div class="col s12" >
-            <div class="card blue-grey darken-3" id="comment_form" style="display: none">
-                <form method="POST">
-                {% if user.is_active %}
+            <div class="card blue-grey darken-3 white-text" >
                 <div class="card-content">
-                        {% csrf_token %}
+                    <div class="section">
+                        <h4 class="hide-on-small-only white-text" id="article_title">{{ post.title }}</h4>
+                        <h5 class="hide-on-med-and-up white-text">{{ post.title }}</h5>
+                    <div class="divider"></div>
+                    <p id="article_icons_container"><i class="material-icons tiny article_icons">access_time</i> {{ post.published_date }} |<i class="material-icons tiny article_icons">contacts</i> {{post.author}} |  {{post.count_of_views}} <i class="material-icons tiny article_icons">remove_red_eye</i></p>
+                    <div class="divider"></div>
+                </div>
+                {% autoescape off %}
+                    <div id="post_text">{{ post.text|linebreaksbr }} </div>
+                {% endautoescape %}
+                <form method="POST" id="add_like_form" target="hidden-iframe" action="like" onclick ="add_like(e)">
+                    {% csrf_token %}
+                    {% if user.is_active %}
+                        <a id="article_icons_container" class="white-text" style="font-size: 2.1rem;" href="like"><i class="material-icons red-text small article_icons">favorite{% if not liked %}_border{% endif %}</i>{{ post.likes.count }}</a>
+                    {% else %}
+                        <p id="article_icons_container" class="white-text" style="font-size: 2.1rem;" onclick="Materialize.toast('Trebuie să te autentifici!', 4000)"><i class="material-icons red-text small article_icons">favorite_border</i>{{ post.likes.count }}</p>
+                    {% endif %}
+                </form>
+                {% if user.is_staff %}
+                    <a class="btn waves-effect waves-light" href="{% url 'post_edit' pk=post.pk %}">
+                        <i class="material-icons">edit</i></a>
+                    <a class="btn waves-effect waves-light red darken-2" href="{% url 'post_remove' pk=post.pk %}">
+                        <i class="material-icons">delete</i></a>
+                {% endif %}
+            </div>
+        </div>
+        {% if post.survey_is_present %}
+            <div class="row">
+                <form method="POST" action="vote">
+                    {% csrf_token %}
+                    <div class="collection with-header z-depth-1" id="survey_section">
+                        <div class="collection-header white-text blue-grey darken-3"><h5>{{ post.question }}</h5></div>
+                        {% for i in survey %}
+                            <a class="collection-item white-text blue-grey darken-3" name="variant_container" id="{{i.variant}}" {% if not uservoted %} onclick="{% if post.type_of_vote %} select_one_variant(this) {% else %}select_multi_variant(this) {% endif %}" {% endif %}>
+                                {% if uservoted %}
+                                    <span class="new badge white-text light-blue darken-2" data-badge-caption="voturi">{{ i.count }}</span>
+                                {% endif %}
+                                {{i.variant}}
+                                <div class="hide secondary-content">
+                                    <input  {% if post.type_of_vote %} name="variant" {% endif %}value="{{ i.variant }}" type="{% if post.type_of_vote %} radio {% else %} check {% endif %}" id="{{ i.variant }}"/>
+                                </div>
+                            </a>
+                        {% endfor %}
+                        {% if user.is_active %}
+                            {% if uservoted %}
+                                <div class="collection-item white-text blue-grey darken-3"><button class="btn" disabled >Ai votat deja!</button></div>
+                            {% else %}
+                                <div class="collection-item white-text blue-grey darken-3"><button class="btn btn-default center light-blue darken-2" type="submit">Votează!</button></div>
+                            {% endif %}
+                        {% else %}
+                            <div class="collection-item white-text blue-grey darken-3"><button class="btn btn-default center light-blue darken-2" type="button"  onclick="Materialize.toast('Trebuie să te autentifici!', 4000)">Votează!</button></div>
+                        {% endif %}
+                    </div>
+                </form>
+            </div>
+        {% endif %}
+        <span class="new badge right light-blue darken-2" data-badge-caption="comentarii">{{ post.comments.count }}</span>
+        <a class="btn center-align light-blue darken-2" id="add_comment" onclick="add_comment()">Lasă un comentariu</a>
+        <div class="card hide blue-grey darken-3" id="comment_form">
+            <form method="POST">
+                {% csrf_token %}
+                {% if user.is_active %}
+                    <div class="card-content">
                         <div class="row">
-                            <h4 style="margin-left: 1%" class="white-text">{{ user.username }}</h4>
+                            <h4 id="comment_author" class="white-text">{{ user.username }}</h4>
                             <div class="input-field col s10">
-                                <input name="text_of_comment" class="white-text" id="author_of_comment" type="text" required>
-                                <label class="active" for="first_name2">Comentariu</label>
+                                <input name="text_of_comment" id="author_of_comment" type="text" required>
+                                <label class="active" for="first_name2">Comentariul</label>
                             </div>
                         </div>
                     </div>
                 {% else %}
                     <div class="card-content">
-                        <h5>Comentariu</h5>
-                        {% csrf_token %}
                         <div class="row">
-                            <div class="input-field col s10">
+                            <div class="input-field col s11">
                                 <input name="author_of_comment" id="author_of_comment" type="text" required>
                                 <label class="active" for="first_name2">Nume de utilizator</label>
                             </div>
-                            <div class="input-field col s10">
+                            <div class="input-field col s11">
                                 <input id="last_name" name="text_of_comment" type="text" required>
-                                <label for="last_name">Last Name</label>
+                                <label for="last_name">Comentariul</label>
                             </div>
                         </div>
-                    </div>                
+                    </div>
                 {% endif %}
-                    <div class="card-action">
-                            <button class="btn-flat btn waves-effect waves-light blue-grey darken-2 white-text" type="submit" value="add_comment" name="add_comment">Trimite <i class="material-icons right">send</i></button>
-                        </div>
-                </form>
-            </div>
+                <div class="card-action">
+                    <button class="btn-flat btn waves-effect waves-light  {% if profile.darktheme %} blue-grey darken-2 white-text {% else %} yellow-text text-darken-4 white {% endif %}" type="submit" value="add_comment" name="add_comment">Trimite <i class="material-icons right">send</i></button>
+                </div>
+            </form>
         </div>
-    </div>
-</div>
-
-{% for comment in post.comments.all %}
-<div class="col s12" style="margin-bottom:3%">
-    <div class="card horizontal">
-        <div class="card-stacked">
-            <div class="card-content white-text blue-grey darken-3">
-                <h5>{{ comment.author }}</h5>
-                <p>{{ comment.text|linebreaks }} </p>
-                <p class="right">{{ comment.created_date }}</p>
-                {% if user.is_staff %}
-                    <a class="btn-floating halfway-fab waves-effect waves-light red" href="{% url 'comment_remove' pk=comment.pk %}"><i class="material-icons">delete</i></a>
-                {% endif %}
+        {% for comment in post.comments.all %}
+            <div class="card horizontal blue-grey darken-3 white-text">
+                <div class="card-stacked">
+                    <div class="card-content">
+                        <h5>{{ comment.author }}</h5>
+                        <p>{{ comment.text|linebreaks }} </p>
+                        <p class="right">{{ comment.created_date }}</p>
+                        {% if user.is_staff %}
+                            <a class="btn-floating halfway-fab waves-effect waves-light red" href="{% url 'comment_remove' pk=comment.pk %}"><i class="material-icons">delete</i></a>
+                        {% endif %}
+                    </div>
+                </div>
             </div>
-        </div>
+        {% endfor %}
     </div>
-</div>
-{% endfor %}
-    </div>
-    <script type="text/javascript" src="{% static 'js/post_detail.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/post_detail_darktheme.js' %}"></script>
 {% endblock %}

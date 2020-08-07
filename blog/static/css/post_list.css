@@ -1,0 +1,147 @@
+@media only screen and (max-width: 992px) {
+    .big_image_the_photo, .big_image_photo_container {
+      height: 30rem;
+    }
+    
+    .text_of_big_image {
+      font-size: 1.1rem;
+    }
+    #big_image_title {
+      font-size: 1.2rem;
+    }
+  }
+  
+@media only screen and (min-width: 993px) and (max-width: 1280px){
+    .big_image_the_photo, .big_image_photo_container {
+      height: 38.29rem;
+    }
+  
+    .text_of_big_image {
+      font-size: 1.5rem;
+    }
+  }
+  
+  @media only screen and (min-width: 1224px){
+  
+    .big_image_the_photo, .big_image_photo_container {
+      height: 39.27rem;
+    }
+  
+    .text_of_big_image {
+      font-size: 1.2rem;
+    }
+  }
+  
+  @media only screen and (min-width : 1824px) {
+    .big_image_the_photo, .big_image_photo_container {
+      height: 58rem;
+    }
+  
+    .text_of_big_image {
+      font-size: 1.6rem;
+    }
+  }
+
+.image {
+    object-fit: cover; 
+    overflow: hidden;
+}
+
+.big_image_title {
+    white-space: nowrap;
+    overflow:hidden;
+    text-overflow: ellipsis;
+    margin-left: 10px;
+    color:#fff;
+    position: absolute;
+    display: inline-block;
+    top:350;
+    left: 50
+}
+
+.change_big_image_button {
+    font-family: 'Poppins',sans-serif;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-left: 10px;
+    color:#fff;
+    position: absolute;
+    font-size: 128px;
+    display: inline-block;
+    top:160;
+    cursor: pointer;
+    visibility: hidden;
+}
+
+.big_image_photo {
+    border:1px solid #ccc;
+    position:relative;
+    margin-top: 10px;
+    margin-bottom: 15px;
+    object-fit: cover;
+    overflow: hidden;
+    border-radius: 2px;
+}
+
+.list_of_pages {
+    font-size: 24px;
+}
+
+.big_image_the_photo {
+    min-width: 100%;
+}
+
+#big_image_title {
+    background-color: rgba(1, 87, 155, 0.5); 
+    margin:2%; 
+    max-width: 80%;
+}
+
+.big_image_switcher {
+    color:#fff;
+    font-size: 900%; 
+    cursor: pointer; 
+    position: absolute; 
+    top: 40%
+}
+
+#big_image_switcher_right {
+    right: 2%;
+}
+
+#big_image_switcher_left {
+    left: 2%;
+}
+
+#article_image {
+    width: 150px; 
+    height: 100%;
+}
+
+.article_icons_container {
+    display: flex;
+}
+
+.article_icon {
+    line-height: inherit;
+    padding-right: 0.5rem;
+    padding-left: 0.2rem;
+}
+
+.article_text {
+    font-size: 1.2rem;
+}
+
+.visible {
+  animation-name: show_big_image;
+  animation-duration: 0.3s;
+}
+
+@keyframes show_big_image {
+  0% {opacity: 50%;}
+  25% {opacity: 62.5%;}
+  50% {opacity: 75%;}
+  75% {opacity: 87.5%;}
+  100% {opacity: 100%;}
+}

@@ -1,111 +1,79 @@
 {% extends 'blog/base.html' %}
 {% load static %}
-
-
 {% block content %}
-
-
-{% if bigimage %}
-    <div class="col s12 valign-wrapper">
-        {% for post in posts %}
-      <div class="big-image card hide" id="post{{post.index}}"  onmouseover="visible_big_image_change({{post.index}})" onmouseout="hidden_big_image_change({{post.index}})">
-        <div class="card-image" style="height: 48rem; min-width: 100%">
-          <a href="{% url 'post_detail' pk=post.pk %}">
-            <img src="/media/{{post.cover}}" style="object-fit: cover; overflow: hidden;height:48rem; ">
-          </a>
-          <span class="card-title z-depth-5" style="background-color: rgba(1, 87, 155, 0.5); margin:2%; max-width: 80%;">{{ post.title }}</span>
-          <span onclick="next_big_image({{post.index}})" id="previous_big_image{{post.index}}" style="display: none;"><i class="material-icons large" style="color:#fff;font-size: 900%; cursor: pointer; right: 2%; position: absolute; top:40%" >arrow_forward</i></span>
-          <span onclick="previous_big_image({{post.index}})" id="next_big_image{{post.index}}" style="display: none; "><i class="material-icons large" style="color:#fff;font-size: 900%; cursor: pointer; left: 2%; position: absolute; top:40%" >arrow_back</i></span>
-        {% if user.is_staff %}  <a href="{% url 'post_edit' pk=post.pk %}" class="btn-floating btn-large halfway-fab waves-effect waves-light hoverable"><i class="material-icons">edit</i></a>  {% endif %}
+    <link rel="stylesheet" href="{% static 'css/post_list.css' %}">
+    {% if bigimage %}
+        <div class="col s12 valign-wrapper">
+            {% for post in posts %}
+                <div class="big-image card hide" id="post{{post.index}}"  onmouseover="visible_big_image_change({{post.index}})" onmouseout="hidden_big_image_change({{post.index}})">
+                    <div class="card-image big_image_photo_container">
+                        <a href="{% url 'post_detail' pk=post.pk %}">
+                            <img src="/media/{{post.cover}}" class="big_image_the_photo image">
+                        </a>
+                        <span class="card-title z-depth-5" id="big_image_title">{{ post.title }}</span>
+                        <span class="hide-on-med-and-down hide" onclick="next_big_image({{post.index}})" id="previous_big_image{{post.index}}"><i id="big_image_switcher_right" class="material-icons large big_image_switcher">arrow_forward</i></span>
+                        <span class="hide-on-med-and-down hide" onclick="previous_big_image({{post.index}})" id="next_big_image{{post.index}}"><i id="big_image_switcher_left" class="material-icons large big_image_switcher">arrow_back</i></span>
+                        {% if user.is_staff %}  
+                            <a href="{% url 'post_edit' pk=post.pk %}" class="btn-floating btn-large halfway-fab waves-effect waves-light hoverable"><i class="material-icons">edit</i></a>  
+                        {% endif %}
+                    </div>
+                    <a href="{% url 'post_detail' pk=post.pk %}">
+                        <div class="card-content s12 hoverable">
+                            <p class="black-text text_of_big_image">{{ post.text|striptags|linebreaksbr|truncatewords:30 }}</p>
+                        </div>
+                    </a>
+                </div>
+            {% endfor %}
         </div>
-       <a href="{% url 'post_detail' pk=post.pk %}">
-         <div class="card-content s12 hoverable">
-          <p class="black-text flow-text">{{ post.text|striptags|linebreaksbr|truncatewords:30 }}</p>
-        </div></a>
-
-      </div>
-        {% endfor %}
-    </div>
-    <div class="row">
-    <div class="col container s12 hide-on-med-and-up">
-    {% if user.is_active %}
-    {% if user.is_staff %}
-    <a class="col btn waves-effect waves-light s12" style="margin-bottom:1%"href="{% if ads_page %}{% url 'new_ad' %} {% else %} /post/new {% endif %}"><i class="material-icons">add</i></a>
     {% endif %}
-    {% if profile.darktheme %}
-        <a href="{% url 'setusertheme' theme=0 %}"><button class="col btn light-blue darken-2 s6" >Treci la tema luminoasă!</button></a>
-    {% else %}
-        <a href="{% url 'setusertheme' theme=1 %}"><button class="col btn light-blue darken-2 s6" >Treci la tema întunecată!</button></a>
-    {% endif %}
-
-    {% else %}
-    <a class="col btn waves-effect waves-light s5 light-blue darken-2" href="/login">Loghează-te</a>
-    {% endif %}
-    <a class="col btn waves-effect waves-light s5 light-blue darken-2" style="margin-left:8.3%" href="/ads">Publicitate</a>
-    </div>
-    </div>
-
-{% endif %}
     {% for post in posts %}
-    <div class="col s12 m12 hide-on-small-only">
+        <div class="col s12 m12 hide-on-small-only">
             <div class="card horizontal hoverable">
                 <div class="card-image valign-wrapper">
-                    <img src="/media/{{post.cover}}" style="width: 150px; height: 20rem; object-fit: cover; overflow: hidden;">
+                    <img src="/media/{{post.cover}}" class="image" id="article_image">
                 </div>
                 <div class="card-stacked">
                     <div class="card-content">
                         <a href="{% url 'post_detail' pk=post.pk %}" class="black-text">
-                        <div class="section">
-                        <h4>{{ post.title }}</h4>
-                        <p style="font-size:1.4rem">{{ post.text|striptags|linebreaksbr|truncatewords:40 }}</p>
-                    </div>
-                        <div class="divider"></div>
-                        <div class="section">
-                        <p style="display: flex" ><i class="material-icons red-text tiny black-text" style="line-height: inherit;padding-right: 0.5rem">access_time</i> {{ post.published_date }} |<i class="material-icons red-text tiny black-text" style="line-height: inherit;padding-right: 0.5rem;padding-left: 0.5rem">contacts</i> {{post.author}} |  {{post.count_of_views}} <i class="material-icons red-text tiny black-text" style="line-height: inherit;padding-left: 0.5rem">remove_red_eye</i></p></div>
+                            <div class="section">
+                                <h4>{% if post.status %} Privat: {% endif %}{{ post.title }}</h4>
+                                <p class="article_text" style="font-size:1.2rem">{{ post.text|striptags|linebreaksbr|truncatewords:35 }}</p>
+                            </div>
+                            <div class="divider"></div>
+                            <div class="section">
+                                <p class="article_icons_container"><i class="material-icons red-text tiny black-text article_icon">access_time</i> {{ post.published_date }} |<i class="material-icons red-text tiny black-text article_icon">contacts</i> {{post.author}} | <i class="material-icons red-text tiny black-text article_icon">remove_red_eye</i> {{post.count_of_views}} | <i class="material-icons red-text tiny black-text article_icon">favorite</i> {{post.likes.count}}</p>
+                            </div>
                         </a>
                     </div>
                 </div>
             </div>
-    </div>
-    <div class="col s12 m12 hide-on-med-and-up">
+        </div>
+        <div class="col s12 m12 hide-on-med-and-up">
             <div class="card hoverable">
                 <div class="card-image valign-wrapper">
-                    <img src="/media/{{post.cover}}" style="object-fit: cover; overflow: hidden;">
+                    <img src="/media/{{post.cover}}" class="image">
                 </div>
                 <div class="card-stacked">
                     <div class="card-content">
                         <a href="{% url 'post_detail' pk=post.pk %}" class="black-text">
-                        <div class="section">
-                        <h4>{{ post.title }}</h4>
-                        <p style="font-size:1.4rem">{{ post.text|striptags|linebreaksbr|truncatewords:40 }}</p>
-                    </div>
-                        <div class="divider"></div>
-                        <div class="section">
-                        <p style="display: flex" ><i class="material-icons red-text tiny black-text" style="line-height: inherit;padding-right: 0.5rem">access_time</i> {{ post.published_date }} |<i class="material-icons red-text tiny black-text" style="line-height: inherit;padding-right: 0.5rem;padding-left: 0.5rem">contacts</i> {{post.author}} |  {{post.count_of_views}} <i class="material-icons red-text tiny black-text" style="line-height: inherit;padding-left: 0.5rem">remove_red_eye</i></p></div>
+                            <div class="section">
+                                <h5>{% if post.status %} Privat: {% endif %}{{ post.title }}</h5>
+                                <p class="article_text">{{ post.text|striptags|linebreaksbr|truncatewords:25 }}</p>
+                            </div>
+                            <div class="divider"></div>
+                            <div class="section">
+                                <p class="article_icons_container"><i class="material-icons red-text tiny black-text article_icon">access_time</i> {{ post.published_date }} | <i class="material-icons red-text tiny black-text article_icon">remove_red_eye</i> {{post.count_of_views}}</p>
+                            </div>
                         </a>
                     </div>
                 </div>
             </div>
-    </div>
-    {% empty %}
-    <div class="col s12 m12 hide-on-med-and-up">
-            <div class="card hoverable">
-                <div class="card-stacked">
-                    <div class="card-content">
-                        <a href="{% url 'post_detail' pk=post.pk %}" class="black-text">
-                        <p style="font-size:1.4rem">La momentul dat nu este nici-un articol sau aveţi probleme cu conexiunea la internet</p>
-                        </a>
-                    </div>
-                    </div>
-                </div>
-            </div>
-    </div>
+        </div>
     {% endfor %}
     <ul class="pagination center">
         {% for i in number_of_pages %}
             <li class="waves-effect {% if i == current_page %} active blue darken-3{% endif %}" ><a href="{% url 'choose_page' lk=i %}"> {{i}} </a></li>
         {% endfor %}
     </ul>
-    </div>
     <script type="text/javascript" src="{% static 'js/post_list.js' %}"></script>
 {% endblock %}

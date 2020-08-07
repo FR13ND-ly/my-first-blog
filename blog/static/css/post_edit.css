@@ -1,0 +1,50 @@
+#main, #multiple_survey_switch {
+    padding-left: 2%;
+}
+
+.format_btn_large {
+    margin-right: 0.5%; 
+    width: 7.1%
+}
+
+.format_btn_small {
+    margin-right: 3%;
+}
+
+#post_code, #post_text {
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    width: 100%; 
+    height: 400px;
+    font-size: 18px;
+    overflow: hidden;
+    outline: none;
+    resize: none;
+}
+
+#representative_cover_img {
+    min-width: 100%;
+    max-width: 100%;
+    min-height: 400px; 
+    height: auto;
+}
+
+.remove_variant_btn {
+    margin-top: 2.5%; 
+    cursor: pointer;
+}
+
+#variant_input {
+    width: 97%;
+}
+
+#save_article_container {
+    position: absolute;
+    right: 1%;
+    top: 8.7%; 
+    width: 25%;
+}
+
+#save_article_header {
+    padding-bottom: 5%;
+}

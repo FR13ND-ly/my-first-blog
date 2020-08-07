@@ -1,32 +1,47 @@
 {% extends 'blog/base.html' %}
-{% block title %}Ads{% endblock %}
 {% block content %}
-<div class="card">
-	<div class="card-content">
-	<div class="row">
-		<div class="col s12">
-<div class="row">
-	{% for column in ads %}
-	<div class="col s4">
-		{% for ad in column %}
-		<div class="row">
-        <div class="col s12">
-          <div class="card hoverable">
-            <div class="card-content">
-              <p>{{ ad.text| linebreaksbr }}</p>
-              <b>{{ ad.contact }}</b>
-            </div>
-            {% if user.is_staff %}
-            <a class="btn-floating halfway-fab waves-effect waves-light" href="{% url 'ad_edit' pk=ad.pk %}"><i class="material-icons">edit</i></a>
-            {% endif %}
-          </div>
-        </div>
-    </div>
-    {% endfor %}
-  </div>
-{% endfor %}
-</div>
-</div>
-</div>
-</div>
+	<div class="card">
+		<div class="card-content">
+			<div class="row">
+				<div class="col s12">
+					<div class="row hide-on-small-only">
+						{% for column in ads %}
+							<div class="col s4">
+								{% for ad in column %}
+									<div class="row">
+        								<div class="col s12">
+          									<div class="card hoverable">
+            									<div class="card-content">
+             						 				<p>{{ ad.text| linebreaksbr }}</p>
+              										<b>{{ ad.contact }}</b>
+            									</div>
+            									{% if user.is_staff %}
+            										<a class="btn-floating halfway-fab waves-effect waves-light" href="{% url 'ad_edit' pk=ad.pk %}"><i class="material-icons">edit</i></a>
+            									{% endif %}
+          									</div>
+        								</div>
+    								</div>
+    							{% endfor %}
+  							</div>
+						{% endfor %}
+					</div>
+					<div class="hide-on-med-and-up">
+						{% for ad in mads %}
+							<div class="col s12">
+								<div class="card hoverable">
+									<div class="card-content">
+										<p>{{ ad.text| linebreaksbr }}</p>
+										<b>{{ ad.contact }}</b>
+									</div>
+									{% if user.is_staff %}
+										<a class="btn-floating halfway-fab waves-effect waves-light" href="{% url 'ad_edit' pk=ad.pk %}"><i class="material-icons">edit</i></a>
+									{% endif %}
+								</div>
+							</div>
+						{% endfor %}
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 {% endblock %}

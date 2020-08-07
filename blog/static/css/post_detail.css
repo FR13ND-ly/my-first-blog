@@ -1,0 +1,51 @@
+.divider {
+    margin-top: 1%;
+}
+
+.article_icons {
+    line-height: inherit; 
+    padding-right: 0.5rem;
+    padding-left: 0.5rem
+}
+
+.like_section {
+    font-size: 28px; 
+    display: flex; 
+    cursor: pointer;
+    line-height: 110%;
+}
+
+#survey_section {
+    border: 0;
+}
+
+#comment_author {
+    margin-left: 1%;
+}
+
+#article_icons_container{
+    display: flex;
+    margin-top: 1%;
+}
+
+.like_btn_user_inactive {
+    line-height: inherit;
+    vertical-align: middle;
+}
+
+.like {
+    vertical-align: middle;
+}
+
+.visible {
+    animation-name: visible_comment;
+    animation-duration: 0.5s;
+}
+
+@keyframes visible_comment {
+    0% {border:0; opacity: 0%;}
+    25% {opacity: 25%;}
+    50% {border:10px solid #0288d1;opacity: 50%;}
+    75% {opacity: 75%;}
+    100% {border:1px solid #0288d1; opacity: 100%;}
+}

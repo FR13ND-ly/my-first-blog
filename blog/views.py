@@ -1,8 +1,8 @@
 from django.shortcuts import render
 from django.utils import timezone
+from django.http import HttpResponse, HttpResponseRedirect
 from datetime import timedelta
 from .models import Post, Comment, Profile, Like, Survey, Vote, Ad, Image
-from django.http import HttpResponse
 from django.contrib.auth.models import User, AnonymousUser
 from django.shortcuts import render, get_object_or_404
 from django.shortcuts import redirect
@@ -90,7 +90,7 @@ def post_detail(request, pk):
             comment.author = user.username
             comment.photo_of_user = Profile.objects.get(user = request.user).photo
         else:
-            comment.author =request.POST.get('author_of_comment')
+            comment.author =request.POST.get('author_of_comment')+'(neautentificat)'
         comment.text = request.POST.get('text_of_comment')
         comment.save()
         return redirect('post_detail', pk=post.pk)
@@ -114,7 +114,7 @@ def post_new(request):
         post = Post.objects.create(author = request.user)
         post.title = request.POST.get("title")
         post.published_date = timezone.now()
-        post.cover = request.FILES.get('coverphoto')
+        post.cover = request.FILES.get('coverphoto',None)
         if request.POST.get('status') == "on":
             post.status = True;
         else:
@@ -133,6 +133,10 @@ def post_new(request):
         post.text = request.POST.get("posttext")
         post.save()
         return redirect('post_detail', pk=post.pk)
+    elif request.method == "POST":
+        if request.FILES.get('file'):
+            new_image = Image.objects.create(image=request.FILES.get('file'))
+            new_image.save()
     rendertemplate = {"post_new": True}
     return render(request, 'blog/' + check_dark_theme(request) + 'post_edit.html', set_dict_for_render(rendertemplate, request))
 
@@ -167,6 +171,9 @@ def post_edit(request, pk):
             post.survey_is_present = False
         post.save()
         return redirect('post_detail', pk=post.pk)
+    elif request.method == "POST" and request.POST.get("action"):
+        new_image = Image.objects.create(image=request.FILES.get('file'))
+        new_image.save()
     rendertemplate = {'post':post,'surveys':surveys}
     return render(request, 'blog/' + check_dark_theme(request) + 'post_edit.html', set_dict_for_render(rendertemplate, request))
 
@@ -187,7 +194,7 @@ def user_login(request):
         if user is not None:
             if user.is_active:
                 login(request, user)
-                return redirect('post_list')
+                return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
         else:
             return render(request, 'blog/login.html', {'incorrect_login_or_password':True})
     return render(request, 'blog/login.html')
@@ -206,7 +213,6 @@ def register(request):
                 user.date_joined = timezone.now()
                 user.save()
                 profile = Profile.objects.create(user=user)
-                profile.photo = request.FILES.get('userphoto')
                 profile.save()
                 theuser = authenticate(username=request.POST.get('username'), password=request.POST.get('password'))
                 login(request, theuser)
@@ -218,8 +224,10 @@ def register(request):
     return render(request, 'blog/register.html')
 
 def user_logout(request):
+    if not request.user.is_active:
+        return redirect('post_list')
     logout(request)
-    return redirect('post_list')
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 @login_required
 def add_like(request, pk):
@@ -256,7 +264,7 @@ def setusertheme(request, theme):
     profile = Profile.objects.get(user = request.user)
     profile.darktheme = bool(theme)
     profile.save()
-    return redirect('post_list')
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 def ads_list(request):
     for i in Ad.objects.all():
@@ -278,7 +286,8 @@ def ads_list(request):
         if ads[i] == 3:
             third_column.append(i)
     ads = [first_column, second_column, third_column]
-    rendertemplate = {'ads_page':True, 'ads_list':True, 'ads': ads}
+    ads_for_mobile = Ad.objects.all()
+    rendertemplate = {'ads_page':True, 'ads_list':True, 'ads': ads, 'mads': ads_for_mobile}
     return render(request, 'blog/' + check_dark_theme(request) + 'ads.html',set_dict_for_render(rendertemplate, request))
 
 def ad_new(request):

@@ -1,3 +1,4 @@
+document.title = "Înregistrare";
 password_input = document.getElementById("password1");
 repeated_password_input = document.getElementById("password2");
 

@@ -1,0 +1,23 @@
+#main {
+    padding: 2%;
+}
+
+#ad_text {
+    width: 100%; 
+    height: 200px;
+}
+
+#remove_ad {
+    border: 0;
+}
+
+.text_input {
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    width: 100%; 
+    height: 400px;
+    font-size: 18px;
+    overflow: hidden;
+    outline: none;
+    resize: none;
+}

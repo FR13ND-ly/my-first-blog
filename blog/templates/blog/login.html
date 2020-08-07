@@ -1,21 +1,24 @@
 {% extends 'blog/base.html' %}
-{% block title %}Log-in{% endblock %}
+{% load static %}
 {% block content %}
-    <h3>Conectare</h3>
-    <form action="." method="post">{% csrf_token %}
-        <div class="row">
-            <div class="input-field col s6">
+    <link rel="stylesheet" href="{% static 'css/login.css' %}">
+    <div class="row" id="main">
+        <form action="." method="post">{% csrf_token %}
+            <div class="col s12">
+                <h4>Loghează-te</h4>
+            </div>
+            <div class="input-field col s10">
                 <input name="logininput" type="text" {% if incorrect_login_or_password %} class="validate invalid {% endif %}">
                 <label class="active" for="first_name2">Numele de utilizator</label>
             </div>
-        </div>
-        <div class="row">
-            <div class="input-field col s6">
+            <div class="input-field col s10">
                 <input name="passwordinput" type="password" {% if incorrect_login_or_password %} class="validate invalid" {% endif %}>
                 <label class="active" for="first_name2">Parola</label>
             </div>
-        </div>
-        <button id="registersubmit" class="btn waves-effect waves-light" type="submit" value="Log-in" >Loghează-te
-        </button>
-    </form>
+            <div class="col s12">
+                <button id="loginsubmit" class="btn waves-effect waves-light s12 light-blue darken-2" type="submit" value="Log-in" >Continuă</button>
+            </div>
+        </form>
+    </div>
+    <script type="text/javascript" src="{% static 'js/login.js' %}"></script>
 {% endblock %}
