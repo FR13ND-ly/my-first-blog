@@ -1,6 +1,13 @@
 document.getElementById("post0").className = 'big-image card';
 var myVar = setInterval(myTimer, 5000);
 
+function search_check(){
+	document.getElementById("search_btn").setAttribute('type', 'submit')
+	if (document.getElementById("search_input").value == '' || document.getElementById("search_input").value == ' '){
+		document.getElementById("search_btn").setAttribute('type', 'button')
+	}
+}
+
 function myTimer() {
     next_big_image(document.querySelector('div.big-image:not(.hide)').id.slice(-1));
 }

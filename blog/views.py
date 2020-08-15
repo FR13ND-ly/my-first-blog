@@ -43,7 +43,7 @@ def post_list(request):
     for i in range(8):
         if 1 + i < relative_number_of_pages + 2:
             number_of_pages.append(1+i)
-    rendertemplate = {'posts': posts, 'number_of_pages': number_of_pages, "current_page":1, 'tposts':True}
+    rendertemplate = {'posts': posts, 'number_of_pages': number_of_pages, 'big_image' : True, "current_page":1, 'tposts':True}
     return render(request, 'blog/' + check_dark_theme(request) + 'post_list.html', set_dict_for_render(rendertemplate, request))
 
 def post_list_next(request, lk):
@@ -93,8 +93,9 @@ def post_detail(request, pk):
         if request.user.is_active:
             comment.author = request.user.username
             comment.photo_of_user = Profile.objects.get(user = request.user).photo
+            comment.by_authenticated = True
         else:
-            comment.author =request.POST.get('author_of_comment') + '(neautentificat)'
+            comment.author = request.POST.get('author_of_comment')
         if request.user.is_staff:
             comment.by_administration = True
         comment.text = request.POST.get('text_of_comment')
@@ -220,7 +221,7 @@ def register(request):
         for i in User.objects.all():
             if i.username == request.POST.get('username'):
                 return render(request, 'blog/register.html', {"Error": "Acest nume de utilizator e ocupat"})
-        for i in ['admin', 'administrator', '(neautentificat)', 'alan', 'estcurier', 'est-curier', 'administrația']:
+        for i in ['admin', 'administrator', 'alan', 'estcurier', 'est-curier', 'administrația']:
             if i in request.POST.get('username').lower():
                return render(request, 'blog/register.html', {"Error": "Numele de utilizator conține un element interzis"})
         if request.POST.get('password') == request.POST.get('repeatedpassword'):
@@ -362,7 +363,7 @@ def image_list():
     return images
 
 def test_page(request):
-    return render(request, 'blog/test.html', set_dict_for_render(rendertemplate, request))
+    return render(request, 'blog/test.html')
 
 def prepare(word):
     return word.lower().replace('ț', 't').replace('ș', 's').replace('î', 'i').replace('â', 'a').replace('ă', 'a')
@@ -391,7 +392,7 @@ def search(request):
                 if prepare(word_of_ad) == prepare(word) and ad not in ads:
                     ads.append(ad)
         for comment in Comment.objects.all().order_by("created_date").reverse():
-                for word_of_comment in prepare_word_list(ad.text.split(" ")):
+                for word_of_comment in prepare_word_list(comment.text.split(" ")):
                     if prepare(word_of_comment) == prepare(word) and comment not in comments:
                         comments.append(comment)
     rendertemplate = {"posts":posts, "ads":ads, "comments":comments, "search_page": True}
@@ -444,9 +445,9 @@ def statistics(request):
         else:
             white_or_dark_theme_stat["Luminoasă"] += 1
     for i in Comment.objects.all():
-        if "(neautentificat)" in i.author:
-            comment_by_signed_and_not["Oaspeți"] += 1
-        else:
+        if  i.by_authenticated:
             comment_by_signed_and_not["Autentificați"] += 1
+        else:
+            comment_by_signed_and_not["Oaspeți"] += 1
     rendertemplate = {"Administrators":Administrators, "Users": Users, "Posts":Posts, "Views":Views, "Likes": Likes, "Comments": Comments, "views_by_date" : views_by_date, "views_by_month": views_by_month, "views_by_year": views_by_year, 'views_by_signed_and_not': views_by_signed_and_not , "white_or_dark_theme_stat":white_or_dark_theme_stat, "comment_by_signed_and_not" : comment_by_signed_and_not}
     return render(request, 'blog/' + check_dark_theme(request) + 'statistic.html', set_dict_for_render(rendertemplate, request))

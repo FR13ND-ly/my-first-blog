@@ -1,7 +1,7 @@
 {% extends 'blog/base.html' %}
 {% load static %}
 {% block content %}
-    <link rel="stylesheet" href="{% static 'css/post_list.css' %}">
+    <link rel="stylesheet" href="{% static 'css/post_list.css' %}">{% if big_image%}
         <div class="col s12 valign-wrapper">
             {% for post in posts %}
                 <div class="big-image card hide" id="post{{post.index}}"  onmouseover="visible_big_image_change({{post.index}})" onmouseout="hidden_big_image_change({{post.index}})">
@@ -23,12 +23,12 @@
                     </a>
                 </div>
             {% endfor %}
-        </div>
+        </div>{% endif %}
     <form method="GET" action="/search">
         <div class="input-field col s12" style="margin-top: -100;">
-            <input id="search_input" name="search" type="text" class="validate black-text">
+            <input id="search_input" name="search" type="text" class="black-text">
             <label for="search_input"></label>
-            <button class="waves-effect waves-light btn" style="position:absolute;right:0%"><i class="material-icons">search</i></button>
+            <button class="waves-effect waves-light btn" id="search_btn" onclick="search_check()" style="position:absolute;right:0%"><i class="material-icons">search</i></button>
         </div>
     </form>
     {% for post in posts %}

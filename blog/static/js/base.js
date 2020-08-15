@@ -11,6 +11,5 @@ addEventListener('keydown', function(e){
     }
     else {
         iteration = 0
-        console.log('fail')
     }
 })

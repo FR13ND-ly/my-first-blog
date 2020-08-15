@@ -21,7 +21,6 @@
                         <a class="btn col format_btn_large" onclick="format('justifyLeft')"><i class="material-icons">format_align_left</i></a>
                         <a class="btn col format_btn_large" onclick="format('justifyCenter')"><i class="material-icons">format_align_center</i></a>
                         <a class="btn col format_btn_large" onclick="format('justifyRight')"><i class="material-icons">format_align_right</i></a>
-                        <a class="btn col format_btn_large" onclick="format('insertUnorderedList')"><i class="material-icons">format_list_bulleted</i></a>
                         <a class="btn col format_btn_large" onclick="format('insertOrderedList')"><i class="material-icons">format_list_numbered</i></a>
                         <a class="btn col format_btn_large" onclick="format('undo')"><i class="material-icons">undo</i></a>
                         <a class="btn col format_btn_large" onclick="format('redo')"><i class="material-icons">redo</i></a>
@@ -157,7 +156,7 @@
                             <h5 id="save_article_header">Salvează Postul</h5>
                             <input type="checkbox" id="draft" class="filled-in" oninput="set_save_button_text(this.checked)" name="status" {% if post.status %} checked {% endif %}/>
                             <label for="draft">Schiță</label>
-                            <div class="chips chips-initial"></div>
+                            <div class="chips chips-initial white-text"></div>
                             <input class="hide" id="tags_container" name="tags_container">
                         </div>
                         <div class="col s12">
@@ -177,7 +176,7 @@
                         <li class="tab col s3"><a onclick="add_image_visible()" href="#test1">Adaugă o imagine</a></li>
                         <li class="tab col s3"><a onclick="select_image_visible()" href="#" class="active" id="active_tab">Alege o imagine</a></li>
                     </ul>
-                    <div id="select_image_menu" class="hide">
+                    <div id="select_image_menu">
                         {% for column in images %}
 						    <div class="col s4">
 							    {% for image in column %}
@@ -262,8 +261,10 @@
     </div>
     <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
+    <script type="text/javascript" src="{% static 'js/post_edit.js' %}"></script>
     <script type="text/javascript">
         window.frames[0].document.getElementsByTagName("body")[0].className = "white-text"
+        document.getElementsByClassName('input')[0].className = 'input white-text'
         $(function(){
             $('#add_image_form').on('submit', function(e){
                 e.preventDefault();
@@ -279,5 +280,5 @@
             });
         });
     </script>
-    <script type="text/javascript" src="{% static 'js/post_edit.js' %}"></script>
+    
 {% endblock %}

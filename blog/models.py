@@ -30,6 +30,7 @@ class Comment(models.Model):
     created_date = models.DateTimeField(default=timezone.now)
     photo_of_user = models.ImageField(upload_to="blog/static/media/", blank=True)
     by_administration = models.BooleanField(default=False)
+    by_authenticated = models.BooleanField(default=False)
 
     def __str__(self):
         return self.text
