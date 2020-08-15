@@ -5,9 +5,11 @@
         <link href="https://fonts.googleapis.com/css?family=Poppins&display=swap" rel="stylesheet">
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css">
+        <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
         <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
         <meta name="description" content="Ziarul cu care stai de vorbă și în care poți avea încredere!">
-        <link rel="icon" href="/media/blog/static/media/logo.png" type=image/x-icon">
+        <link rel="icon" href="/media/blog/static/media/logo.png" type="image/x-icon">
         <link rel="canonical" href="https://drive.google.com/file/d/1rAXdOsmLCaAAZ_gAL4eiYZ5ufMDnFlOG/view?usp=sharing">
         <meta name="robots" content="noodp">
         <meta property="og:locale" content="ro_RO">
@@ -19,120 +21,93 @@
         <link rel="stylesheet" href="{% static 'css/base.css' %}">
         <title>Est-Curier</title>
     </head>
-    <body class=" blue-grey darken-4">
+    <body class="blue-grey darken-4">
         <header>
-            <nav>
-                <div class="nav-wrapper blue-grey darken-3">
-                    <a href="/" class="brand-logo center ">Est Curier</a>
-                    <ul id="nav-mobile" class="left hide-on-small-only ">
-                        <li><i class="material-icons" id="user_menu_trigger" style="color: white;" onclick="makevisibleusermenu()">account_circle</i></li>
-                    </ul>
-                    <ul class="right hide-on-small-only flow-text ">
-                        <li>{% if user.is_staff %} <a class="btn waves-effect waves-light " href="{% if ads_page %}{% url 'new_ad' %} {% else %} /post/new {% endif %}">
-                            <i class="material-icons">add</i></a> {% endif %}</li>
-                        <li><a href="/ads">Publicitate</a></li>
-                    </ul>
-                    <ul class="hide-on-med-and-up">
-                        <li><i class="material-icons white-text" id="mobile_menu_trigger" onclick="show_mobile_usermenu()">menu</i></li>
-                    </ul>
-                </div>
-            </nav>
-        </header>
-        <style>
-            @keyframes color_user_menu_trigger {
-                0% {color: #fff} 
-                50% {color: #0288d1;}
-                100% {color: #FFF;}
-            }
-        </style>
-        <main style="flex: 1 0 auto">
-            <div class="row pinned hide hide-on-med-and-up" style="z-index:100;" id="mobile_menu">
-                <div class="col s12 m12">
-                    <div class="card blue-grey darken-3">
-                        <div class="card-content s12">
-                            <div class="row">
-                                {% if user.is_active %}
-                                    <a href="{% url 'logout' %}" class="light-blue-text text-darken-2 right"><i class="material-icons">logout</i></a>
-                                {% endif %}
-                                <h4 class="white-text">Meniu</h4>
-                                {% if not ads_page %}
-                                    <a class="btn waves-effect waves-light s12" href="/ads">Pagina de Publicitate</a>
-                                {% endif %}
-                                {% if user.is_staff %} 
-                                    <a class="btn waves-effect waves-light " href="{% if ads_page %}{% url 'new_ad' %} {% else %} /post/new {% endif %}">
-                                    <i class="material-icons">add</i></a> 
-                                {% endif %}<br><br>
-                                {% if not user.is_active %}
-                                    <a class="btn" href="/login">Autentifică-te</a><br><br>
-                                    <a class="btn" href="/register">Înregistrează-te</a>
-                                {% else %}
-                                    <a class="btn">Treci la tema Luminoasă</a>
-                                {% endif %}
-                            </div>
-                        </div>
+            <div class="navbar-fixed">
+                <nav>
+                    <div class="nav-wrapper blue-grey darken-3">
+                        <a href="/" id="e-c" class="brand-logo center blue-text text-accent-3">Est Curier</a>
+                        <ul id="nav-mobile" class="left">
+                            <li><a href="#" data-activates="slide-out" style="display: block;" class="white-text button-collapse"><i class="material-icons">menu</i></a></li>
+                        </ul> 
+                        <ul class="right hide-on-small-only flow-text ">
+                            <li><a href="/ads" class="white-text">Publicitate</a></li>
+                        </ul>
                     </div>
-                </div>
+                </nav>
             </div>
-            <div class="row pinned hide" style="z-index:100;" id="usermenu">
-                <div class="col s12 m12">
-                    <div class="card blue-grey darken-3">
+        </header>
+        <main style="flex: 1 0 auto">
+            <ul id="slide-out" class="side-nav white-text blue-grey darken-3">
+                <li>
+                    <div class="user-view">
+                        <div class="background" style="padding-bottom: 1rem;">
+                            <img  src="data:image/jpeg;base64,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">
+                        </div>
                         {% if user.is_active %}
-                            <div class="card-content s12">
-                                <div class="row">
-                                    <a href="{% url 'logout' %}" class="light-blue-text text-darken-2 right"><i class="material-icons">logout</i></a><br>
-                                    <h3 class="center-align white-text">{{ user.username }}</h3>
-                                    <p class="center-align white-text">{% if user.is_staff %}Administrator{% else %}Utilizator{% endif %}</p>
-                                </div>
-                            </div>
-                            <div class="card-action">
-                                <a href="{% url 'setusertheme' theme=0 %}"><button class="btn-flat white-text">Treci la tema Luminoasă!</button></a>
-                            </div>
-                        {% else %}
+                            <a href="{% url 'logout' %}" class="white-text right"><i class="material-icons">logout</i></a>
+                        {% endif %}
+                        <a href="#!name" ><span class="white-text name" style="padding-top:30%;padding-bottom: 5%; font-size: 2rem;">{% if user.is_active %}{{user.username}}{% else %}Oaspete{% endif %}</span></a>
+                        </div>
+                    </li>
+                    {% if user.is_active %}
+                        {% if user.is_staff %}
+                            <li>
+                                <a href="/post/new" class="white-text"><i class="material-icons white-text">create</i>Crează un articol</a>
+                                <a href="{% url 'new_ad' %}" class="white-text"><i class="material-icons white-text">add</i>Crează un bloc publicitar</a>
+                                <a href="{% url 'statistics' %}" class="white-text"><i class="material-icons white-text">assessment</i>Statistică</a>
+                            </li>
+                        {% endif%}
+                    <li><a href="{% url 'setusertheme' theme=0 %}" class="white-text"><i class="material-icons white-text">brightness_high</i>Treci la tema luminoasă</a></li>
+                    {% else %}
+                        <li><div class="row" style="margin-left: 1%;">
                             <form method="POST" action="/login/">
                                 <div class="card-content">
-                                    <h4>Autentifică-te</h4>
                                     <input type="hidden" name="next" value="{{ request.path }}">
                                     {% csrf_token %}
                                     <div class="row">
-                                        <div class="input-field col s10">
+                                        <div class="input-field col s12">
                                             <input name="logininput" type="text" >
                                             <label class="active" for="first_name2">Nume de utilizator</label>
                                         </div>
-                                        <div class="input-field col s10">
+                                        <div class="input-field col s12">
                                             <input name="passwordinput" type="password">
                                             <label class="active" for="first_name2">Parola</label>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="card-action">
-                                    <a href="/register" class="yellow-text text-darken-4"><button type="button" class="btn-flat btn waves-effect waves-light white yellow-text text-darken-4">Înregistrează-te</button></a>
-                                    <button class="btn-flat btn waves-effect waves-light white yellow-text text-darken-4" type="submit" name="action">Continuă</button>
+                                    <a href="/register" class="btn-flat btn waves-effect waves-light white yellow-text text-darken-4 left"><i class="material-icons">person_add</i></a>
+                                    <button class="btn-flat btn waves-effect waves-light white yellow-text text-darken-4 right" type="submit" name="action">Autentifică-te</button>
                                 </div>
                             </form>
-                        {% endif %}
+                        </li></div>
+                    {% endif %}
+                    <div class="hide-on-med-and-up">
+                        <li><div class="divider"></div></li>
+                        <li><a class="waves-effect white-text" href="/ads">Publicitate</a></li>
                     </div>
-                </div>
-            </div>
-            {% if tposts %}
-                <ul class="collection hide-on-med-and-down card top_articles blue-grey darken-3">
-                    <div class="section" style="margin-bottom: 5%">
-                        <li><p class="collection-item title_of_top_articles center white-text blue-grey darken-3" id="top_posts_header">Top Articole</p></li>
-                    </div>
-                    {% for post in tposts %}
-                        <li style="margin:2%">
-                            <a href="{% url 'post_detail' pk=post.pk %}">
-                                <div class="card horizontal valign-wrapper hoverable top_article blue-grey darken-2" style="margin-left:2%">
-                                    <div class="card-image">
-                                        <img src="/media/{{post.cover}}" style="width: 5rem;" class="image_of_top_article">
-                                    </div>
-                                    <div class="card-stacked">
-                                        <div class="card-content">
-                                            <div class="section " >
-                                                <p class="white-text title_of_top_article">{{ post.title }}</p>
-                                            </div>
-                                            <div class="divider"></div>
+                </ul>
+                {% if tposts %}
+                    <ul class="collection hide-on-med-and-down card top_articles white-text blue-grey darken-3">
+                        <div class="section" style="margin-bottom: 5%">
+                            <li><p class="collection-item title_of_top_articles center white-text blue-grey darken-3" id="top_posts_header">Top Articole</p></li>
+                        </div>
+                        {% for post in tposts %}
+                            <li style="margin:2%">
+                                <a href="{% url 'post_detail' pk=post.pk %}">
+                                    <div class="card horizontal valign-wrapper hoverable top_article white-text blue-grey darken-2" style="margin-left:2%">
+                                        <div class="card-image">
+                                            <img src="/media/{{post.cover.image}}" style="width: 5rem;" class="image_of_top_article">
+                                        </div>
+                                        <div class="card-stacked">
+                                            <div class="card-content">
+                                                <div class="section " >
+                                                    <p class="white-text title_of_top_article">{{ post.title }}</p>
+                                                </div>
+                                                <div class="divider"></div>
                                                 <div class="section">
-                                                    <p id="top_article_short_info" class="white-text"><i class="material-icons red-text tiny top_article_icons white-text">favorite</i> {{ post.likes.count }}  <i class="material-icons red-text tiny top_article_icons white-text">remove_red_eye</i>  {{post.count_of_views}}</p></div>
+                                                    <p id="top_article_short_info" class="white-text"><i class="material-icons tiny white-text top_article_icons">favorite</i> {{ post.likes.count }}  <i class="material-icons tiny white-text top_article_icons">remove_red_eye</i>  {{post.view.count}}</p></div>
                                                 </div>
                                             </div>
                                         </div>
@@ -153,17 +128,48 @@
                     </div>
                 </div>
             {% endif %}
+            {% if search_page %}
+                <div class="card hide-on-med-and-down white-text blue-grey darken-3" id="ads_warning">
+                    <div class="card-content">
+                        <div class="row">
+                            <h5>Filtre</h5>
+                            <p>
+                                <input oninput="use_filter('articles', this.checked)" type="checkbox" class="filled-in" id="hide_articles"/>
+                                <label for="hide_articles">Ascunde articolele</label>
+                            </p>
+                            <p>
+                                <input oninput="use_filter('ads', this.checked)" type="checkbox" class="filled-in" id="hide_ads"/>
+                                <label for="hide_ads">Ascunde publicitatea</label>
+                            </p>
+                            <p>
+                                <input oninput="use_filter('comments', this.checked)" type="checkbox" class="filled-in" id="hide_comments"/>
+                                <label for="hide_comments">Ascunde comentariile</label>
+                              </p>
+                        </div>
+                        <script>
+                            function use_filter(filter, status){
+                                if (status) {
+                                    document.getElementById(filter).className = 'hide'
+                                }
+                                else {
+                                    document.getElementById(filter).className = ''
+                                }
+                            }
+                        </script>
+                    </div>
+                </div>
+            {% endif %}
             <div class="main_page">
                 {% block content %}
                 {% endblock %}
             </div>
         </main>
-        <footer class="page-footer blue-grey darken-3 ">
+        <footer class="page-footer blue-grey darken-3">
             <div class="container ">
                 <div class="row">
                     <div class="col l6 s12">
                         <h5 class="white-text">Est Curier</h5>
-                        <p class="grey-text text-lighten-4">Ziarul cu care stai de vorbă și în care poți avea încredere</p>
+                        <p class="white-text">Ziarul cu care stai de vorbă și în care poți avea încredere</p>
                     </div>
                     <div class="col l4 offset-l2 s12">
                         <h5 class="white-text">Rețele Sociale</h5>
@@ -177,14 +183,13 @@
                 </div>
             </div>
             <div class="footer-copyright">
-                <div class="container grey-text text-lighten-4">
+                <div class="container white-text">
                     © 2020 Est Curier. All Rights Reserved.
                     <div id="estcurier_support" class="hide-on-small-only">Support:estcuriercriuleni@gmail.com</div>
                 </div>
             </div>
         </footer>
     </body>
+    <!--awesome-->
     <script type="text/javascript" src="{% static 'js/base.js' %}"></script>
-    <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
 </html>

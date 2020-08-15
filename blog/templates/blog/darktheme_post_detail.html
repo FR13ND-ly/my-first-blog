@@ -10,18 +10,22 @@
                         <h4 class="hide-on-small-only white-text" id="article_title">{{ post.title }}</h4>
                         <h5 class="hide-on-med-and-up white-text">{{ post.title }}</h5>
                     <div class="divider"></div>
-                    <p id="article_icons_container"><i class="material-icons tiny article_icons">access_time</i> {{ post.published_date }} |<i class="material-icons tiny article_icons">contacts</i> {{post.author}} |  {{post.count_of_views}} <i class="material-icons tiny article_icons">remove_red_eye</i></p>
+                    <p id="article_icons_container"><i class="material-icons tiny article_icons">access_time</i> {{ post.published_date }} |<i class="material-icons tiny article_icons">contacts</i> {{post.author}} |  {{ post.view.count }} <i class="material-icons tiny article_icons">remove_red_eye</i></p>
                     <div class="divider"></div>
                 </div>
                 {% autoescape off %}
-                    <div id="post_text">{{ post.text|linebreaksbr }} </div>
+                    <div class="white-text" id="post_text">{{ post.text|linebreaksbr }} </div>
                 {% endautoescape %}
-                <form method="POST" id="add_like_form" target="hidden-iframe" action="like" onclick ="add_like(e)">
+                {% for i in post.tags.all %}
+                    <a href="/search_by_tag/{{i.tag}}">#{{i.tag}}</a>
+                {% endfor%}
+                <form method="POST" id="add_like_form" onsubmit="alert('sf)'" action="like">
                     {% csrf_token %}
                     {% if user.is_active %}
-                        <a id="article_icons_container" class="white-text" style="font-size: 2.1rem;" href="like"><i class="material-icons red-text small article_icons">favorite{% if not liked %}_border{% endif %}</i>{{ post.likes.count }}</a>
+                        <button class="hide" id="submit_btn" type="submit"></button>
+                        <a onclick="add_like()" id="article_icons_container" class="white-text" style="font-size: 2.1rem;cursor:pointer"><i id="like_icon" class="material-icons red-text small article_icons">favorite{% if not liked %}_border{% endif %}</i><div style="display:inline" id="like_count">{{ post.likes.count }}</div></a>
                     {% else %}
-                        <p id="article_icons_container" class="white-text" style="font-size: 2.1rem;" onclick="Materialize.toast('Trebuie să te autentifici!', 4000)"><i class="material-icons red-text small article_icons">favorite_border</i>{{ post.likes.count }}</p>
+                        <p id="article_icons_container" class="white-text" style="font-size: 2.1rem; cursor: pointer;" onclick="Materialize.toast('Trebuie să te autentifici!', 4000)"><i class="material-icons red-text small article_icons">favorite</i>{{ post.likes.count }}</p>
                     {% endif %}
                 </form>
                 {% if user.is_staff %}
@@ -36,12 +40,12 @@
             <div class="row">
                 <form method="POST" action="vote">
                     {% csrf_token %}
-                    <div class="collection with-header z-depth-1" id="survey_section">
-                        <div class="collection-header white-text blue-grey darken-3"><h5>{{ post.question }}</h5></div>
+                    <div class="collection with-header z-depth-1 blue-grey darken-3 white-text" id="survey_section">
+                        <div class="collection-header blue-grey darken-3 white-text"><h5>{{ post.question }}</h5></div>
                         {% for i in survey %}
-                            <a class="collection-item white-text blue-grey darken-3" name="variant_container" id="{{i.variant}}" {% if not uservoted %} onclick="{% if post.type_of_vote %} select_one_variant(this) {% else %}select_multi_variant(this) {% endif %}" {% endif %}>
+                            <a class="collection-item blue-grey darken-3 white-text" name="variant_container" id="{{i.variant}}" {% if not uservoted %} onclick="{% if post.type_of_vote %} select_one_variant(this) {% else %}select_multi_variant(this) {% endif %}" {% endif %}>
                                 {% if uservoted %}
-                                    <span class="new badge white-text light-blue darken-2" data-badge-caption="voturi">{{ i.count }}</span>
+                                    <span class="new badge light-blue darken-2" data-badge-caption="voturi">{{ i.count }}</span>
                                 {% endif %}
                                 {{i.variant}}
                                 <div class="hide secondary-content">
@@ -51,12 +55,12 @@
                         {% endfor %}
                         {% if user.is_active %}
                             {% if uservoted %}
-                                <div class="collection-item white-text blue-grey darken-3"><button class="btn" disabled >Ai votat deja!</button></div>
+                                <div class="collection-item blue-grey darken-3 white-text"><button class="btn" disabled >Ai votat deja!</button></div>
                             {% else %}
-                                <div class="collection-item white-text blue-grey darken-3"><button class="btn btn-default center light-blue darken-2" type="submit">Votează!</button></div>
+                                <div class="collection-item blue-grey darken-3 white-text"><button class="btn btn-default center light-blue darken-2" type="submit">Votează!</button></div>
                             {% endif %}
                         {% else %}
-                            <div class="collection-item white-text blue-grey darken-3"><button class="btn btn-default center light-blue darken-2" type="button"  onclick="Materialize.toast('Trebuie să te autentifici!', 4000)">Votează!</button></div>
+                            <div class="collection-item blue-grey darken-3 white-text"><button class="btn btn-default center light-blue darken-2" type="button"  onclick="Materialize.toast('Trebuie să te autentifici!', 4000)">Votează!</button></div>
                         {% endif %}
                     </div>
                 </form>
@@ -64,7 +68,7 @@
         {% endif %}
         <span class="new badge right light-blue darken-2" data-badge-caption="comentarii">{{ post.comments.count }}</span>
         <a class="btn center-align light-blue darken-2" id="add_comment" onclick="add_comment()">Lasă un comentariu</a>
-        <div class="card hide blue-grey darken-3" id="comment_form">
+        <div class="card hide " id="comment_form">
             <form method="POST">
                 {% csrf_token %}
                 {% if user.is_active %}
@@ -72,7 +76,7 @@
                         <div class="row">
                             <h4 id="comment_author" class="white-text">{{ user.username }}</h4>
                             <div class="input-field col s10">
-                                <input name="text_of_comment" id="author_of_comment" type="text" required>
+                                <input name="text_of_comment" id="author_of_comment" class="white-text" type="text" required>
                                 <label class="active" for="first_name2">Comentariul</label>
                             </div>
                         </div>
@@ -92,7 +96,7 @@
                     </div>
                 {% endif %}
                 <div class="card-action">
-                    <button class="btn-flat btn waves-effect waves-light  {% if profile.darktheme %} blue-grey darken-2 white-text {% else %} yellow-text text-darken-4 white {% endif %}" type="submit" value="add_comment" name="add_comment">Trimite <i class="material-icons right">send</i></button>
+                    <button class="btn-flat white-text" type="submit" value="add_comment" name="add_comment">Trimite <i class="material-icons right">send</i></button>
                 </div>
             </form>
         </div>
@@ -100,9 +104,9 @@
             <div class="card horizontal blue-grey darken-3 white-text">
                 <div class="card-stacked">
                     <div class="card-content">
-                        <h5>{{ comment.author }}</h5>
-                        <p>{{ comment.text|linebreaks }} </p>
-                        <p class="right">{{ comment.created_date }}</p>
+                        <h5 class="{% if comment.by_administration %} yellow-text {% else %}white-text{% endif %}">{{ comment.author }}</h5>
+                        <p class="white-text">{{ comment.text|linebreaks }} </p>
+                        <p class="right white-text">{{ comment.created_date }}</p>
                         {% if user.is_staff %}
                             <a class="btn-floating halfway-fab waves-effect waves-light red" href="{% url 'comment_remove' pk=comment.pk %}"><i class="material-icons">delete</i></a>
                         {% endif %}
@@ -112,4 +116,23 @@
         {% endfor %}
     </div>
     <script type="text/javascript" src="{% static 'js/post_detail_darktheme.js' %}"></script>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+
+    <script type="text/javascript">
+        $(function(){
+            $('#add_like_form').on('submit', function(e){
+                e.preventDefault();
+                $.ajax({
+                    url: $(this).attr('action'),
+                    method: $(this).attr('method'),
+                    data: new FormData(this),
+                    cache: false,
+                    processData: false,
+                    contentType: false,
+                    success: function(data){$('#target').html(data);}
+                });
+            });
+        });
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
 {% endblock %}

@@ -2,13 +2,12 @@
 {% load static %}
 {% block content %}
     <link rel="stylesheet" href="{% static 'css/post_list.css' %}">
-    {% if bigimage %}
         <div class="col s12 valign-wrapper">
             {% for post in posts %}
                 <div class="big-image card hide" id="post{{post.index}}"  onmouseover="visible_big_image_change({{post.index}})" onmouseout="hidden_big_image_change({{post.index}})">
                     <div class="card-image big_image_photo_container">
                         <a href="{% url 'post_detail' pk=post.pk %}">
-                            <img src="/media/{{post.cover}}" class="big_image_the_photo image" style="">
+                            <img src="/media/{{post.cover.image}}" class="big_image_the_photo image" style="">
                         </a>
                         <span class="card-title z-depth-5" id="big_image_title">{{ post.title }}</span>
                         <span class="hide-on-med-and-down hide" onclick="next_big_image({{post.index}})" id="previous_big_image{{post.index}}"><i id="big_image_switcher_right" class="material-icons large big_image_switcher">arrow_forward</i></span>
@@ -25,12 +24,18 @@
                 </div>
             {% endfor %}
         </div>
-    {% endif %}
+    <form method="GET" action="/search">
+        <div class="input-field col s12" style="margin-top: -100;">
+            <input id="search_input" name="search" type="text" class="white-text">
+            <label for="search_input"></label>
+            <button class="waves-effect waves-light btn" style="position:absolute;right:0%"><i class="material-icons">search</i></button>
+        </div>
+    </form>
     {% for post in posts %}
         <div class="col s12 m12 hide-on-small-only">
             <div class="card horizontal hoverable white-text blue-grey darken-3">
                 <div class="card-image valign-wrapper">
-                    <img src="/media/{{post.cover}}" class="image" id="article_image">
+                    <img src="/media/{{post.cover.image}}" class="image" id="article_image">
                 </div>
                 <div class="card-stacked">
                     <div class="card-content">
@@ -41,7 +46,7 @@
                             </div>
                             <div class="divider"></div>
                             <div class="section">
-                                <p class="article_icons_container white-text"><i class="material-icons red-text tiny white-text article_icon">access_time</i> {{ post.published_date }} |<i class="material-icons red-text tiny white-text article_icon">contacts</i> {{post.author}} | <i class="material-icons red-text tiny white-text article_icon">remove_red_eye</i> {{post.count_of_views}} | <i class="material-icons red-text tiny white-text article_icon">favorite</i> {{post.likes.count}}</p>
+                                <p class="article_icons_container white-text"><i class="material-icons red-text tiny white-text article_icon">access_time</i> {{ post.published_date }} |<i class="material-icons red-text tiny white-text article_icon">contacts</i> {{post.author}} | <i class="material-icons red-text tiny white-text article_icon">remove_red_eye</i> {{post.view.count}} | <i class="material-icons red-text tiny white-text article_icon">favorite</i> {{post.likes.count}}</p>
                             </div>
                         </a>
                     </div>
@@ -51,7 +56,7 @@
         <div class="col s12 m12 hide-on-med-and-up">
             <div class="card hoverable white-text blue-grey darken-3">
                 <div class="card-image valign-wrapper">
-                    <img src="/media/{{post.cover}}" class="image">
+                    <img src="/media/{{post.cover.image}}" class="image">
                 </div>
                 <div class="card-stacked">
                     <div class="card-content">
@@ -62,7 +67,7 @@
                             </div>
                             <div class="divider"></div>
                             <div class="section">
-                                <p class="article_icons_container"><i class="material-icons red-text tiny white-text article_icon">access_time</i> {{ post.published_date }} | <i class="material-icons red-text tiny white-text article_icon">remove_red_eye</i> {{post.count_of_views}}</p>
+                                <p class="article_icons_container"><i class="material-icons red-text tiny white-text article_icon">access_time</i> {{ post.published_date }} | <i class="material-icons red-text tiny white-text article_icon">remove_red_eye</i> {{post.view.count}}</p>
                             </div>
                         </a>
                     </div>

@@ -10,18 +10,22 @@
                         <h4 class="hide-on-small-only" id="article_title">{{ post.title }}</h4>
                         <h5 class="hide-on-med-and-up">{{ post.title }}</h5>
                     <div class="divider"></div>
-                    <p id="article_icons_container"><i class="material-icons tiny article_icons">access_time</i> {{ post.published_date }} |<i class="material-icons tiny article_icons">contacts</i> {{post.author}} |  {{post.count_of_views}} <i class="material-icons tiny article_icons">remove_red_eye</i></p>
+                    <p id="article_icons_container"><i class="material-icons tiny article_icons">access_time</i> {{ post.published_date }} |<i class="material-icons tiny article_icons">contacts</i> {{post.author}} |  {{ post.view.count }} <i class="material-icons tiny article_icons">remove_red_eye</i></p>
                     <div class="divider"></div>
                 </div>
                 {% autoescape off %}
                     <div id="post_text">{{ post.text|linebreaksbr }} </div>
                 {% endautoescape %}
-                <form method="POST" id="add_like_form" target="hidden-iframe" action="like" onclick ="add_like(e)">
+                {% for i in post.tags.all %}
+                    <a href="/search_by_tag/{{i.tag}}">#{{i.tag}}</a>
+                {% endfor%}
+                <form method="POST" id="add_like_form" action="like">
                     {% csrf_token %}
                     {% if user.is_active %}
-                        <a id="article_icons_container" class="black-text" style="font-size: 2.1rem;" href="like"><i class="material-icons red-text small article_icons">favorite{% if not liked %}_border{% endif %}</i>{{ post.likes.count }}</a>
+                        <button class="hide" id="submit_btn" type="submit"></button>
+                        <a onclick="add_like()" id="article_icons_container" class="black-text" style="font-size: 2.1rem;cursor:pointer"><i id="like_icon" class="material-icons red-text small article_icons">favorite{% if not liked %}_border{% endif %}</i><div style="display:inline" id="like_count">{{ post.likes.count }}</div></a>
                     {% else %}
-                        <p id="article_icons_container" class="black-text" style="font-size: 2.1rem;" onclick="Materialize.toast('Trebuie să te autentifici!', 4000)"><i class="material-icons red-text small article_icons">favorite_border</i>{{ post.likes.count }}</p>
+                        <p id="article_icons_container" class="black-text" style="font-size: 2.1rem; cursor: pointer;" onclick="Materialize.toast('Trebuie să te autentifici!', 4000)"><i class="material-icons red-text small article_icons">favorite</i>{{ post.likes.count }}</p>
                     {% endif %}
                 </form>
                 {% if user.is_staff %}
@@ -100,7 +104,7 @@
             <div class="card horizontal">
                 <div class="card-stacked">
                     <div class="card-content">
-                        <h5>{{ comment.author }}</h5>
+                        <h5 class="{% if comment.by_administration %}yellow-text text-darken-2{% else %}black-text{% endif %}">{{ comment.author }}</h5>
                         <p>{{ comment.text|linebreaks }} </p>
                         <p class="right">{{ comment.created_date }}</p>
                         {% if user.is_staff %}
@@ -112,4 +116,22 @@
         {% endfor %}
     </div>
     <script type="text/javascript" src="{% static 'js/post_detail.js' %}"></script>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script type="text/javascript">
+        $(function(){
+            $('#add_like_form').on('submit', function(e){
+                e.preventDefault();
+                $.ajax({
+                    url: $(this).attr('action'),
+                    method: $(this).attr('method'),
+                    data: new FormData(this),
+                    cache: false,
+                    processData: false,
+                    contentType: false,
+                    success: function(data){$('#target').html(data);}
+                });
+            });
+        });
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
 {% endblock %}

@@ -33,20 +33,115 @@ iframe_head.appendChild(poppins_font);
 width_container = document.getElementById('width_container');
 height_container = document.getElementById('height_container');
 post_text.style = "font-size:18px; padding:2px;";
+post_code.value = document.createTextNode(post_text.innerHTML).wholeText;
+images = post_text.querySelectorAll('img');
+post_text.innerHTML = post_code.value;
+for (i = 0; i<images.length; i++){
+    images[i].addEventListener("click", function(e){create_img_tools(e.target.id)}, true)
+}
+
+document.getElementById('file-input').oninput = function(){
+    document.getElementById('pre_added_img').src = URL.createObjectURL(document.getElementById('file-input').files[0])
+}
+
+$(document).ready(function () {
+    setTimeout(function () {
+    var kelle = $('.select-wrapper');
+    $.each(kelle, function (i, t) {
+        t.addEventListener('click', e => e.stopPropagation())
+    });
+}, 500)
+});
+
+$(document).ready(function() {
+    $('select').material_select();
+});
+$(document).ready(function(){
+    $('.modal').modal();
+});
+$('.chips').material_chip();
+$('.chips-initial').material_chip({
+    placeholder: 'Adaugă o etichetă',
+    secondaryPlaceholder: '+Etichetă',
+
+});
+
+$('.chips').on('chip.add', function(e, chip){
+    set_tag_list()
+    console.log('new tag added')
+});
+
+$('.chips').on('chip.delete', function(e, chip){
+    set_tag_list()
+    console.log('tag removed')
+});
+
+function set_tag_list(){
+    chips_list = document.querySelectorAll('.chips')
+    tags_container = ""
+    for (i=0; i<chips_list.length; i++ ){
+        if (chips_list[i].textContent != 'close'){
+            tags_container = tags_container + chips_list[i].textContent + ""
+        }
+    }
+    document.getElementById('tags_container').value = tags_container
+}
+function select_image_visible() {
+    document.getElementById("select_image_menu").className = "hide-on-med-and-down";
+    document.getElementById("add_image_menu").className = "hide"
+    document.getElementById("add_image").checked = false
+}
+
+function add_image_visible() {
+    document.getElementById("select_image_menu").className = "hide";
+    document.getElementById("add_image_menu").className = "";
+    document.getElementById("add_image").checked = true
+}
+
+function select_image(variant) {
+    to_select_variants = document.querySelectorAll('img[name="variant"]')
+    for (i = 0; i < to_select_variants.length; i++){
+        to_select_variants[i].className = "image"
+    }
+    variant.className = "image selected_variant"
+    console.log('image selected')
+}
+function add_image_cover() {
+    $('#modal1').modal('open')
+    document.getElementById("add_cover_photo").className = "btn waves-effect waves-light"
+    document.getElementById("new_image").className = "btn waves-effect waves-light hide"
+}
+
+function second_stage_add_cover_photo(){
+    if (document.getElementById("add_image").checked ) {
+        document.getElementById("cover_name").value = "blog/static/media/" + document.getElementById('file-input').files[0].name;
+        document.getElementById("representative_cover_img").src = URL.createObjectURL(document.getElementById('file-input').files[0]);
+    }
+    else {
+        src_container = (document.querySelector("img[class='image selected_variant']").id.split("/"))
+        document.getElementById("cover_name").value = "blog/static/media/" + src_container[src_container.length -1];
+        document.getElementById("representative_cover_img").src = "/media/blog/static/media/" + src_container[src_container.length -1];
+    }
+    console.log('cover image added')
+    $("#modal1").modal('close')
+}
+$('.modal').modal({
+    ready: function(modal, trigger) {
+        alert('sad');
+    }
+})
 
 function set_save_button_text(draw){
     if (draw){
         save_button.innerHTML = 'Salvează';
         save_button.className = "btn col s12 red";
+        console.log('set to draft')
     }
     else {
         save_button.innerHTML = "Publică";
         save_button.className = "btn col s12";
+        console.log('set to publish')
     }
-}
-
-function set_representative_cover_img(image){
-    document.getElementById('representative_cover_img').src = URL.createObjectURL(image);
 }
 
 function set_code_or_visual(value){
@@ -54,11 +149,13 @@ function set_code_or_visual(value){
         post_code.className = 'text_input s12 z-depth-1 hoverable';
         iframe.className = 'hide text_input s12 z-depth-1 hoverable';
         code_or_visual_icon.innerHTML = 'title';
+        console.log('viewing code part of post')
     }
     else {
         post_code.className = 'hide text_input s12 z-depth-1 hoverable';
         iframe.className = 'text_input s12 z-depth-1 hoverable';
         code_or_visual_icon.innerHTML = 'code';
+        console.log('viewing visual part of post')
     }
 }
 
@@ -66,15 +163,18 @@ function activate_survey(approved){
     if (approved){
         survey_container.className = 'col s10';
         card_action.className = "card-action";
+        console.log('surveys activated')
     }
     else {
         survey_container.className = 'col hide s10';
         card_action.className = "card-action hide";
+        console.log('surveys disabled')
     }
 }
 
 function delete_variant(number){
     document.getElementById('variant_container'+number).remove();
+    console.log('variant removed')
 }
 
 function add_variant(){
@@ -101,6 +201,7 @@ function add_variant(){
     variant_container.appendChild(variant_label);
     variant_container.appendChild(variant_remove_button);
     variant_index = variant_index + 1;
+    console.log('added new survey variant')
 }
 
 function size_change(){
@@ -127,11 +228,18 @@ post_code.oninput =function(){
 }
 
 function first_stage_add_image(){
-    document.getElementById('representative-img').src= URL.createObjectURL(document.getElementById('file-input').files[0]);
+    if (document.getElementById("add_image").checked) {
+        document.getElementById('representative-img').src= URL.createObjectURL(document.getElementById('file-input').files[0]);
+    }
+    else {
+        document.getElementById('representative-img').src = document.querySelector("img[class='image selected_variant']").src;
+    }
     add_img.className = 'waves-effect waves-light btn green';
     edit_img.className = 'waves-effect waves-light btn green hide';
 }
 function reset_add_image_menu(){
+    document.getElementById('pre_added_img').src = '';
+    document.getElementById('representative-img').src = '';
     img_size_selector.selectedIndex = 1;
     size_change();
     img_title.value = '';
@@ -140,7 +248,13 @@ function reset_add_image_menu(){
 }
 
 function second_stage_add_image(){
-    img_name = document.getElementById('file-input').files[0].name;
+    if (document.getElementById("add_image").checked ) {
+        img_name = document.getElementById('file-input').files[0].name;
+    }
+    else {
+        src_container = (document.querySelector("img[class='image selected_variant']").id.split("/"))
+        img_name = src_container[src_container.length -1];
+    }
     if(img_size_selector[img_size_selector.selectedIndex].value != 'custom'){
         size = img_size_selector[img_size_selector.selectedIndex].value;
         code = "<img class='responsive-img' title='" + img_title.value + "' id='" + img_name + "' align='"+ document.querySelector('input[name="image_align"]:checked').value + "' style='position:relative; width:" + size + "%'  src='/media/blog/static/media/" + img_name + "'/>";
@@ -149,6 +263,7 @@ function second_stage_add_image(){
         code = "<img style='position: relative;object-fit: cover; overflow: hidden;' title='" + img_title.value + "'  id='" + img_name + "' title='" + img_title.value +"' align='"+ document.querySelector('input[name="image_align"]:checked').value + "' width='"+ document.getElementById('width_input').value + "' height='"+ document.getElementById('height_input').value+"' src='/media/blog/static/media/" + img_name + "'/>";
     }
     format('insertHTML', code);
+    console.log('added image')
     reset_add_image_menu();
 }
 
@@ -184,50 +299,54 @@ function second_stage_edit_img(img){
         image.style.height = height_input.value;
     }
     $('#modal2').modal('close');
+    console.log('image edited')
     reset_add_image_menu();
 }
 
 function create_img_tools(img){
     image = window.frames[0].document.getElementById(img);
-    var img_container = document.createElement('div');
-    img_container.id = img + 'container';
-    img_container.style = "white-space: nowrap";
-    img_container.onmouseleave=function(){
-        remove_img_tools(img);
+    if (image.parentNode == post_text) {
+        var img_container = document.createElement('div');
+        img_container.id = img + 'container';
+        img_container.style = "white-space: nowrap";
+        img_container.onmouseleave=function(){
+            remove_img_tools(img);
+        }
+        img_tools_container = document.createElement('div');
+        img_tools_container.id = img + 'tools_container';
+        img_tools_container.style = "position: absolute;z-index:10;white-space: normal;display: inline-block;margin-top:10px; margin-left:" + String(image.offsetLeft + 10) + "px;";
+        img_tools_container.className = "img_tools_container";
+        var remove_img_icon = document.createElement('i');
+        remove_img_icon.className = "material-icons";
+        remove_img_icon.innerHTML = 'delete';
+        var remove_img_tool = document.createElement('a');
+        remove_img_tool.className = "btn center";
+        remove_img_tool.id = img + 'remove';
+        remove_img_tool.onclick = function(){
+            img_container.remove();
+        }
+        var edit_img_icon = document.createElement('i');
+        edit_img_icon.className = "material-icons";
+        edit_img_icon.innerHTML = 'edit';
+        var edit_img_tool = document.createElement('a');
+        edit_img_tool.className="btn";
+        edit_img_tool.id = img + 'edit';
+        edit_img_tool.onclick= function(){
+            first_stage_edit_img(img);
+        }
+        edit_img_tool.appendChild(edit_img_icon);
+        remove_img_tool.appendChild(remove_img_icon);
+        image.insertAdjacentElement("beforebegin", img_container);
+        img_container.appendChild(img_tools_container);
+        img_tools_container.appendChild(remove_img_tool);
+        img_tools_container.appendChild(edit_img_tool);
+        img_container.appendChild(image);
     }
-    img_tools_container = document.createElement('div');
-    img_tools_container.id = img + 'tools_container';
-    img_tools_container.style = "position: absolute;z-index:10;white-space: normal;display: inline-block;margin-top:10px; margin-left:" + String(image.offsetLeft + 10) + "px;";
-    img_tools_container.className = "img_tools_container";
-    var remove_img_icon = document.createElement('i');
-    remove_img_icon.className = "material-icons";
-    remove_img_icon.innerHTML = 'delete';
-    var remove_img_tool = document.createElement('a');
-    remove_img_tool.className = "btn center";
-    remove_img_tool.id = img + 'remove';
-    remove_img_tool.onclick = function(){
-        img_container.remove();
-    }
-    var edit_img_icon = document.createElement('i');
-    edit_img_icon.className = "material-icons";
-    edit_img_icon.innerHTML = 'edit';
-    var edit_img_tool = document.createElement('a');
-    edit_img_tool.className="btn";
-    edit_img_tool.id = img + 'edit';
-    edit_img_tool.onclick= function(){
-        first_stage_edit_img(img);
-    }
-    edit_img_tool.appendChild(edit_img_icon);
-    remove_img_tool.appendChild(remove_img_icon);
-    image.insertAdjacentElement("beforebegin", img_container);
-    img_container.appendChild(img_tools_container);
-    img_tools_container.appendChild(remove_img_tool);
-    img_tools_container.appendChild(edit_img_tool);
-    img_container.appendChild(image);
 }
 function add_video(){
     var video = prompt("Inserează link-ul la video");
     format('insertHTML', '<div class="video-container"><iframe src="https://www.youtube.com/embed/' + video.slice(-11) + '" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>');
+    console.log('added video')
 }
 
 function format(a,b){

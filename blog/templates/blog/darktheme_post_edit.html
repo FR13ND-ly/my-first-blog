@@ -50,7 +50,7 @@
                         </div>
                         <div class="input-field col s2">
                             <select onchange="format('fontname',this[this.selectedIndex].value);this.selectedIndex=0;">
-                                <option selected hidden disabled>Font</option>
+                                <option selected hidden>Font</option>
                                 <option value="Arial">Arial</option>
                                 <option value="Poppins">Poppins</option>
                                 <option value="Impact">Impact</option>
@@ -63,7 +63,7 @@
                         </div>
                         <div class="input-field col s3">
                             <select onchange="format('backcolor',this[this.selectedIndex].value);this.selectedIndex=0;">
-                                <option selected hidden disabled>Culoarea Fundalului</option>
+                                <option selected hidden>Culoarea Fundalului</option>
                                 <option value="black">Negru</option>
                                 <option value="white">Alb</option>
                                 <option value="red">Roșu</option>
@@ -77,7 +77,7 @@
                         </div>
                         <div class="input-field col s2">
                             <select onchange="format('formatblock',this[this.selectedIndex].value);this.selectedIndex=0;">
-                                <option selected hidden disabled>Format</option>
+                                <option selected hidden>Format</option>
                                 <option value="h1"><h1>Title 1</h1></option>
                                 <option value="h2"><h2>Title 2</h2></option>
                                 <option value="h3"><h3>Title 3</h3></option>
@@ -88,9 +88,9 @@
                                 <option value="pre"><pre>Preformatat</pre></option>
                             </select>
                         </div>
-                        <div class="input-field col s3 ">
+                        <div class="input-field col s3">
                             <select onchange="format('fontsize',this[this.selectedIndex].value);this.selectedIndex=0;">
-                                <option selected hidden disabled>Mărime Font</option>
+                                <option selected hidden>Mărime Font</option>
                                 <option value="2">Mic</option>
                                 <option value="4">Normal</option>
                                 <option value="6">Mare</option>
@@ -98,7 +98,7 @@
                         </div>
                     </div>
                     <div class="col s12 content">
-                        <a class="btn modal-trigger" onclick="format('removeFormat')" href="#modal1"><i class="material-icons">add_a_photo</i></a>
+                        <a class="btn modal-trigger" id="modal-trigger1" onclick="document.getElementById('add_cover_photo').className = 'btn waves-effect waves-light hide'; document.getElementById('new_image').className = 'btn waves-effect waves-light';document.getElementById('active_tab').click()" href="#modal1"><i class="material-icons">add_a_photo</i></a>
                         <a class="btn" onclick="add_video(); "><i class="material-icons">video_call</i></a>
                         <a class="btn right" onclick="set_code_or_visual(Boolean(Number(this.id)));this.id = -1*(Number(this.id)-1)" id='1'><i class="material-icons" id="set_code_or_visual_icon">code</i></a>
                     </div>
@@ -113,8 +113,8 @@
                     <label for="post_status">Schiță</label>
                 </div>
                 <h5>Imagine de copertă</h5>
-                <input type="file" name="coverphoto" class="hide" id="cover_upload" oninput="set_representative_cover_img(this.files[0])">
-                <label for="cover_upload"><img class="card" id="representative_cover_img"{% if post_new %} src="/media//blog/static/media/black_default_cover.png" {% else %} src="/media/{{post.cover}}" {% endif%}  id="representative_cover" required/></label>
+                <input id="cover_name" name="cover_name" value="{{post.cover.image}}" class="hide">
+                <img class="card" style="height: auto;width: 100%;" id="representative_cover_img" onclick="add_image_cover()" {% if post_new %} src="/media//blog/static/media/black_default_cover.png" {% else %} src="/media/{{post.cover.image}}" {% endif%}  id="representative_cover" required/>
             </div>
         </div>
         <div class="col s12 m6" >
@@ -157,6 +157,8 @@
                             <h5 id="save_article_header">Salvează Postul</h5>
                             <input type="checkbox" id="draft" class="filled-in" oninput="set_save_button_text(this.checked)" name="status" {% if post.status %} checked {% endif %}/>
                             <label for="draft">Schiță</label>
+                            <div class="chips chips-initial"></div>
+                            <input class="hide" id="tags_container" name="tags_container">
                         </div>
                         <div class="col s12">
                             <button class="btn col s12 {% if post.status %}red{% else %}Publică {% endif %}" type="submit" name="save_post" id="save_post" onclick="add_variant()" value="Save Post">{% if post.status %}Salvează{% else %}Publică {% endif %}</button>
@@ -166,24 +168,56 @@
             </div>
         </div>
     </form>
-    <form method="POST" enctype="multipart/form-data" target="hidden-iframe" id="add_image_form" onsubmit ="$('#modal1').modal('close'); $('#modal2').modal('open')">
+    <form method="POST" enctype="multipart/form-data" target="hidden-iframe" id="add_image_form">
         {% csrf_token %}
-        <div id="modal1" class="modal white-text blue-grey darken-3">
+        <div id="modal1" class="modal modal-fixed-footer white-text blue-grey darken-3">
             <div class="modal-content">
-                <h4>Adaugă o fotografie</h4>
-                <div class="file-field input-field">
-                    <div class="btn">
-                        <span >File</span>
-                        <input type="file" name="file" accept="image/*" oninput="first_stage_add_image()" id="file-input" required>
+                <div class="row">
+                    <ul class="tabs blue-grey darken-3 " style="margin-bottom: 1%;" id="tabs">
+                        <li class="tab col s3"><a onclick="add_image_visible()" href="#test1">Adaugă o imagine</a></li>
+                        <li class="tab col s3"><a onclick="select_image_visible()" href="#" class="active" id="active_tab">Alege o imagine</a></li>
+                    </ul>
+                    <div id="select_image_menu" class="hide">
+                        {% for column in images %}
+						    <div class="col s4">
+							    {% for image in column %}
+									<div class="row">
+        								<div class="col">
+                                            <img class="image" width="210" class="hoverable" onclick="select_image(this)" id="{{image.image}}" name="variant" height="210" src="/media/{{image.image}}" >
+										</div>
+        							</div>
+    							{% endfor %}
+  							</div>
+                        {% endfor %}
                     </div>
-                    <div class="file-path-wrapper">
-                        <input class="file-path validate" type="text">
+                    <div id="select_image_menu" class="hide-on-med-and-up">
+                        <div class="row">
+                            <div class="col s12 center-align">
+                            {% for image in mimage_list %}
+                                <img class="image" width="210" onclick="select_image(this)" id="{{image.image}}" name="variant" height="210" src="/media/{{image.image}}" >
+                            {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="hide" id="add_image_menu">
+                    <div class="file-field input-field">
+                        <div><img class="responsive-img" id="pre_added_img"></div>
+                        <div class="btn">
+                            <span >File</span>
+                            <input type="file" name="file" accept="image/*" id="file-input" oninput="pre_added_img(this)">
+                        </div>
+                        <div class="file-path-wrapper">
+                            <input class="file-path validate" type="text">
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="modal-footer white-text blue-grey darken-3">
+            <div class="modal-footer blue-grey darken-3 ">
                 <a class="waves-effect waves-light btn left red" onclick="$('#modal1').modal('close')"><i class="material-icons">close</i></a>
-                <button class="btn waves-effect waves-light" type="submit" name="new_image" id="new_image" value="new_image">Continuă</button>
+                <button class="btn waves-effect waves-light" onclick="$('#modal1').modal('close'); $('#modal2').modal('open');first_stage_add_image(false)" type="submit" name="new_image" id="new_image" value="new_image">Continuă</button>
+                <button class="btn waves-effect waves-light hide" onclick="second_stage_add_cover_photo()" type="submit" id="add_cover_photo">Continuă</button>
+                <input name="select_or_add_cover" type="checkbox" id="add_image" class="hide">
             </div>
         </div>
     </form>
@@ -220,25 +254,16 @@
                 </div>
             </div>
         </div>
-        <div class="modal-footer white-text blue-grey darken-3">
+        <div class="modal-footer blue-grey darken-3">
             <a class="waves-effect waves-light btn left red" onclick="$('#modal2').modal('close')"><i class="material-icons">close</i></a>
             <a class="waves-effect waves-light btn green" id="add_img" onclick="second_stage_add_image();$('#modal2').modal('close')"><i class="material-icons">check</i></a>
-            <a class="waves-effect waves-light btn green" id="edit_img" onclick="second_stage_edit_img(this.value)" value=''><i class="material-icons">check</i></a>
+            <a class="waves-effect waves-light btn green hide" id="edit_img" onclick="second_stage_edit_img(this.value)"><i class="material-icons">check</i></a>
         </div>
     </div>
     <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
     <script type="text/javascript">
-        $(document).ready(function() {
-            $('select').material_select();
-        });
-        $(document).ready(function(){
-            $('.modal').modal();
-        });
-        $('.modal').modal({
-            dismissible: false
-        });
-    </script>
-    <script type="text/javascript">
+        window.frames[0].document.getElementsByTagName("body")[0].className = "white-text"
         $(function(){
             $('#add_image_form').on('submit', function(e){
                 e.preventDefault();
@@ -249,13 +274,10 @@
                     cache: false,
                     processData: false,
                     contentType: false,
-                    success: function(data){ $('#target').html(data);}
+                    success: function(data){$('#target').html(data);}
                 });
             });
         });
-    </script>
-    <script>
-        window.frames[0].document.getElementsByTagName("body")[0].className= "white-text"
     </script>
     <script type="text/javascript" src="{% static 'js/post_edit.js' %}"></script>
 {% endblock %}

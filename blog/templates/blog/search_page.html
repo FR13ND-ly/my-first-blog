@@ -1,0 +1,98 @@
+{% extends 'blog/base.html' %}
+{% load static %}
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/post_list.css' %}">
+<div class="row">
+    <div id="articles">
+        <h3>Posturi</h3>
+        {% for post in posts %}
+            <div class="col s12 m12 hide-on-small-only">
+                <div class="card horizontal hoverable">
+                    <div class="card-image valign-wrapper">
+                        <img src="/media/{{post.cover.image}}" class="image" id="article_image">
+                    </div>
+                    <div class="card-stacked">
+                        <div class="card-content">
+                            <a href="{% url 'post_detail' pk=post.pk %}" class="black-text">
+                                <div class="section">
+                                    <h4>{% if post.status %} Privat: {% endif %}{{ post.title }}</h4>
+                                    <p class="article_text" style="font-size:1.2rem">{{ post.text|striptags|linebreaksbr|truncatewords:35 }}</p>
+                                </div>
+                                <div class="divider"></div>
+                                <div class="section">
+                                    <p class="article_icons_container"><i class="material-icons red-text tiny black-text article_icon">access_time</i> {{ post.published_date }} |<i class="material-icons red-text tiny black-text article_icon">contacts</i> {{post.author}} | <i class="material-icons red-text tiny black-text article_icon">remove_red_eye</i> {{post.view.count}} | <i class="material-icons red-text tiny black-text article_icon">favorite</i> {{post.likes.count}}</p>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                </div>
+            <div class="col s12 m12 hide-on-med-and-up">
+                <div class="card hoverable">
+                    <div class="card-image valign-wrapper">
+                        <img src="/media/{{post.cover.image}}" class="image">
+                    </div>
+                    <div class="card-stacked">
+                        <div class="card-content">
+                            <a href="{% url 'post_detail' pk=post.pk %}" class="black-text">
+                                <div class="section">
+                                    <h5>{% if post.status %} Privat: {% endif %}{{ post.title }}</h5>
+                                    <p class="article_text">{{ post.text|striptags|linebreaksbr|truncatewords:25 }}</p>
+                                </div>
+                                <div class="divider"></div>
+                                <div class="section">
+                                    <p class="article_icons_container"><i class="material-icons red-text tiny black-text article_icon">access_time</i> {{ post.published_date }} | <i class="material-icons red-text tiny black-text article_icon">remove_red_eye</i> {{post.view.count}}</p>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <p>Nici-un rezultat</p>
+        {% endfor %}
+    </div>
+{% if not hide_ads_and_comments %}
+    <div id="ads">
+        <h3>Publicitate</h3>
+        {% for ad in ads %}
+            <div class="col s12 m12 hide-on-small-only">
+                <div class="card hoverable">
+                    <div class="card-content">
+                        <p>{{ad.text}}</p>
+                        <b>{{ad.contact}}</b>
+                    </div>
+                    {% if user.is_staff %}
+                		<a class="btn-floating halfway-fab waves-effect waves-light red" href="{% url 'ad_delete' pk=ad.pk %}"><i class="material-icons">edit</i></a>
+				    {% endif %}
+                </div>
+            </div>
+        {% empty %}
+            <p>Nici-un rezultat</p>
+        {% endfor %}
+    </div>
+    <div id="comments">
+    <h3>Comentarii</h3>
+    {% for comment in comments %}
+        <div class="col s12 m12 hide-on-small-only">
+            <div class="card hoverable">
+                <div class="card-content">
+                    <h4>{{comment.author}}</h4>
+                    <p>{{comment.text}}</p>
+                    <p class="right">{{comment.created_date}}</p>
+                </div>
+                <div class="card-action">
+                    <a href="{% url 'post_detail' pk=comment.post.pk %}">Treci la articolul terț</a>
+                </div>
+                {% if user.is_staff %}
+            		<a class="btn-floating halfway-fab waves-effect waves-light red" href="{% url 'comment_remove' pk=comment.pk %}"><i class="material-icons">edit</i></a>
+			    {% endif %}
+            </div>
+        </div>
+    {% empty %}
+        <p>Nici-un rezultat</p>
+    {% endfor %}
+    </div>
+{% endif %}
+</div>
+{% endblock %}

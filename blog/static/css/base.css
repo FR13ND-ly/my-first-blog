@@ -137,3 +137,33 @@ body {
     80% {opacity: 80%;}
     100% {opacity: 100%;}
 }
+
+.rainbow {
+    animation-name: rainbow;
+    animation-duration: 0.25s;
+    animation-iteration-count: infinite;
+    animation-direction: alternate-reverse;
+}
+@keyframes rainbow {
+    0%{color: #c62828}
+    5%{color: #ad1457}
+    10%{color: #6a1b9a}
+    15%{color: #4527a0}
+    20%{color: #283593}
+    25%{color: #1565c0}
+    30%{color: #0277bd}
+    35%{color: #00838f}
+    40%{color: #00695c}
+    45%{color: #2e7d32}
+    50%{color: #558b2f}
+    55%{color: #9e9d24}
+    60%{color: #f9a825}
+    65%{color: #ff8f00}
+    70%{color: #ef6c00}
+    75%{color: #d84315}
+    80%{color: #4e342e}
+    85%{color: #424242}
+    90%{color: #37474f}
+    95%{color: #0277bd}
+    100%{color: #2e7d32}
+}

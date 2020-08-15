@@ -48,3 +48,19 @@
 #save_article_header {
     padding-bottom: 5%;
 }
+
+.image {
+    object-fit: cover; 
+    overflow: hidden;
+}
+
+.selected_variant {
+    animation-name: select_image;
+    animation-duration: 0.15s;
+    border: 10px solid #26a69a;
+}
+
+@keyframes select_image {
+    0% {border: 0}
+    100% {border: 10px solid #26a69a}
+}

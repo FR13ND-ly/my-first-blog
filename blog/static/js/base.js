@@ -1,19 +1,16 @@
-function show_mobile_usermenu(){
-    var mobile_menu = document.getElementById('mobile_menu');
-    if (mobile_menu.className == 'row pinned hide hide-on-med-and-up'){
-        mobile_menu.className = 'row pinned hide-on-med-and-up';
+$(".button-collapse").sideNav();
+$('.collapsible').collapsible();
+keyCodes = [65, 87, 69, 83, 79, 77, 69]
+iteration = 0
+addEventListener('keydown', function(e){
+    if (e.keyCode == keyCodes[iteration]){
+        iteration = iteration + 1;
+        if (iteration == 7){
+            document.getElementById('e-c').className = "brand-logo center rainbow"
+        }
     }
-    else{
-        mobile_menu.className = 'row pinned hide hide-on-med-and-up';
+    else {
+        iteration = 0
+        console.log('fail')
     }
-  }
-
-function makevisibleusermenu(){
-    var usermenu = document.getElementById('usermenu');
-    if (usermenu.className == 'row pinned hide'){
-        usermenu.className = 'row pinned visible_usermenu';
-    }
-    else{
-        usermenu.className = 'row pinned hide';
-    }
-}
+})

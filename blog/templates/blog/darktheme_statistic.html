@@ -1,0 +1,153 @@
+{% extends 'blog/darktheme_base.html' %}
+{% load static %}
+{% block content %}
+<style>
+    tr:hover{
+        background-color: #455a64;
+    }
+</style>
+<div class="row">
+    <table class="responsive-table white-text">
+        <thead>
+            <tr>
+                <th>Indicator</th>
+                <th>Numărul</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Administratori</td>
+                <td>{{Administrators}}</td>
+            </tr>
+            <tr>
+                <td>Utilizatori</td>
+                <td>{{Users}}</td>
+            </tr>
+            <tr>
+                <td>Articole</td>
+                <td>{{Posts}}</td>
+            </tr>
+            <tr>
+                <td>Vizualizări</td>
+                <td>{{Views}}</td>
+            </tr>
+            <tr>
+                <td>Like-uri</td>
+                <td>{{Likes}}</td>
+            </tr>
+            <tr>
+                <td>Comentarii</td>
+                <td>{{Comments}}</td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="responsive-table white-text">
+        <thead>
+            <tr>
+                <th>Data</th>
+                <th>Numărul de vizualizări</th>
+                <th>Like-uri</th>
+                <th>Comentarii</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for date, info in views_by_date.items %}
+            <tr>
+                <td>{{date}}</td>
+                {% for i in info %}
+                <td>{{i}}</td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <table class="responsive-table white-text">
+        <thead>
+            <tr>
+                <th>Luna</th>
+                <th>Numărul de vizualizări</th>
+                <th>Like-uri</th>
+                <th>Comentarii</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for date, info in views_by_month.items %}
+            <tr>
+                <td>{{date}}</td>
+                {%for i in info%}
+                <td>{{i}}</td>
+                {%endfor%}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <table class="responsive-table white-text">
+        <thead>
+            <tr>
+                <th>Anul</th>
+                <th>Numărul de vizualizări</th>
+                <th>Like-uri</th>
+                <th>Comentarii</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for year, info in views_by_year.items %}
+            <tr>
+                <td>{{year}}</td>
+                {% for i in info%}
+                <td>{{i}}</td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <table class="responsive-table white-text">
+        <thead>
+            <tr>
+                <th>Urmăritor</th>
+                <th>Numărul de vizualizări</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for type, count in views_by_signed_and_not.items %}
+            <tr>
+                <td>{{type}}</td>
+                <td>{{count}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <table class="responsive-table white-text">
+        <thead>
+            <tr>
+                <th>Tipul interfaței</th>
+                <th>Numărul de utilizatori</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for type, count in white_or_dark_theme_stat.items %}
+            <tr>
+                <td>{{type}}</td>
+                <td>{{count}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <table class="responsive-table white-text">
+        <thead>
+            <tr>
+                <th>Comentatori</th>
+                <th>Numărul de vizualizări</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for type, count in comment_by_signed_and_not.items %}
+            <tr>
+                <td>{{type}}</td>
+                <td>{{count}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

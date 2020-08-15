@@ -11,13 +11,31 @@ meta_type.setAttribute('property', 'og:type');
 meta_type.content = 'article';
 header.appendChild(meta_description);
 header.appendChild(meta_title);
-header.appendChild(meta_type);
+header.appendChild(meta_type); 
+
+function add_like(){ 
+    like_icon = document.getElementById('like_icon');
+    like_count = document.getElementById('like_count');
+    input = document.getElementById('liked')
+    document.getElementById('submit_btn').click()
+    if (like_icon.innerHTML == "favorite") {
+        like_icon.innerHTML = 'favorite_border'
+        like_count.innerHTML = Number(document.getElementById('like_count').innerHTML) - 1;
+        console.log('like removed')
+    }
+    else {
+        like_icon.innerHTML = 'favorite'
+        like_count.innerHTML = Number(document.getElementById('like_count').innerHTML) + 1;
+        console.log('like added')
+    }
+}
 
 function add_comment(){
     var comment_form = document.getElementById('comment_form');
     var add_comment_btn = document.getElementById('add_comment');
     add_comment_btn.className = "btn center-align light-blue darken-2 hide";
     comment_form.className = "card visible blue-grey darken-3";
+    console.log('add new comment section opened')
 }
 
 function select_one_variant(variant){
