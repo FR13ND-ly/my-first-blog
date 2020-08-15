@@ -82,7 +82,7 @@
                     <p class="right">{{comment.created_date}}</p>
                 </div>
                 <div class="card-action">
-                    <a href="{% url 'post_detail' pk=comment.post.pk %}">Treci la articolul terț</a>
+                    <a href="{% url 'post_detail' pk=comment.post.pk %}">Treci la articolul în cadrul căruia a fost scris</a>
                 </div>
                 {% if user.is_staff %}
             		<a class="btn-floating halfway-fab waves-effect waves-light red" href="{% url 'comment_remove' pk=comment.pk %}"><i class="material-icons">edit</i></a>
