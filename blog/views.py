@@ -17,11 +17,10 @@ def set_dict_for_render(rdict, request):
         rdict.update({'profile' : profile})
     if request.user.is_staff:
         rdict.update({'reports' : Report.objects.all()})
-    if rdict.get('ad_and_side_menu'):
-        add_ad_and_side_menu(rdict)
     if re.compile(r".*(iphone|mobile|androidtouch)",re.IGNORECASE).match(request.META['HTTP_USER_AGENT']):
         rdict.update({"mobile" : True})
-    else:
+    elif rdict.get('ad_and_side_menu'):
+        add_ad_and_side_menu(rdict)
         rdict.update({"mobile" : False})
     return rdict
 

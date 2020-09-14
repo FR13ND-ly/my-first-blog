@@ -15,7 +15,7 @@
         }
     </style>
     {% if mobile %}
-    <div class="row hide-on-med-and-up">
+    <div class="row">
         <div class="col s12 white-text">
             <h3>Baza de ziare în format online</h3>
             {% for i in np %}
@@ -24,7 +24,7 @@
                         <div class="card-image" style="padding: 5%">
                             <img class="responsive-image" src="/media/blog/static/media/ad_default.png">
                         </div>
-                        <div class="card-action">
+                        <div class="card-action blue-grey darken-3 white-text">
                             <b>Nr: {{ i.title }}</b>
                             <p>Data: {{ i.date }}</p>
                         </div>

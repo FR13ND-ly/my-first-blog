@@ -3,15 +3,17 @@
 {% if mobile %}
 <div class="row">
 	<div class="col s12">
-		<div class="card hoverable blue-grey darken-3 white-text">
-			<div class="card-content">
-				<p>{{ ad.text| linebreaksbr }}</p>
-				<b>{{ ad.contact }}</b>
+		{% for ad in mads%}
+			<div class="card hoverable blue-grey darken-3 white-text">
+				<div class="card-content">
+					<p>{{ ad.text| linebreaksbr }}</p>
+					<b>{{ ad.contact }}</b>
+				</div>
+				{% if user.is_staff %}
+					<a class="btn-floating halfway-fab waves-effect waves-light" href="{% url 'ad_edit' pk=ad.pk %}"><i class="material-icons">edit</i></a>
+				{% endif %}
 			</div>
-			{% if user.is_staff %}
-				<a class="btn-floating halfway-fab waves-effect waves-light" href="{% url 'ad_edit' pk=ad.pk %}"><i class="material-icons">edit</i></a>
-			{% endif %}
-		</div>
+		{% endfor %}
 	</div>
 </div>
 {% else %}
@@ -27,7 +29,7 @@
 								{% for ad in column %}
 									<div class="row">
         								<div class="col">
-          									<div class="card hoverable">
+          									<div class="card hoverable blue-grey darken-2">
             									<div class="card-content">
              						 				<p>{{ ad.text| linebreaksbr }}</p>
               										<b>{{ ad.contact }}</b>
