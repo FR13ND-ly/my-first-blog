@@ -15,6 +15,8 @@ class Post(models.Model):
     survey_is_present = models.BooleanField(default=False)
     question = models.CharField(max_length=200, blank=True, null=True)
     type_of_vote = models.BooleanField(default=True)
+    url = models.CharField(max_length=200, default=True)
+    video = models.BooleanField(default=False)
 
     def publish(self):
         self.published_date = timezone.now()
@@ -22,6 +24,12 @@ class Post(models.Model):
 
     def __str__(self):
         return self.title
+class Ad_Block(models.Model):
+    link = models.CharField(max_length=200, null=True)
+    title = models.CharField(max_length=200, null=True)
+    description = models.CharField(max_length=200, null=True)
+    image = models.ForeignKey('blog.Image', on_delete=models.CASCADE, related_name='ad_block', null=True)
+    active = models.BooleanField(default=True)
 
 class Comment(models.Model):
     author = models.CharField(max_length=200, null=True)
@@ -40,6 +48,7 @@ class Profile(models.Model):
     photo = models.ImageField(upload_to="blog/static/media/", blank=True)
     darktheme = models.BooleanField(default=False)
     created_date = models.DateTimeField(default=timezone.now)
+    is_premium = models.BooleanField(default=False)
 
 class Like(models.Model):
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
@@ -60,6 +69,11 @@ class Vote(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     variant = models.ForeignKey('blog.Survey', on_delete=models.CASCADE, related_name='vote')
 
+class NewsPapper(models.Model):
+    title = models.CharField(max_length=200)
+    pdf = models.FileField(upload_to="blog/static/media/",null=True, blank=True)
+    date = models.DateTimeField(blank=True, null=True)
+
 class Ad(models.Model):
     contact = models.CharField(max_length=200)
     text = models.TextField()
@@ -77,3 +91,6 @@ class Image(models.Model):
 class Tag(models.Model):
     tag = models.CharField(max_length=200, null=True)
     post = models.ForeignKey('blog.Post', on_delete=models.CASCADE, related_name='tags', null=True)
+
+class Report(models.Model):
+    comment = models.ForeignKey('blog.Comment', on_delete=models.CASCADE, related_name='reports')

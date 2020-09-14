@@ -1,37 +1,38 @@
 {% extends 'blog/darktheme_base.html' %}
 {% load static %}
 {% block content %}
-    <link rel="stylesheet" href="{% static 'css/post_detail.css' %}">
-    <div class="row">
-        <div class="col s12" >
-            <div class="card blue-grey darken-3 white-text" >
-                <div class="card-content">
-                    <div class="section">
-                        <h4 class="hide-on-small-only white-text" id="article_title">{{ post.title }}</h4>
-                        <h5 class="hide-on-med-and-up white-text">{{ post.title }}</h5>
+<link rel="stylesheet" href="{% static 'css/post_detail.css' %}">
+{% if mobile %}
+<div class="row hide-on-med-and-up">
+    <div class="col s12">
+        <div class="card blue-grey darken-3 white-text">
+            <div class="card-content">
+                <div class="section">
+                    <h4 class="hide-on-small-only" id="article_title">{{ post.title }}</h4>
+                    <h5 class="hide-on-med-and-up">{{ post.title }}</h5>
                     <div class="divider"></div>
-                    <p id="article_icons_container"><i class="material-icons tiny article_icons">access_time</i> {{ post.published_date }} |<i class="material-icons tiny article_icons">contacts</i> {{post.author}} |  {{ post.view.count }} <i class="material-icons tiny article_icons">remove_red_eye</i></p>
+                    <p id="article_icons_container"><i class="material-icons tiny article_icons white-text">access_time</i> {{ post.published_date }} |<i class="material-icons tiny article_icons white-text">contacts</i> {{post.author}} |  {{ post.view.count }} <i class="material-icons tiny article_icons white-text">remove_red_eye</i></p>
                     <div class="divider"></div>
                 </div>
                 {% autoescape off %}
-                    <div class="white-text" id="post_text">{{ post.text|linebreaksbr }} </div>
+                    <div id="post_text">{{ post.text|linebreaksbr }} </div>
                 {% endautoescape %}
                 {% for i in post.tags.all %}
                     <a href="/search_by_tag/{{i.tag}}">#{{i.tag}}</a>
                 {% endfor%}
-                <form method="POST" id="add_like_form" onsubmit="alert('sf)'" action="like">
+                <form method="POST" id="add_like_form" action="like">
                     {% csrf_token %}
                     {% if user.is_active %}
                         <button class="hide" id="submit_btn" type="submit"></button>
                         <a onclick="add_like()" id="article_icons_container" class="white-text" style="font-size: 2.1rem;cursor:pointer"><i id="like_icon" class="material-icons red-text small article_icons">favorite{% if not liked %}_border{% endif %}</i><div style="display:inline" id="like_count">{{ post.likes.count }}</div></a>
                     {% else %}
-                        <p id="article_icons_container" class="white-text" style="font-size: 2.1rem; cursor: pointer;" onclick="Materialize.toast('Trebuie să te autentifici!', 4000)"><i class="material-icons red-text small article_icons">favorite</i>{{ post.likes.count }}</p>
+                        <p id="article_icons_container" class="black-text" style="font-size: 2.1rem; cursor: pointer;" onclick="Materialize.toast('Trebuie să te autentifici!', 4000)"><i class="material-icons red-text small article_icons">favorite</i>{{ post.likes.count }}</p>
                     {% endif %}
                 </form>
                 {% if user.is_staff %}
-                    <a class="btn waves-effect waves-light" href="{% url 'post_edit' pk=post.pk %}">
+                    <a class="btn waves-effect waves-light" href="{% url 'post_edit' pk=post.url %}">
                         <i class="material-icons">edit</i></a>
-                    <a class="btn waves-effect waves-light red darken-2" href="{% url 'post_remove' pk=post.pk %}">
+                    <a class="btn waves-effect waves-light red darken-2" onclick="r = confirm('Sunteți sigur?'); if (r){this.href='remove'}" href="#">
                         <i class="material-icons">delete</i></a>
                 {% endif %}
             </div>
@@ -40,7 +41,7 @@
             <div class="row">
                 <form method="POST" action="vote">
                     {% csrf_token %}
-                    <div class="collection with-header z-depth-1 blue-grey darken-3 white-text" id="survey_section">
+                    <div class="collection with-header z-depth-1" id="survey_section">
                         <div class="collection-header blue-grey darken-3 white-text"><h5>{{ post.question }}</h5></div>
                         {% for i in survey %}
                             <a class="collection-item blue-grey darken-3 white-text" name="variant_container" id="{{i.variant}}" {% if not uservoted %} onclick="{% if post.type_of_vote %} select_one_variant(this) {% else %}select_multi_variant(this) {% endif %}" {% endif %}>
@@ -68,15 +69,117 @@
         {% endif %}
         <span class="new badge right light-blue darken-2" data-badge-caption="comentarii">{{ post.comments.count }}</span>
         <a class="btn center-align light-blue darken-2" id="add_comment" onclick="add_comment()">Lasă un comentariu</a>
-        <div class="card hide " id="comment_form">
+        <div class="card hide" id="comment_form">
+            <form method="POST">
+                {% csrf_token %}
+                <div class="card-content blue-grey darken-3 white-text">
+                    <div class="row">
+                        <h4 id="comment_author">{{ user.username }}</h4>
+                        <div class="input-field col s10">
+                            <input name="text_of_comment" id="author_of_comment" type="text" required>
+                            <label class="active" for="first_name2">Comentariul</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-action">
+                    <button class="btn-flat btn waves-effect waves-light yellow-text text-darken-4" type="submit" value="add_comment" name="add_comment">Trimite <i class="material-icons right">send</i></button>
+                </div>
+            </form>
+        </div>
+        {% for comment in post.comments.all %}
+            <div class="card horizontal blue-grey darken-3 white-text" style="margin-bottom: 3%;">
+                <div class="card-stacked">
+                    <div class="card-content">
+                        <h5 class="{% if comment.by_administration %}yellow-text text-darken-2{% else %}{% if comment.by_authenticated %} light-blue-text text-darken-2 {% endif %}black-text{% endif %}">{{ comment.author }}</h5>
+                        <p>{{ comment.text|linebreaks }} </p>
+                        <p class="right">{{ comment.created_date }}</p>
+                        {% if user.is_staff %}
+                            <a class="btn-floating halfway-fab waves-effect waves-light red" onclick="r = confirm('Sunteți sigur?'); if (r){this.href='/comment/{{ comment.pk }}/remove'}"><i class="material-icons">delete</i></a>
+                        {% else %}
+                        <a class="btn-floating halfway-fab waves-effect waves-light red" href="{% url 'report_comment' pk=comment.pk %}" title="Raportează acest comentariu"><i class="material-icons">report</i></a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% else %}
+<div class="row hide-on-small-only">
+    <div class="col s9">
+        <div class="card blue-grey darken-3 white-text">
+            <div class="card-content">
+                <div class="section">
+                    <h4 class="hide-on-small-only" id="article_title">{{ post.title }}</h4>
+                    <h5 class="hide-on-med-and-up">{{ post.title }}</h5>
+                    <div class="divider"></div>
+                    <p id="article_icons_container"><i class="material-icons tiny article_icons">access_time</i> {{ post.published_date }} |<i class="material-icons tiny article_icons">contacts</i> {{post.author}} |  {{ post.view.count }} <i class="material-icons tiny article_icons">remove_red_eye</i></p>
+                    <div class="divider"></div>
+                </div>
+                {% autoescape off %}
+                    <div id="post_text">{{ post.text|linebreaksbr }} </div>
+                {% endautoescape %}
+                {% for i in post.tags.all %}
+                    <a href="/search_by_tag/{{i.tag}}">#{{i.tag}}</a>
+                {% endfor%}
+                <form method="POST" id="add_like_form" action="like">
+                    {% csrf_token %}
+                    {% if user.is_active %}
+                        <button class="hide" id="submit_btn" type="submit"></button>
+                        <a onclick="add_like()" id="article_icons_container" class="white-text" style="font-size: 2.1rem;cursor:pointer"><i id="like_icon" class="material-icons red-text small article_icons">favorite{% if not liked %}_border{% endif %}</i><div style="display:inline" id="like_count">{{ post.likes.count }}</div></a>
+                    {% else %}
+                        <p id="article_icons_container" class="black-text" style="font-size: 2.1rem; cursor: pointer;" onclick="Materialize.toast('Trebuie să te autentifici!', 4000)"><i class="material-icons red-text small article_icons">favorite</i>{{ post.likes.count }}</p>
+                    {% endif %}
+                </form>
+                {% if user.is_staff %}
+                    <a class="btn waves-effect waves-light hide-on-small-only" href="{% url 'post_edit' pk=post.url %}">
+                        <i class="material-icons">edit</i></a>
+                    <a class="btn waves-effect waves-light red darken-2" onclick="r = confirm('Sunteți sigur?'); if (r){this.href='remove'}" href="#">
+                        <i class="material-icons">delete</i></a>
+                {% endif %}
+            </div>
+        </div>
+        {% if post.survey_is_present %}
+            <div class="row">
+                <form method="POST" action="vote">
+                    {% csrf_token %}
+                    <div class="collection with-header z-depth-1" id="survey_section">
+                        <div class="collection-header blue-grey darken-3 white-text"><h5>{{ post.question }}</h5></div>
+                        {% for i in survey %}
+                            <a class="collection-item blue-grey darken-3 white-text" name="variant_container" id="{{i.variant}}" {% if not uservoted %} onclick="{% if post.type_of_vote %} select_one_variant(this) {% else %}select_multi_variant(this) {% endif %}" {% endif %}>
+                                {% if uservoted %}
+                                    <span class="new badge light-blue darken-2" data-badge-caption="voturi">{{ i.count }}</span>
+                                {% endif %}
+                                {{i.variant}}
+                                <div class="hide secondary-content">
+                                    <input  {% if post.type_of_vote %} name="variant" {% endif %}value="{{ i.variant }}" type="{% if post.type_of_vote %} radio {% else %} check {% endif %}" id="{{ i.variant }}"/>
+                                </div>
+                            </a>
+                        {% endfor %}
+                        {% if user.is_active %}
+                            {% if uservoted %}
+                                <div class="collection-item blue-grey darken-3 white-text"><button class="btn" disabled >Ai votat deja!</button></div>
+                            {% else %}
+                                <div class="collection-item"><button class="btn btn-default center light-blue darken-2" type="submit">Votează!</button></div>
+                            {% endif %}
+                        {% else %}
+                            <div class="collection-item"><button class="btn btn-default center light-blue darken-2" type="button"  onclick="Materialize.toast('Trebuie să te autentifici!', 4000)">Votează!</button></div>
+                        {% endif %}
+                    </div>
+                </form>
+            </div>
+        {% endif %}
+        <span class="new badge right light-blue darken-2" data-badge-caption="comentarii">{{ post.comments.count }}</span>
+        <a class="btn center-align light-blue darken-2" id="add_comment" onclick="add_comment()">Lasă un comentariu</a>
+        <div class="card hide" id="comment_form">
             <form method="POST">
                 {% csrf_token %}
                 {% if user.is_active %}
-                    <div class="card-content">
+                    <div class="card-content blue-grey darken-3 white-text">
                         <div class="row">
-                            <h4 id="comment_author" class="white-text">{{ user.username }}</h4>
+                            <h4 id="comment_author">{{ user.username }}</h4>
                             <div class="input-field col s10">
-                                <input name="text_of_comment" id="author_of_comment" class="white-text" type="text" required>
+                                <input name="text_of_comment" id="author_of_comment" type="text" required>
                                 <label class="active" for="first_name2">Comentariul</label>
                             </div>
                         </div>
@@ -95,44 +198,281 @@
                         </div>
                     </div>
                 {% endif %}
-                <div class="card-action">
-                    <button class="btn-flat white-text" type="submit" value="add_comment" name="add_comment">Trimite <i class="material-icons right">send</i></button>
+                <div class="card-action blue-grey darken-3 white-text">
+                    <button class="btn-flat btn waves-effect waves-light yellow-text text-darken-4 " type="submit" value="add_comment" name="add_comment">Trimite <i class="material-icons right">send</i></button>
                 </div>
             </form>
         </div>
         {% for comment in post.comments.all %}
-            <div class="card horizontal blue-grey darken-3 white-text">
+            <div class="card horizontal blue-grey darken-3 white-text" style="margin-bottom: 3%;">
                 <div class="card-stacked">
                     <div class="card-content">
-                        <h5 class="{% if comment.by_administration %} yellow-text {% else %}white-text{% endif %}">{{ comment.author }}</h5>
-                        <p class="white-text">{{ comment.text|linebreaks }} </p>
-                        <p class="right white-text">{{ comment.created_date }}</p>
+                        <h5 class="{% if comment.by_administration %}yellow-text text-darken-2{% else %}{% if comment.by_authenticated %} light-blue-text text-darken-2 {% endif %}black-text{% endif %}">{{ comment.author }}</h5>
+                        <p>{{ comment.text|linebreaks }} </p>
+                        <p class="right">{{ comment.created_date }}</p>
                         {% if user.is_staff %}
-                            <a class="btn-floating halfway-fab waves-effect waves-light red" href="{% url 'comment_remove' pk=comment.pk %}"><i class="material-icons">delete</i></a>
+                            <a class="btn-floating halfway-fab waves-effect waves-light red" onclick="r = confirm('Sunteți sigur?'); if (r){this.href='/comment/{{ comment.pk }}/remove'}"><i class="material-icons">delete</i></a>
+                        {% else %}
+                        <a class="btn-floating halfway-fab waves-effect waves-light red" href="{% url 'report_comment' pk=comment.pk %}" title="Raportează acest comentariu"><i class="material-icons">report</i></a>
                         {% endif %}
                     </div>
                 </div>
             </div>
         {% endfor %}
     </div>
-    <script type="text/javascript" src="{% static 'js/post_detail_darktheme.js' %}"></script>
-    <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-
-    <script type="text/javascript">
-        $(function(){
-            $('#add_like_form').on('submit', function(e){
-                e.preventDefault();
-                $.ajax({
-                    url: $(this).attr('action'),
-                    method: $(this).attr('method'),
-                    data: new FormData(this),
-                    cache: false,
-                    processData: false,
-                    contentType: false,
-                    success: function(data){$('#target').html(data);}
-                });
+    <div class="col s3">
+        {% if third_ad.active %}
+            <a href="{{ third_ad.link }}">
+                <div class="card hoverable blue-grey darken-3 white-text" style="padding: 0">
+                    <div class="card-image">
+                        <img src="/media/{{third_ad.image.image}}">
+                        <span class="card-title">{{ third_ad.title }}</span>
+                    </div>
+                    <div class="card-content">
+                        <i class="material-icons right white-text">monetization_on</i>
+                        <p class="white-text">{{third_ad.description}}</p>
+                    </div>
+                </div>
+            </a>
+        {% endif %}
+        <div class="card light-blue darken-2 valign-wrapper" style="height: 3rem;">
+            <div class="card-content white-text">
+                <p>Cele mai populare</p>
+            </div>
+        </div>
+        {% for post in tposts %}
+            <a href="{% url 'post_detail' pk=post.url %}">
+                <div class="card horizontal blue-grey darken-3 white-text hoverable top_article">
+                    <div class="card-image">
+                        <img class="image image_of_top_article" src="/media/{{ post.cover.image }}">
+                    </div>
+                    <div class="card-stacked">
+                        <div class="card-content valign-wrapper">
+                            <p class="white-text">{{ post.title }}</p>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        {%endfor%}
+        {% if first_ad.active %}
+            <a href="{{ first_ad.link }}">
+                <div class="card horizontal blue-grey darken-3 white-text hoverable top_article">
+                    <div class="card-image">
+                        <img style="width: 8rem!important" class="image image_of_top_article" src="/media/{{ first_ad.image.image }}">
+                    </div>
+                    <div class="card-stacked">
+                        <div class="card-content">
+                            <i class="material-icons right white-text">monetization_on</i>
+                            <span class="card-title white-text">{{ first_ad.title }}</span>
+                            <p class="white-text">{{ first_ad.description }}</p>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        {% endif %}
+    </div>
+</div>
+<div class="row hide-on-small-only">
+    <div class="col s4 ">
+        <a href="/search_by_tag/social">
+            <div class="card light-blue darken-2">
+                <div class="card-content white-text">
+                    <p>Social<i class="material-icons right">people</i></p>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col s4">
+        <a href="/search_by_tag/politic">
+            <div class="card light-blue darken-2">
+                <div class="card-content white-text">
+                    <p>Politic<i class="material-icons right">gavel</i></p>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col s4">
+        <a href="/search_by_tag/economic">
+            <div class="card light-blue darken-2">
+                <div class="card-content white-text">
+                    <p>Economic<i class="material-icons right">account_balance</i></p>
+                </div>
+            </div>
+        </a>
+    </div>
+</div>
+<style>
+    .post-image {
+        height: 14rem
+    }
+    .post {
+        height: 30rem
+    }
+</style>
+<div class="row hide-on-small-only">
+    <div class="col s4">
+    {% for post in social %}
+        <a href="{% url 'post_detail' pk=post.url %}" class="black-text">
+            <div class="card post hoverable blue-grey darken-3 white-text">
+                <div class="card-image valign-wrapper">
+                    <img src="/media/{{post.cover.image}}" class="image post-image">
+                </div>
+                <div class="card-stacked">
+                    <div class="card-content">
+                        <div class="section">
+                            <h4>{{ post.title }}</h4>
+                        </div>
+                        <div class="divider"></div>
+                        <div class="section">
+                            <p class="icons_container"><i class="material-icons red-text tiny white-text icon">access_time</i> {{ post.published_date }} |<i class="material-icons red-text tiny white-text icon">contacts</i> {{post.author}} | <i class="material-icons red-text tiny white-text icon">remove_red_eye</i> {{post.view.count}}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </a>
+    {% endfor %}
+    {% if second_ad_fposition %}
+        <a href="{{ second_ad.link }}" class="black-text hide-on-small-only">
+            <div class="card post blue-grey darken-3 white-text hoverable">
+                <div class="card-image valign-wrapper">
+                    <img src="/media/{{second_ad.image.image}}" class="image post-image">
+                </div>
+                <div class="card-stacked">
+                    <div class="card-content">
+                        <div class="section">
+                            <i class="material-icons right white-text">monetization_on</i>
+                            <h4 class="white-text">{{ second_ad.title }}</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </a>
+    {% endif %}
+</div>
+<div class="col s4">
+    {% for post in politic %}
+        <a href="{% url 'post_detail' pk=post.url %}">
+            <div class="card post hoverable blue-grey darken-3 white-text">
+                <div class="card-image valign-wrapper">
+                    <img src="/media/{{post.cover.image}}" class="image post-image">
+                </div>
+                <div class="card-stacked">
+                    <div class="card-content">
+                        <div class="section">
+                            <h4>{{ post.title }}</h4>
+                        </div>
+                        <div class="divider"></div>
+                        <div class="section">
+                            <p class="icons_container"><i class="material-icons red-text tiny white-text icon">access_time</i> {{ post.published_date }} |<i class="material-icons red-text tiny white-text icon">contacts</i> {{post.author}} | <i class="material-icons red-text tiny white-text icon">remove_red_eye</i> {{post.view.count}}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </a>
+    {% endfor %}
+    {% if second_ad_sposition %}
+        <a href="{{ second_ad.link }}">
+            <div class="card post hoverable blue-grey darken-3 white-text">
+                <div class="card-image valign-wrapper">
+                    <img src="/media/{{second_ad.image.image}}" class="image post-image">
+                </div>
+                <div class="card-stacked">
+                    <div class="card-content">
+                        <div class="section">
+                            <i class="material-icons right">monetization_on</i>
+                            <h4>{{ second_ad.title }}</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </a>
+    {% endif %}
+</div>
+<div class="col s4">
+    {% for post in economic %}
+        <a href="{% url 'post_detail' pk=post.url %}">
+            <div class="card post hoverable blue-grey darken-3 white-text">
+                <div class="card-image valign-wrapper">
+                    <img src="/media/{{post.cover.image}}" class="image post-image">
+                </div>
+                <div class="card-stacked">
+                    <div class="card-content">
+                        <div class="section">
+                            <h4>{{ post.title }}</h4>
+                        </div>
+                        <div class="divider"></div>
+                        <div class="section">
+                            <p class="icons_container"><i class="material-icons red-text tiny white-text icon">access_time</i> {{ post.published_date }} |<i class="material-icons red-text tiny white-text icon">contacts</i> {{post.author}} | <i class="material-icons red-text tiny white-text icon">remove_red_eye</i> {{post.view.count}}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </a>
+    {% endfor %}
+    {% if second_ad_tposition %}
+        <a href="{{ second_ad.link }}">
+            <div class="card post hoverable blue-grey darken-3 white-text">
+                <div class="card-image valign-wrapper">
+                    <img src="/media/{{second_ad.image.image}}" class="image post-image">
+                </div>
+                <div class="card-stacked">
+                    <div class="card-content">
+                        <div class="section">
+                            <i class="material-icons right">monetization_on</i>
+                            <h4>{{ second_ad.title }}</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </a>
+    {% endif %}
+</div>
+<div class="row hide-on-small-only">
+    <a href="/search_by_tag/video">
+        <div class="col s12">
+            <div class="card light-blue darken-2">
+                <div class="card-content white-text">
+                    <p>Video<i class="material-icons right">videocam</i></p>
+                </div>
+            </div>
+        </div>
+    </a>
+</div>
+<div class="row hide-on-small-only">
+{% for post in e_posts %}
+    <div class="col s4">
+        <div class="card hoverable" style="padding: 0; margin-right: 5px;">
+            <a href="{% url 'post_detail' pk=post.url %}" class="black-text">
+                <div class="card-image">
+                    <img src="/media/{{post.cover.image}}" class="image" style="height: 20rem">
+                    <span class="card-title">{{ post.title }}</span>
+                </div>
+            </a>
+        </div>
+    </div>
+{% endfor %}
+</div>
+{% endif %}
+<script type="text/javascript" src="{% static 'js/post_detail.js' %}"></script>
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+<script type="text/javascript">
+    $(function(){
+        $('#add_like_form').on('submit', function(e){
+            e.preventDefault();
+            $.ajax({
+                url: $(this).attr('action'),
+                method: $(this).attr('method'),
+                data: new FormData(this),
+                cache: false,
+                processData: false,
+                contentType: false,
+                success: function(data){$('#target').html(data);}
             });
         });
-    </script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
+    });
+    $(document).ready(function(){
+        $('.materialboxed').materialbox();
+    });
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
 {% endblock %}

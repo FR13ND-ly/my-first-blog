@@ -1,5 +1,22 @@
 {% extends 'blog/base.html' %}
 {% block content %}
+{% if mobile %}
+<div class="row">
+	<div class="col s12">
+		<div class="card hoverable">
+			<div class="card-content">
+				<p>{{ ad.text| linebreaksbr }}</p>
+				<b>{{ ad.contact }}</b>
+			</div>
+			{% if user.is_staff %}
+				<a class="btn-floating halfway-fab waves-effect waves-light" href="{% url 'ad_edit' pk=ad.pk %}"><i class="material-icons">edit</i></a>
+			{% endif %}
+		</div>
+	</div>
+</div>
+{% else %}
+<div class="row">
+	<div class="col s9">
 	<div class="card">
 		<div class="card-content">
 			<div class="row">
@@ -9,7 +26,7 @@
 							<div class="col s4">
 								{% for ad in column %}
 									<div class="row">
-        								<div class="col s12">
+        								<div class="col">
           									<div class="card hoverable">
             									<div class="card-content">
              						 				<p>{{ ad.text| linebreaksbr }}</p>
@@ -25,23 +42,21 @@
   							</div>
 						{% endfor %}
 					</div>
-					<div class="hide-on-med-and-up">
-						{% for ad in mads %}
-							<div class="col s12">
-								<div class="card hoverable">
-									<div class="card-content">
-										<p>{{ ad.text| linebreaksbr }}</p>
-										<b>{{ ad.contact }}</b>
-									</div>
-									{% if user.is_staff %}
-										<a class="btn-floating halfway-fab waves-effect waves-light" href="{% url 'ad_edit' pk=ad.pk %}"><i class="material-icons">edit</i></a>
-									{% endif %}
-								</div>
-							</div>
-						{% endfor %}
-					</div>
 				</div>
 			</div>
 		</div>
 	</div>
+</div>
+<div class="col s3">
+<div class="card hide-on-med-and-down">
+	<div class="card-content">
+		<div class="row">
+			<h5>Anunț</h5>
+			<p>Dacă doriți ca publicitatea voastră să apară aici, contactaține pe estcurier@gmail.com sau adresați-vă la redacția Est-Curier</p>
+		</div>
+	</div>
+</div>
+</div>
+</div>
+{% endif %}
 {% endblock %}

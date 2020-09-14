@@ -1,0 +1,23 @@
+.image {
+    margin: 2%;
+    object-fit: cover; 
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.selected {
+    animation-name: select_image;
+    animation-duration: 0.15s;
+    border: 10px solid #26a69a;
+}
+
+.menu {
+    position: absolute;
+    right: 1%;
+    top: 15%;
+}
+
+@keyframes select_image {
+    0% {border: 0}
+    100% {border: 10px solid #26a69a}
+}

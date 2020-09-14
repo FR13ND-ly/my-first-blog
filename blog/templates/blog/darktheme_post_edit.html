@@ -1,8 +1,10 @@
 {% extends 'blog/darktheme_base.html' %}
 {% load static %}
 {% block content %}
+<form method="POST" class="post-form" enctype="multipart/form-data">
+<div class="row">
+    <div class="col s9">
     <link rel="stylesheet" href="{% static 'css/post_edit.css' %}">
-    <form method="POST" class="post-form" enctype="multipart/form-data">
         {% csrf_token %}
         <div class="card white-text blue-grey darken-3">
             <div class="card-content" id="main">
@@ -104,7 +106,7 @@
                 </div>
                 <div class="col s12">
                     <iframe class="text_input s12 z-depth-1 hoverable" id="post_text"></iframe>
-                    <textarea class="text_input s12 z-depth-1 hide hoverable white-text" name="posttext" id="post_code">{{ post.text }}</textarea>
+                    <textarea class="text_input s12 z-depth-1 hide hoverable" name="posttext" id="post_code">{{ post.text }}</textarea>
                 </div>
                 <div class="hide-on-large-only">
                     <button class="btn col s12 right" type="submit" name="save_post" onclick="add_variant()" value="Save Post">{% if post_status %}Salvează{% else %}Publică {% endif %}</button>
@@ -113,56 +115,55 @@
                 </div>
                 <h5>Imagine de copertă</h5>
                 <input id="cover_name" name="cover_name" value="{{post.cover.image}}" class="hide">
-                <img class="card" style="height: auto;width: 100%;" id="representative_cover_img" onclick="add_image_cover()" {% if post_new %} src="/media//blog/static/media/black_default_cover.png" {% else %} src="/media/{{post.cover.image}}" {% endif%}  id="representative_cover" required/>
+                <img class="card" id="representative_cover_img" onclick="add_image_cover()" {% if post_new %} src="/media//blog/static/media/black_default_cover.png" {% else %} src="/media/{{post.cover.image}}" {% endif%}  id="representative_cover" required/>
             </div>
         </div>
-        <div class="col s12 m6" >
             <div class="card white-text blue-grey darken-3">
-                <div class="card-content">
-                    <input type="checkbox" name="survey_is_present" class="filled-in" id="test5" oninput="activate_survey(this.checked)" {% if post.survey_is_present %} checked {% endif %}/>
-                    <label for="test5">Activează chestionarele</label>
-                    <div class="col {% if not post.survey_is_present %} hide {% endif %} s8" id="survey_container">
-                        <div class="switch" id="multiple_survey_switch">
-                            <label>
-                                Multivot
-                                <input type="checkbox" name="type_of_vote" id="one_or_multi_vote" {% if not post.type_of_vote %} checked {% endif %}>
-                                <span class="lever"></span>
-                                Univot
-                            </label>
-                        </div>
-                        <div class="input-field col s12" >
-                            <input id="article_question" type="text" value="{{ post.question }}" name="survey_question">
-                            <label class="active" for="article_question">Întrebarea chestionarului</label>
-                        </div>
-                        {% for variant, index in surveys.items %}
-                            <div class="input-field col s12" id="variant_container{{ index }}" name="variant_container">
-                                <input id="variant_input{{ index }}" value="{{ variant }}" type="text" name="variant_of_survey" style="width: 97%;">
-                                <label for="variant_input{{ index }}">Variantă</label>
-                                <i class="material-icons prefix teal-text remove_variant_btn" id="{{ index }}" onclick="delete_variant(this.id)">delete</i>
+                <div class="row">
+                    <div class="card-content">
+                        <input type="checkbox" name="survey_is_present" class="filled-in" id="test5" oninput="activate_survey(this.checked)" {% if post.survey_is_present %} checked {% endif %}/>
+                        <label for="test5">Activează chestionarele</label>
+                        <div class="{% if not post.survey_is_present %} hide {% endif %}" id="survey_container">
+                            <div class="switch" id="multiple_survey_switch">
+                                <label>
+                                    Multivot
+                                    <input type="checkbox" name="type_of_vote" id="one_or_multi_vote" {% if not post.type_of_vote %} checked {% endif %}>
+                                    <span class="lever"></span>
+                                    Univot
+                                </label>
                             </div>
-                        {% endfor %}
+                            <div class="input-field" >
+                                <input id="article_question" type="text" value="{{ post.question }}" name="survey_question">
+                                <label class="active" for="article_question">Întrebarea chestionarului</label>
+                            </div>
+                            {% for variant, index in surveys.items %}
+                                <div class="input-field" id="variant_container{{ index }}" name="variant_container">
+                                    <input id="variant_input{{ index }}" value="{{ variant }}" type="text" name="variant_of_survey" style="width: 97%;">
+                                    <label for="variant_input{{ index }}">Variantă</label>
+                                    <i class="material-icons prefix teal-text remove_variant_btn" id="{{ index }}" onclick="delete_variant(this.id)">delete</i>
+                                </div>
+                            {% endfor %}
+                        </div>
                     </div>
-                </div>
-                <div class="card-action {% if not post.survey_is_present %} hide {% endif %}" id="card-action">
-                    <a class="btn col s12" id="add_variant_button" onclick="add_variant()">Adaugă o Variantă de vot</a>
+                    <div class="card-action {% if not post.survey_is_present %} hide {% endif %}" id="card-action">
+                        <a class="btn" id="add_variant_button" onclick="add_variant()">Adaugă o Variantă de vot</a>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="col s12 m6 hide-on-med-and-down" id="save_article_container">
-            <div class="card white-text blue-grey darken-3">
+    </div>
+    <div class="col s3">
+            <div class="card hide-on-med-and-down white-text blue-grey darken-3">
                 <div class="card-content">
-                    <div class="row">
-                        <div class="col s12" style="margin-bottom: 5%;">
-                            <h5 id="save_article_header">Salvează Postul</h5>
-                            <input type="checkbox" id="draft" class="filled-in" oninput="set_save_button_text(this.checked)" name="status" {% if post.status %} checked {% endif %}/>
-                            <label for="draft">Schiță</label>
-                            <div class="chips chips-initial white-text"></div>
-                            <input class="hide" id="tags_container" name="tags_container">
-                        </div>
-                        <div class="col s12">
-                            <button class="btn col s12 {% if post.status %}red{% else %}Publică {% endif %}" type="submit" name="save_post" id="save_post" onclick="add_variant()" value="Save Post">{% if post.status %}Salvează{% else %}Publică {% endif %}</button>
-                        </div>
+                    <h5 id="save_article_header">Salvează Postul</h5>
+                    <input type="checkbox" id="draft" class="filled-in" oninput="set_save_button_text(this.checked)" name="status" {% if post.status %} checked {% endif %}/>
+                    <label for="draft">Schiță</label><br>
+                    <input type="checkbox" id="video" class="filled-in" name="video" {% if post.video %} checked {% endif %}/>
+                    <label for="video">Conține video</label>
+                    <h5>Etichete</h5>
+                    <div class="chips chips-autocomplete">
                     </div>
+                    <input class="hide" id="tags_container" name="tags_container" value="{% for tag in post.tags.all %}{{ tag.tag }}close{% endfor %}">
+                    <button class="btn {% if post.status %}red{% endif %}" style="width: 100%;" type="submit" name="save_post" id="save_post" onclick="add_variant()" value="Save Post">{% if post.status %}Salvează{% else %}Publică {% endif %}</button>
                 </div>
             </div>
         </div>
@@ -172,27 +173,14 @@
         <div id="modal1" class="modal modal-fixed-footer white-text blue-grey darken-3">
             <div class="modal-content">
                 <div class="row">
-                    <ul class="tabs blue-grey darken-3 " style="margin-bottom: 1%;" id="tabs">
+                    <ul class="tabs white-text blue-grey darken-3" style="margin-bottom: 1%;" id="tabs">
                         <li class="tab col s3"><a onclick="add_image_visible()" href="#test1">Adaugă o imagine</a></li>
                         <li class="tab col s3"><a onclick="select_image_visible()" href="#" class="active" id="active_tab">Alege o imagine</a></li>
                     </ul>
-                    <div id="select_image_menu">
-                        {% for column in images %}
-						    <div class="col s4">
-							    {% for image in column %}
-									<div class="row">
-        								<div class="col">
-                                            <img class="image" width="210" class="hoverable" onclick="select_image(this)" id="{{image.image}}" name="variant" height="210" src="/media/{{image.image}}" >
-										</div>
-        							</div>
-    							{% endfor %}
-  							</div>
-                        {% endfor %}
-                    </div>
-                    <div id="select_image_menu" class="hide-on-med-and-up">
-                        <div class="row">
-                            <div class="col s12 center-align">
-                            {% for image in mimage_list %}
+                    <div id="select_image_menu" class="sfa">
+                        <div class="row center-align">
+                            <div class="col s12" id ="image_list">
+                            {% for image in image_list %}
                                 <img class="image" width="210" onclick="select_image(this)" id="{{image.image}}" name="variant" height="210" src="/media/{{image.image}}" >
                             {% endfor %}
                             </div>
@@ -212,7 +200,7 @@
                     </div>
                 </div>
             </div>
-            <div class="modal-footer blue-grey darken-3 ">
+            <div class="modal-footer white-text blue-grey darken-3">
                 <a class="waves-effect waves-light btn left red" onclick="$('#modal1').modal('close')"><i class="material-icons">close</i></a>
                 <button class="btn waves-effect waves-light" onclick="$('#modal1').modal('close'); $('#modal2').modal('open');first_stage_add_image(false)" type="submit" name="new_image" id="new_image" value="new_image">Continuă</button>
                 <button class="btn waves-effect waves-light hide" onclick="second_stage_add_cover_photo()" type="submit" id="add_cover_photo">Continuă</button>
@@ -224,7 +212,7 @@
         <div class="modal-content">
             <h4>Ajustă imaginea</h4>
             <img class="responsive-img" id="representative-img">
-            <div class="input-field col s6">
+            <div class="input-field col s12">
                 <input id="image_title" type="text">
                 <label class="active" for="image_title">Titlu</label>
             </div>
@@ -236,7 +224,7 @@
             <input class="with-gap" name="image_align" type="radio" value="right" id="align_right" />
             <label for="align_right"><i class="material-icons">format_align_right</i></label>
             <h5>Mărime</h5>
-            <div class="input-field col s3">
+            <div class="input-field col s12">
                 <select id="img_size_selector" onchange="size_change()">
                     <option value="30">Mică</option>
                     <option value="60" selected>Medie</option>
@@ -253,18 +241,29 @@
                 </div>
             </div>
         </div>
-        <div class="modal-footer blue-grey darken-3">
+        <div class="modal-footer white-text blue-grey darken-3">
             <a class="waves-effect waves-light btn left red" onclick="$('#modal2').modal('close')"><i class="material-icons">close</i></a>
             <a class="waves-effect waves-light btn green" id="add_img" onclick="second_stage_add_image();$('#modal2').modal('close')"><i class="material-icons">check</i></a>
             <a class="waves-effect waves-light btn green hide" id="edit_img" onclick="second_stage_edit_img(this.value)"><i class="material-icons">check</i></a>
         </div>
     </div>
+    
     <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
-    <script type="text/javascript" src="{% static 'js/post_edit.js' %}"></script>
-    <script type="text/javascript">
+    <script>
+        
         window.frames[0].document.getElementsByTagName("body")[0].className = "white-text"
-        document.getElementsByClassName('input')[0].className = 'input white-text'
+        var hook = true;
+        window.onbeforeunload = function() {
+            if (hook) {
+                return "Sunteți sigur";
+            }
+        }
+        $(function () {
+            $("#save_post").click(function() {hook = false;});
+        });
+    </script>
+    <script type="text/javascript">
         $(function(){
             $('#add_image_form').on('submit', function(e){
                 e.preventDefault();
@@ -279,6 +278,35 @@
                 });
             });
         });
+        $('.chips').material_chip();
+        $('.chips-autocomplete').material_chip({
+            autocompleteOptions: {
+                data: {
+                    'Apple': null,
+                    'Microsoft': null,
+                    'Google': null
+                },
+                limit: Infinity,
+                minLength: 1
+            },
+            data: [
+                {% for tag in post.tags.all %}
+                {tag: '{{tag.tag}}',},
+                {% endfor%}
+            ],
+            placeholder: 'Adaugă o etichetă',
+            secondaryPlaceholder: '+Etichetă',
+        });
+       
     </script>
-    
+    <script type="text/javascript" src="{% static 'js/post_edit.js' %}"></script>
+    <style>
+        .input {
+            color: #fff!important;
+        }
+        .chip {
+            background-color: #455a64;
+            color: #fff!important;
+        }
+    </style>
 {% endblock %}

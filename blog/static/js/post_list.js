@@ -1,5 +1,5 @@
 document.getElementById("post0").className = 'big-image card';
-var myVar = setInterval(myTimer, 5000);
+var myVar = setInterval(myTimer, 15000);
 
 function search_check(){
 	document.getElementById("search_btn").setAttribute('type', 'submit')
@@ -46,5 +46,5 @@ function next_big_image(current_big_image_index){
 
 function reset_interval(){
 	window.clearInterval(myVar);
-	myVar = setInterval(myTimer, 5000);
+	myVar = setInterval(myTimer, 15000);
 }

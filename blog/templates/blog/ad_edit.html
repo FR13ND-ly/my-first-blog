@@ -24,7 +24,7 @@
    						</p>
    					</div>
    					<div class="col s12">
-						<button class="waves-effect waves-light btn right" type="submit">{% if ad_new %}Publică{% else %} Salvează {% endif %}</button>
+						<button class="waves-effect waves-light btn right" type="submit" id="save_ad">{% if ad_new %}Publică{% else %} Salvează {% endif %}</button>
 						{% if not ad_new and user.is_staff %}
 							<a class="btn btn-default red" id="remove_ad" href="remove" style="border: 0px">Șterge</a>
 						{% endif %}
@@ -33,4 +33,15 @@
 			</div>
 		</div>
 	</form>
+	<script>
+        var hook = true;
+        window.onbeforeunload = function() {
+            if (hook) {
+                return "Sunteți sigur";
+            }
+        }
+        $(function () {
+            $("#save_ad").click(function() {hook = false;});
+        });
+    </script>
 {% endblock %}

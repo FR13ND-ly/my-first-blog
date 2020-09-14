@@ -34,7 +34,7 @@ function add_comment(){
     var comment_form = document.getElementById('comment_form');
     var add_comment_btn = document.getElementById('add_comment');
     add_comment_btn.className = "btn center-align light-blue darken-2 hide";
-    comment_form.className = "card visible blue-grey darken-3";
+    comment_form.className = "card blue-grey darken-3";
     console.log('add new comment section opened')
 }
 

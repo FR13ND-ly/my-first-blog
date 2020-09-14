@@ -1,84 +1,374 @@
 {% extends 'blog/darktheme_base.html' %}
 {% load static %}
 {% block content %}
-    <link rel="stylesheet" href="{% static 'css/post_list.css' %}">{% if big_image%}
+    <link rel="stylesheet" href="{% static 'css/post_list.css' %}">
+    {% if mobile %}
+    <div class="row hide-on-med-and-up">
         <div class="col s12 valign-wrapper">
             {% for post in posts %}
-                <div class="big-image card hide" id="post{{post.index}}"  onmouseover="visible_big_image_change({{post.index}})" onmouseout="hidden_big_image_change({{post.index}})">
-                    <div class="card-image big_image_photo_container">
-                        <a href="{% url 'post_detail' pk=post.pk %}">
-                            <img src="/media/{{post.cover.image}}" class="big_image_the_photo image" style="">
+                <div class="big-image card hide" id="mpost{{post.index}}">
+                    <div class="card-image big_image_photo_container" style="height: 20rem;">
+                        <a href="/articol/{{post.url}}">
+                            <img src="/media/{{post.cover.image}}" style="height: 20rem;" class="big_image_the_photo image">
                         </a>
                         <span class="card-title z-depth-5" id="big_image_title">{{ post.title }}</span>
-                        <span class="hide-on-med-and-down hide" onclick="next_big_image({{post.index}})" id="previous_big_image{{post.index}}"><i id="big_image_switcher_right" class="material-icons large big_image_switcher">arrow_forward</i></span>
-                        <span class="hide-on-med-and-down hide" onclick="previous_big_image({{post.index}})" id="next_big_image{{post.index}}"><i id="big_image_switcher_left" class="material-icons large big_image_switcher">arrow_back</i></span>
-                        {% if user.is_staff %}  
-                            <a href="{% url 'post_edit' pk=post.pk %}" class="btn-floating btn-large halfway-fab waves-effect waves-light hoverable"><i class="material-icons">edit</i></a>  
-                        {% endif %}
                     </div>
-                    <a href="{% url 'post_detail' pk=post.pk %}">
-                        <div class="card-content s12 hoverable white-text blue-grey darken-3">
-                            <p class="text_of_big_image">{{ post.text|striptags|linebreaksbr|truncatewords:30 }}</p>
+                    <a href="{% url 'post_detail' pk=post.url %}">
+                        <div class="card-content s12 hoverable">
+                            <p class="black-text text_of_big_image">{{ post.text|striptags|linebreaksbr|truncatewords:20 }}</p>
                         </div>
                     </a>
                 </div>
             {% endfor %}
-        </div>{% endif %}
-    <form method="GET" action="/search">
-        <div class="input-field col s12" style="margin-top: -100;">
-            <input id="search_input" name="search" type="text" class="white-text">
-            <label for="search_input"></label>
-            <button class="waves-effect waves-light btn" id="search_btn" onclick="search_check()" style="position:absolute;right:0%"><i class="material-icons">search</i></button>
         </div>
-    </form>
-    {% for post in posts %}
-        <div class="col s12 m12 hide-on-small-only">
-            <div class="card horizontal hoverable white-text blue-grey darken-3">
-                <div class="card-image valign-wrapper">
-                    <img src="/media/{{post.cover.image}}" class="image" id="article_image">
-                </div>
-                <div class="card-stacked">
-                    <div class="card-content">
-                        <a href="{% url 'post_detail' pk=post.pk %}" class="">
-                            <div class="section">
-                                <h4 class="white-text">{% if post.status %} Privat: {% endif %}{{ post.title }}</h4>
-                                <p class="article_text white-text" style="font-size:1.2rem">{{ post.text|striptags|linebreaksbr|truncatewords:35 }}</p>
+        <div class="col s12">
+            {% for post in posts %}
+                <a href="{% url 'post_detail' pk=post.url %}" class="black-text">
+                    <div class="card hoverable">
+                        <div class="card-image valign-wrapper">
+                            <img src="/media/{{post.cover.image}}" class="image">
+                            <span class="card-title">{% if post.status %} Privat: {% endif %}{{ post.title }}<p style="font-size: 1rem;">{{ post.published_date }}</p></span>
+                        </div>
+                    </div>
+                </a>
+            {% endfor %}
+            {% if second_ad %}
+                <a href="{{ second_ad.link }}" class="black-text">
+                    <div class="card hoverable">
+                        <div class="card-image valign-wrapper">
+                            <img src="/media/{{second_ad.image.image}}" class="image post-image">
+                        </div>
+                        <div class="card-stacked">
+                            <div class="card-content">
+                                <div class="section">
+                                    <i class="material-icons right">monetization_on</i>
+                                    <h4>{{ second_ad.title }}</h4>
+                                </div>
                             </div>
-                            <div class="divider"></div>
-                            <div class="section">
-                                <p class="article_icons_container white-text"><i class="material-icons red-text tiny white-text article_icon">access_time</i> {{ post.published_date }} |<i class="material-icons red-text tiny white-text article_icon">contacts</i> {{post.author}} | <i class="material-icons red-text tiny white-text article_icon">remove_red_eye</i> {{post.view.count}} | <i class="material-icons red-text tiny white-text article_icon">favorite</i> {{post.likes.count}}</p>
+                        </div>
+                    </div>
+                </a>
+            {% endif %}
+        </div>
+        <ul class="pagination center">
+            {% for i in number_of_pages %}
+                <li class="waves-effect {% if i == current_page %} active blue darken-3{% endif %}" ><a href="{% url 'choose_page' lk=i %}"> {{i}} </a></li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% else %}
+    <div class="row hide-on-small-only">
+        <div class="col s9 valign-wrapper">
+            {% for post in posts %}
+                <div class="big-image card hide" id="post{{post.index}}"  onmouseover="visible_big_image_change({{post.index}})" onmouseout="hidden_big_image_change({{post.index}})">
+                    <div class="card-image big_image_photo_container">
+                        <a href="/articol/{{post.url}}">
+                            <img src="/media/{{post.cover.image}}" class="big_image_the_photo image">
+                        </a>
+                        <span class="card-title z-depth-5 big_image_title">{{ post.title }}</span>
+                        <span class="hide" onclick="next_big_image({{post.index}})" id="previous_big_image{{post.index}}"><i id="big_image_switcher_right" class="material-icons large big_image_switcher">arrow_forward</i></span>
+                        <span class="hide" onclick="previous_big_image({{post.index}})" id="next_big_image{{post.index}}"><i id="big_image_switcher_left" class="material-icons large big_image_switcher">arrow_back</i></span>
+                    </div>
+                    <a href="{% url 'post_detail' pk=post.url %}">
+                        <div class="card-content s12 hoverable blue-grey darken-3">
+                            <p class="white-text text_of_big_image">{{ post.text|striptags|linebreaksbr|truncatewords:30 }}</p>
+                        </div>
+                    </a>
+                </div>
+            {% endfor %}
+        </div>
+        <div class="col s3">
+            <form method="GET" action="/search">
+                <div class="input-field">
+                    <input id="search_input" name="search" type="text" class="black-text">
+                    <label for="search_input">Caută</label>
+                    <button class="waves-effect waves-light btn" id="search_btn" onclick="search_check()" style="position:absolute; right:0%; top: 0"><i class="material-icons">search</i></button>
+                </div>
+            </form>
+            <div class="card light-blue darken-2 valign-wrapper" style="height: 3rem;">
+                <div class="card-content white-text">
+                    <p>Cele mai populare</p>
+                </div>
+            </div>
+            {% for post in tposts %}
+                <a href="{% url 'post_detail' pk=post.url %}">
+                    <div class="card horizontal hoverable top_article blue-grey darken-3">
+                        <div class="card-image">
+                            <img class="image image_of_top_article" src="/media/{{ post.cover.image }}">
+                        </div>
+                        <div class="card-stacked">
+                            <div class="card-content valign-wrapper">
+                                <p class="white-text">{{ post.title }}</p>
+                            </div>                                
+                        </div>
+                    </div>
+                </a>
+            {% endfor %}
+            {% if first_ad.active %}
+                <a href="{{ first_ad.link }}">
+                    <div class="card horizontal hoverable top_article blue-grey darken-3 white-text">
+                        <div class="card-image">
+                            <img style="width: 8rem!important" class="image image_of_top_article" src="/media/{{ first_ad.image.image }}">
+                        </div>
+                        <div class="card-stacked">
+                            <div class="card-content">
+                                <i class="material-icons right">monetization_on</i>
+                                <span class="card-title">{{ first_ad.title }}</span>
+                                <p>{{ first_ad.description }}</p>
+                            </div>
+                                
+                        </div>
+                    </div>
+                </a>
+            {% endif %}
+        </div>
+        <div class="row">
+            <div class="col s4">
+                <a href="/search_by_tag/social">
+                    <div class="card light-blue darken-2">
+                        <div class="card-content white-text">
+                            <p>Social<i class="material-icons right">people</i></p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="col s4">
+                <a href="/search_by_tag/politic">
+                    <div class="card light-blue darken-2">
+                        <div class="card-content white-text">
+                            <p>Politic<i class="material-icons right">gavel</i></p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="col s4">
+                <a href="/search_by_tag/economic">
+                    <div class="card light-blue darken-2">
+                        <div class="card-content white-text">
+                            <p>Economic<i class="material-icons right">account_balance</i></p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col s4">
+                {% for post in social %}
+                    <a href="{% url 'post_detail' pk=post.url %}" class="white-text">
+                        <div class="card post hoverable blue-grey darken-3">
+                            <div class="card-image valign-wrapper">
+                                <img src="/media/{{post.cover.image}}" class="image post-image">
+                            </div>
+                            <div class="card-stacked">
+                                <div class="card-content">
+                                    <div class="section">
+                                        <h4>{{ post.title }}</h4>
+                                    </div>
+                                    <div class="divider"></div>
+                                    <div class="section">
+                                        <p class="icons_container"><i class="material-icons red-text tiny white-text icon">access_time</i> {{ post.published_date }} |<i class="material-icons red-text tiny white-text icon">contacts</i> {{post.author}} | <i class="material-icons red-text tiny white-text icon">remove_red_eye</i> {{post.view.count}}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                {% endfor %}
+                {% if second_ad_fposition %}
+                    <a href="{{ second_ad.link }}" class="white-text">
+                        <div class="card post hoverable blue-grey darken-3">
+                            <div class="card-image valign-wrapper">
+                                <img src="/media/{{second_ad.image.image}}" class="image post-image">
+                            </div>
+                            <div class="card-stacked">
+                                <div class="card-content">
+                                        <div class="section">
+                                            <i class="material-icons right">monetization_on</i>
+                                            <h4>{{ second_ad.title }}</h4>
+                                        </div>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                {% endif %}
+            </div>
+            <div class="col s4">
+                {% for post in politic %}
+                    <a href="{% url 'post_detail' pk=post.url %}" class="white-text">
+                        <div class="card post hoverable blue-grey darken-3">
+                            <div class="card-image valign-wrapper">
+                                <img src="/media/{{post.cover.image}}" class="image post-image">
+                            </div>
+                            <div class="card-stacked">
+                                <div class="card-content">
+                                    <div class="section">
+                                        <h4>{{ post.title }}</h4>
+                                    </div>
+                                    <div class="divider"></div>
+                                    <div class="section">
+                                        <p class="icons_container"><i class="material-icons red-text tiny white-text icon">access_time</i> {{ post.published_date }} |<i class="material-icons red-text tiny white-text icon">contacts</i> {{post.author}} | <i class="material-icons red-text tiny white-text icon">remove_red_eye</i> {{post.view.count}}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                {% endfor %}
+                {% if second_ad_sposition %}
+                    <a href="{{ second_ad.link }}" class="white-text">
+                        <div class="card post hoverable blue-grey darken-3">
+                            <div class="card-image valign-wrapper">
+                                <img src="/media/{{second_ad.image.image}}" class="image post-image">
+                            </div>
+                            <div class="card-stacked">
+                                <div class="card-content">        
+                                    <div class="section">
+                                        <i class="material-icons right">monetization_on</i>
+                                        <h4>{{ second_ad.title }}</h4>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                {% endif %}
+            </div>
+            <div class="col s4">
+                {% for post in economic %}
+                    <a href="{% url 'post_detail' pk=post.url %}" class="white-text">
+                        <div class="card post hoverable blue-grey darken-3">
+                            <div class="card-image valign-wrapper">
+                                <img src="/media/{{post.cover.image}}" class="image post-image">
+                            </div>
+                            <div class="card-stacked">
+                                <div class="card-content">
+                                    <div class="section">
+                                        <h4>{{ post.title }}</h4>
+                                    </div>
+                                    <div class="divider"></div>
+                                    <div class="section">
+                                        <p class="icons_container"><i class="material-icons red-text tiny white-text icon">access_time</i> {{ post.published_date }} |<i class="material-icons tiny white-text icon">contacts</i> {{post.author}} | <i class="material-icons tiny white-text icon">remove_red_eye</i> {{post.view.count}}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                {% endfor %}
+                {% if second_ad_tposition %}
+                    <a href="{{ second_ad.link }}" class="white-text">
+                        <div class="card post hoverable blue-grey darken-3">
+                            <div class="card-image valign-wrapper">
+                                <img src="/media/{{second_ad.image.image}}" class="image post-image">
+                            </div>
+                            <div class="card-stacked">
+                                <div class="card-content">
+                                    <div class="section">
+                                        <i class="material-icons right">monetization_on</i>
+                                        <h4>{{ second_ad.title }}</h4>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+        <div class="row">
+            <a href="/search_by_tag/video">
+                <div class="col s12">
+                    <div class="card light-blue darken-2">
+                        <div class="card-content white-text">
+                            <p>Video<i class="material-icons right">videocam</i></p>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="row">
+            {% for post in e_posts %}
+                <div class="col s4">
+                    <div class="card hoverable" style="padding: 0; margin-right: 5px;">
+                        <a href="{% url 'post_detail' pk=post.url %}" class="black-text">
+                            <div class="card-image">
+                                <img src="/media/{{post.cover.image}}" class="image" style="height: 20rem">
+                                <span class="card-title">{% if post.status %} Privat: {% endif %}{{ post.title }}</span>
                             </div>
                         </a>
                     </div>
                 </div>
-            </div>
+            {% endfor %}
         </div>
-        <div class="col s12 m12 hide-on-med-and-up">
-            <div class="card hoverable white-text blue-grey darken-3">
-                <div class="card-image valign-wrapper">
-                    <img src="/media/{{post.cover.image}}" class="image">
-                </div>
-                <div class="card-stacked">
-                    <div class="card-content">
-                        <a href="{% url 'post_detail' pk=post.pk %}" class="white-text">
-                            <div class="section">
-                                <h4>{% if post.status %} Privat: {% endif %}{{ post.title }}</h4>
-                                <p class="article_text">{{ post.text|striptags|linebreaksbr|truncatewords:25 }}</p>
+        <div class="row">
+            <div class="col s9">
+                {% for post in posts %}
+                    <div class="hide-on-small-only">
+                        <div class="card horizontal hoverable blue-grey darken-3">
+                            <div class="card-image valign-wrapper">
+                                <img src="/media/{{post.cover.image}}" class="image article_image">
                             </div>
-                            <div class="divider"></div>
-                            <div class="section">
-                                <p class="article_icons_container"><i class="material-icons red-text tiny white-text article_icon">access_time</i> {{ post.published_date }} | <i class="material-icons red-text tiny white-text article_icon">remove_red_eye</i> {{post.view.count}}</p>
+                            <div class="card-stacked">
+                                <div class="card-content">
+                                    <a href="{% url 'post_detail' pk=post.url %}" class="white-text">
+                                        <div class="section">
+                                            <h4>{% if post.status %} Privat: {% endif %}{{ post.title }}</h4>
+                                            <p style="font-size:1.2rem">{{ post.text|striptags|linebreaksbr|truncatewords:35 }}</p>
+                                        </div>
+                                        <div class="divider"></div>
+                                        <div class="section">
+                                            <p class="icons_container"><i class="material-icons white-text tiny icon">access_time</i> {{ post.published_date }} |<i class="material-icons white-text tiny icon">contacts</i> {{post.author}} | <i class="material-icons white-text tiny icon">remove_red_eye</i> {{post.view.count}} | <i class="material-icons white-text tiny icon">favorite</i> {{post.likes.count}}</p>
+                                        </div>
+                                    </a>
+                                </div>
                             </div>
-                        </a>
+                        </div>
                     </div>
-                </div>
+                {% endfor %}
+                <ul class="pagination center">
+                    {% for i in number_of_pages %}
+                        <li class="waves-effect {% if i == current_page %} active blue darken-3{% endif %}" ><a href="{% url 'choose_page' lk=i %}"> {{i}} </a></li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="col s3">
+                {% if week_img.active %}
+                    <div class="card hoverable blue-grey darken-3" style="padding: 0">
+                        <div class="card-image">
+                            <img src="/media/{{ week_img.image.image }}">
+                            <span class="card-title">{{ week_img.title }}</span>
+                        </div>
+                        <div class="card-content white-text">
+                            <p>Imaginea săptămânii</p>
+                        </div>
+                    </div>
+                {% endif %}
+                {% if third_ad.active %}
+                    <a href="{{third_ad.link}}">
+                        <div class="card hoverable blue-grey darken-3" style="padding: 0">
+                            <div class="card-image">
+                                <img src="/media/{{ third_ad.image.image}}">
+                                <span class="card-title">{{ third_ad.title }}</span>
+                            </div>
+                            <div class="card-content white-text">
+                                <i class="material-icons right">monetization_on</i>
+                                <p>{{ third_ad.description}}</p>
+                            </div>
+                        </div>
+                    </a>
+                {% endif %}
+                <a href="https://consiliuldepresa.md/ro/page/lista-semnatarilor" target="_blank">
+                    <div class="card hoverable blue-grey darken-3" style="padding: 0">
+                        <div class="card-image" style="padding: 5%;">
+                            <img src="/media/blog/static/media/cod_deontologic.png">
+                        </div>
+                    </div>
+                </a>
+                <a href="http://api.md" target="_blank">
+                    <div class="card hoverable blue-grey darken-3">
+                        <div class="card-image" style="padding: 5%">
+                            <img src="/media/blog/static/media/api.png">
+                        </div>
+                    </div>
+                </a>
             </div>
         </div>
-    {% endfor %}
-    <ul class="pagination center">
-        {% for i in number_of_pages %}
-            <li class="waves-effect  {% if i == current_page %} active blue darken-3{% endif %}" ><a class="white-text" href="{% url 'choose_page' lk=i %}"> {{i}} </a></li>
-        {% endfor %}
-    </ul>
+    </div>
+    {% endif %}
     <script type="text/javascript" src="{% static 'js/post_list.js' %}"></script>
 {% endblock %}

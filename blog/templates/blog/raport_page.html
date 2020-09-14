@@ -1,0 +1,24 @@
+{% extends 'blog/base.html' %}
+{% load static %}
+{% block content %}
+    {% for comment in reported_comments %}
+        <div class="col s12">
+            <div class="card hoverable">
+                <div class="card-content">
+                    <p class="right red-text">{{comment.reports.count}} raportări</p>
+                    <h4 class="{% if comment.by_administration %}yellow-text text-darken-2{% else %}{% if comment.by_authenticated %} light-blue-text text-darken-2 {% endif %}black-text{% endif %}">{{comment.author}}</h4>
+                    <p>{{comment.text}}</p>
+                    <p class="right">{{comment.created_date}}</p>
+                </div>
+                <div class="card-action">
+                    <a href="{% url 'post_detail' pk=comment.post.url %}">Treci la articolul în cadrul căruia a fost scris</a>
+                </div>
+                <a class="btn-floating halfway-fab waves-effect waves-light red" href="{% url 'comment_remove' pk=comment.pk %}"><i class="material-icons">delete</i></a>
+                <a class="btn-floating halfway-fab waves-effect waves-light red green hide-on-med-and-up" style="right: 18%" href="{% url 'approve_comment' pk=comment.pk %}"><i class="material-icons">check</i></a>
+                <a class="btn-floating halfway-fab waves-effect waves-light red green hide-on-small-only" style="right: 6%" href="{% url 'approve_comment' pk=comment.pk %}"><i class="material-icons">check</i></a>
+            </div>
+        </div>
+    {% empty %}
+        <p>Nici-un comentariu raportat</p>
+    {% endfor %}
+{% endblock %}

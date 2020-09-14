@@ -59,12 +59,6 @@ $(document).ready(function() {
 $(document).ready(function(){
     $('.modal').modal();
 });
-$('.chips').material_chip();
-$('.chips-initial').material_chip({
-    placeholder: 'Adaugă o etichetă',
-    secondaryPlaceholder: '+Etichetă',
-
-});
 
 $('.chips').on('chip.add', function(e, chip){
     set_tag_list()
@@ -87,7 +81,7 @@ function set_tag_list(){
     document.getElementById('tags_container').value = tags_container
 }
 function select_image_visible() {
-    document.getElementById("select_image_menu").className = "hide-on-med-and-down";
+    document.getElementById("select_image_menu").className = "";
     document.getElementById("add_image_menu").className = "hide"
     document.getElementById("add_image").checked = false
 }
@@ -116,6 +110,15 @@ function second_stage_add_cover_photo(){
     if (document.getElementById("add_image").checked ) {
         document.getElementById("cover_name").value = "blog/static/media/" + document.getElementById('file-input').files[0].name;
         document.getElementById("representative_cover_img").src = URL.createObjectURL(document.getElementById('file-input').files[0]);
+        new_image_variant = document.createElement('img')
+        new_image_variant.className = "image"
+        new_image_variant.width = 210
+        new_image_variant.height = 210
+        new_image_variant.setAttribute("onclick", "select_image(this)")
+        new_image_variant.setAttribute('name', 'variant')
+        new_image_variant.src = URL.createObjectURL(document.getElementById('file-input').files[0])
+        new_image_variant.id = "blog/media/blog/static/media/" + document.getElementById('file-input').files[0].name
+        document.getElementById('image_list').appendChild(new_image_variant)
     }
     else {
         src_container = (document.querySelector("img[class='image selected_variant']").id.split("/"))
@@ -134,12 +137,12 @@ $('.modal').modal({
 function set_save_button_text(draw){
     if (draw){
         save_button.innerHTML = 'Salvează';
-        save_button.className = "btn col s12 red";
+        save_button.className = "btn red";
         console.log('set to draft')
     }
     else {
         save_button.innerHTML = "Publică";
-        save_button.className = "btn col s12";
+        save_button.className = "btn";
         console.log('set to publish')
     }
 }
@@ -161,12 +164,12 @@ function set_code_or_visual(value){
 
 function activate_survey(approved){
     if (approved){
-        survey_container.className = 'col s10';
+        survey_container.className = '';
         card_action.className = "card-action";
         console.log('surveys activated')
     }
     else {
-        survey_container.className = 'col hide s10';
+        survey_container.className = 'hide';
         card_action.className = "card-action hide";
         console.log('surveys disabled')
     }
@@ -179,7 +182,7 @@ function delete_variant(number){
 
 function add_variant(){
     var variant_container = document.createElement('div');
-    variant_container.className = 'input-field col';
+    variant_container.className = 'input-field';
     variant_container.id = 'variant_container' + String(variant_index);
     variant_container.setAttribute("name","variant_container");
     var variant_input = document.createElement('input');
@@ -229,7 +232,16 @@ post_code.oninput =function(){
 
 function first_stage_add_image(){
     if (document.getElementById("add_image").checked) {
-        document.getElementById('representative-img').src= URL.createObjectURL(document.getElementById('file-input').files[0]);
+        document.getElementById('representative-img').src = URL.createObjectURL(document.getElementById('file-input').files[0]);
+        new_image_variant = document.createElement('img')
+        new_image_variant.className = "image"
+        new_image_variant.width = 210
+        new_image_variant.height = 210
+        new_image_variant.setAttribute("onclick", "select_image(this)")
+        new_image_variant.setAttribute('name', 'variant')
+        new_image_variant.src = URL.createObjectURL(document.getElementById('file-input').files[0])
+        new_image_variant.id = "blog/media/blog/static/media/" + document.getElementById('file-input').files[0].name
+        document.getElementById('image_list').appendChild(new_image_variant)
     }
     else {
         document.getElementById('representative-img').src = document.querySelector("img[class='image selected_variant']").src;
@@ -257,10 +269,10 @@ function second_stage_add_image(){
     }
     if(img_size_selector[img_size_selector.selectedIndex].value != 'custom'){
         size = img_size_selector[img_size_selector.selectedIndex].value;
-        code = "<img class='responsive-img' title='" + img_title.value + "' id='" + img_name + "' align='"+ document.querySelector('input[name="image_align"]:checked').value + "' style='position:relative; width:" + size + "%'  src='/media/blog/static/media/" + img_name + "'/>";
+        code = "<img class='responsive-img materialboxed' title='" + img_title.value + "' data-caption='" + img_title.value + "' id='" + img_name + "' align='"+ document.querySelector('input[name="image_align"]:checked').value + "' style='position:relative; width:" + size + "%'  src='/media/blog/static/media/" + img_name + "'/>";
     }
     else{
-        code = "<img style='position: relative;object-fit: cover; overflow: hidden;' title='" + img_title.value + "'  id='" + img_name + "' title='" + img_title.value +"' align='"+ document.querySelector('input[name="image_align"]:checked').value + "' width='"+ document.getElementById('width_input').value + "' height='"+ document.getElementById('height_input').value+"' src='/media/blog/static/media/" + img_name + "'/>";
+        code = "<img style='position: relative;object-fit: cover; overflow: hidden;' class='materialboxed' title='" + img_title.value + "' data-caption='" + img_title.value + "'  id='" + img_name + "' title='" + img_title.value +"' align='"+ document.querySelector('input[name="image_align"]:checked').value + "' width='"+ document.getElementById('width_input').value + "' height='"+ document.getElementById('height_input').value+"' src='/media/blog/static/media/" + img_name + "'/>";
     }
     format('insertHTML', code);
     console.log('added image')
@@ -290,6 +302,7 @@ function second_stage_edit_img(img){
     image = window.frames[0].document.getElementById(img);
     image.align = document.querySelector('input[name="image_align"]:checked').value;
     image.title = img_title.value;
+    image.dataset.caption = img_title.value;
     if (img_size_selector[img_size_selector.selectedIndex].value != 'custom') {
          image.style.width = img_size_selector[img_size_selector.selectedIndex].value + '%';
          image.style.height = 'auto';

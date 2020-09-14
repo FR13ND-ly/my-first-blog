@@ -1,0 +1,166 @@
+{% extends 'blog/base.html' %}
+{% load static %}
+{% block content %}
+{% if user.is_staff or premium %}
+    <style>
+        .selected {
+            animation-name: select_image;
+            animation-duration: 0.15s;
+            border: 10px solid #2196f3;
+        }
+
+        @keyframes select_image {
+            0% {border: 0}
+            100% {border: 10px solid#2196f3}
+        }
+    </style>
+    {% if mobile %}
+    <div class="row hide-on-med-and-up">
+        <div class="col s12">
+            <h3>Baza de ziare în format online</h3>
+            {% for i in np %}
+                <a onclick="window.location.href = '/media/' + '{{i.pdf}}'" class="black-text">
+                    <div class="card hoverable">
+                        <div class="card-image" style="padding: 5%">
+                            <img class="responsive-image" src="/media/blog/static/media/ad_default.png">
+                        </div>
+                        <div class="card-action">
+                            <b>Nr: {{ i.title }}</b>
+                            <p>Data: {{ i.date }}</p>
+                        </div>
+                    </div>
+                </a>
+            {% endfor %}
+        </div>
+    </div>
+    {% else %}
+    <div class="row hide-on-small-only">
+        <div class="col s9">
+            <div class="card">
+                <div class="card-content">
+                    {% if user.is_staff %}
+                        <a class="btn right modal-trigger" href="#modal1"><i class="material-icons">note_add</i></a>
+                    {% endif %}
+                    <span class="card-title">Baza de ziare în format online</span>
+                    <div class="row">
+                        {% for i in np %}
+                            <div class="col s4">
+                                <div class="card hoverable" onclick="select_pdf(this)" data-pk="{{ i.pk }}" data-title="{{ i.title }}" data-date="{{ i.date }}" data-pdf="{{ i.pdf }}" style="cursor: pointer;">
+                                    <div class="card-image" style="padding: 5%">
+                                        <img class="responsive-image" src="/media/blog/static/media/ad_default.png">
+                                    </div>
+                                    <div class="card-action">
+                                        <b>Nr: {{ i.title }}</b>
+                                        <p>Data: {{ i.date.date }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col s3">
+            <div class="card">
+                <div class="card-image" style="padding: 5%">
+                    <img class="responsive-image" src="/media/blog/static/media/ad_default.png">
+                </div>
+                <div class="card-action">
+                    <div class="row">
+                        <form method="POST">
+                            {% csrf_token %}
+                            <div class="col s12">
+                                <b id="nr">Nr: {{ i.title }}</b>
+                                <p id="date">Data: {{ i.date }}</p>
+                                <input id="pk" name="pk" class="hide">
+                            </div>
+                                <a class="btn" href="#" id="read" style="width: 100%; margin-bottom: 5%;">Citește</a>
+                                {% if user.is_staff %}
+                                    <div class="input-field">
+                                        <input id="last_name" type="text" class="validate" name="new_nr">
+                                        <label for="last_name">Schimbă nr</label>
+                                    </div>
+                                    <button class="btn" name="save_pdf_changes" value="save_pdf_changes" style="width: 100%; margin-bottom: 5%">Salvează</button>
+                                    <button class="btn red" onclick="r = confirm('Sunteți sigur?'); if (r){this.type = 'submit'}" type="button" name="remove_pdf" value="remove_pdf_changes" style="width: 100%;">Șterge</button>
+                                {% endif %}
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="modal1" class="modal">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="modal-content">
+                <h4>Adaugă o ediție</h4>
+                <div class="file-field input-field">
+                    <div class="btn">
+                        <span>File</span>
+                        <input type="file" name="pdf">
+                    </div>
+                    <div class="file-path-wrapper">
+                        <input class="file-path validate" type="text">
+                    </div>
+                </div>
+                <div class="input-field col s12">
+                    <input id="pdf_nr" type="text" class="validate" name="nr">
+                    <label for="pdf_nr">Nr-ul</label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-action modal-close waves-effect waves-green btn-flat" name="add_pdf" value="add_pdf">Adaugă</button>
+            </div>
+        </form>
+    </div>
+    <script>
+        function select_pdf(pdf){
+            var selected_pdfs = document.querySelectorAll(".selected");
+            for (i = 0; i < selected_pdfs.length; i++){
+                selected_pdfs[i].className = "card hoverable";
+            }
+            pdf.className = 'card hoverable selected';
+            document.getElementById('nr').innerHTML = "Nr: " + pdf.dataset.title;
+            document.getElementById('date').innerHTML = "Data: " + pdf.dataset.date;
+            document.getElementById('pk').value = pdf.dataset.pk;
+            document.getElementById('read').onclick = function(){
+                window.location.href = "/media/" + pdf.dataset.pdf;
+            }
+        }
+        $(document).ready(function(){
+            $('.modal').modal();
+        });
+    </script>
+    {% endif %}
+{% else %}
+    <div class="row">
+        <div class="col s12">
+            <div class="card">
+                <div class="card-content">
+                    <span class="card-title">Versiune Online</span>
+                    <p>Obținând acest abonament, veți avea acces la baza de arhivă a ziarului în format pdf</p>
+                </div>
+                <div class="card-action">
+                    <form method="POST">
+                        {% csrf_token %}
+                        <button class="btn" name="buy_online_premium" value="buy_online_premium">Cumpără cu 11 lei/luna</button>
+                    </form>
+                </div>
+            </div>
+            <div class="card"> 
+                <div class="card-content">
+                    <span class="card-title">Versiune fizică</span>
+                    <p>Abonați-vă la ziar online</p>
+                </div>
+                <div class="card-action">
+                    <form method="POST">
+                        {% csrf_token %}
+                        <button class="btn" name="buy_material_premium" value="buy_material_premium">Cumpără</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endif %}
+{% endblock %}

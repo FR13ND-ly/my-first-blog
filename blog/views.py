@@ -1,40 +1,138 @@
+import os, random, re
 from django.shortcuts import render
 from django.utils import timezone
 from django.http import HttpResponse, HttpResponseRedirect
 from datetime import timedelta
-from .models import Post, Comment, Profile, Like, Survey, Vote, Ad, Image, Tag, View
+from .models import Post, Comment, Profile, Like, Survey, Vote, Ad, Image, Tag, View, Report, Ad_Block, NewsPapper
 from django.contrib.auth.models import User, AnonymousUser
-from django.shortcuts import render, get_object_or_404
-from django.shortcuts import redirect
+from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth import authenticate, login
-from django.contrib.auth import logout
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.hashers import make_password
-from django.db.models import Count
 from dateutil.relativedelta import relativedelta
 
 def set_dict_for_render(rdict, request):
-    if 'tposts' in rdict:
-       rdict.update({'tposts' : Post.objects.filter(published_date__lte=timezone.now()).annotate(count_of_views = Count('view')).order_by(('count_of_views')).reverse().filter(status=False)[0:3]})
     if request.user.is_active:
         profile = Profile.objects.get_or_create(user = request.user)
         rdict.update({'profile' : profile})
+    if request.user.is_staff:
+        rdict.update({'reports' : Report.objects.all()})
+    if rdict.get('ad_and_side_menu'):
+        add_ad_and_side_menu(rdict)
+    if re.compile(r".*(iphone|mobile|androidtouch)",re.IGNORECASE).match(request.META['HTTP_USER_AGENT']):
+        rdict.update({"mobile" : True})
+    else:
+        rdict.update({"mobile" : False})
     return rdict
 
 def check_dark_theme(request):
     if request.user.is_active:
-        profile, exist = Profile.objects.get_or_create(user = request.user)
+        profile = Profile.objects.get_or_create(user = request.user)[0]
         if profile.darktheme:
             return 'darktheme_'
     return ''
 
-def post_list(request):
-    if request.user.is_staff:
-        relative_number_of_pages = ((len(Post.objects.filter(published_date__lte=timezone.now()))-1)//5)
-        posts = Post.objects.filter(published_date__lte=timezone.now()).order_by('published_date').reverse()[0:5]
+def mobile(request):
+    if re.compile(r".*(iphone|mobile|androidtouch)",re.IGNORECASE).match(request.META['HTTP_USER_AGENT']):
+        return True
     else:
-        relative_number_of_pages = ((len(Post.objects.filter(published_date__lte=timezone.now()).filter(status=False))-1)//5)
-        posts = Post.objects.filter(published_date__lte=timezone.now()).order_by('published_date').reverse().filter(status=False)[0:5]
+        return False
+
+def add_ad_and_side_menu(rdict):
+    social = []
+    second_ad = Ad_Block.objects.get_or_create(pk = 2)[0]
+    if second_ad.active:
+        second_ad_position = random.randrange(1, 4)
+    else:
+        second_ad_position = False
+    for post in Post.objects.all().order_by("published_date").filter(status = False).reverse():
+        if second_ad_position != 1:
+            if len(social) >= 2:
+                break
+        else:
+            if len(social) >= 1:
+                break
+        if not post in social:
+            for post_tag in post.tags.all():
+                if post_tag.tag.lower() == 'social':
+                    social.append(post)
+    politic = []
+    for post in Post.objects.all().order_by("published_date").filter(status = False).reverse():
+        if second_ad_position != 2:
+            if len(politic) >= 2:
+                break
+        else:
+            if len(politic) >= 1:
+                break
+        if not post in social:
+            for post_tag in post.tags.all():
+                if post_tag.tag.lower() == 'politic':
+                    politic.append(post)
+    economic = []
+    for post in Post.objects.all().order_by("published_date").filter(status = False).reverse():
+        if second_ad_position != 3:
+            if len(economic) >= 2:
+                break
+        else:
+            if len(economic) >= 1:
+                break
+        if not post in social:
+            for post_tag in post.tags.all():
+                if post_tag.tag.lower() == 'economic':
+                    economic.append(post)
+    first_ad = Ad_Block.objects.get_or_create(pk = 1)[0]
+    top_posts_dict = {}
+    top_posts_points = []
+    for i in Post.objects.filter(published_date__lte=timezone.now()).filter(status = False).order_by('published_date').reverse():
+        points = i.view.count()
+        points += i.comments.count() * 10
+        points += i.likes.count() * 5
+        if i.video:
+            points += 100
+        if i.survey_is_present:
+            points += 50
+            for survey in i.survey.all():
+                for vote in survey.vote.all():
+                    points += 10
+        def check_exist(points):
+            if points in top_posts_dict:
+                points += 1
+                check_exist(points)
+            else:
+                top_posts_dict[points] = i
+                top_posts_points.append(points)
+        check_exist(points)
+    top_posts_points.sort()
+    top_posts_points.reverse()
+    tposts = []
+    if first_ad.active:
+        for tpoints in top_posts_points[ : 2]:
+            tposts.append(top_posts_dict[tpoints])
+    else:
+        for tpoints in top_posts_points[ : 3]:
+            tposts.append(top_posts_dict[tpoints])
+    extras_posts = Post.objects.filter(published_date__lte=timezone.now()).order_by('published_date').reverse().filter(status = False).filter(video = True)
+    extra_posts = extras_posts[ : 3]
+    rdict.update({"second_ad_fposition" : second_ad_position == 1, "second_ad_sposition" : second_ad_position == 2, "second_ad_tposition" : second_ad_position == 3})    
+    rdict.update({"social" : social})
+    rdict.update({"politic" : politic})
+    rdict.update({"economic" : economic})
+    rdict.update({'week_img' : Ad_Block.objects.get_or_create(pk = 0)[0]})
+    rdict.update({"first_ad" : first_ad})
+    rdict.update({"second_ad" : second_ad})
+    rdict.update({"third_ad" : Ad_Block.objects.get_or_create(pk = 3)[0]})
+    rdict.update({"e_posts": extra_posts})
+    rdict.update({"tposts" : tposts})
+    return rdict
+
+def post_list(request):
+    print(mobile(request))
+    if request.user.is_staff:
+        relative_number_of_pages = ((len(Post.objects.filter(published_date__lte = timezone.now())) - 1) // 5)
+        posts = Post.objects.filter(published_date__lte = timezone.now()).order_by('published_date').reverse()[0 : 5]
+    else:
+        relative_number_of_pages = ((len(Post.objects.filter(published_date__lte = timezone.now(), status = False)) - 1) // 5)
+        posts = Post.objects.filter(published_date__lte = timezone.now(), status = False).order_by('published_date').reverse()[0 : 5]
     number_of_pages = []
     index = 0
     for post in posts:
@@ -42,54 +140,58 @@ def post_list(request):
         index += 1
     for i in range(8):
         if 1 + i < relative_number_of_pages + 2:
-            number_of_pages.append(1+i)
-    rendertemplate = {'posts': posts, 'number_of_pages': number_of_pages, 'big_image' : True, "current_page":1, 'tposts':True}
+            number_of_pages.append(1 + i)
+    rendertemplate = {'posts' : posts, 'number_of_pages' : number_of_pages, "current_page" : 1, 'ad_and_side_menu' : True}
     return render(request, 'blog/' + check_dark_theme(request) + 'post_list.html', set_dict_for_render(rendertemplate, request))
 
 def post_list_next(request, lk):
+    lk = int(lk)
     if lk == 1:
         return redirect('post_list')
     if request.user.is_staff:
-        relative_number_of_pages = (len(Post.objects.filter(published_date__lte=timezone.now()) )- 1)//5
-        posts = Post.objects.filter(published_date__lte=timezone.now()).order_by('published_date').reverse()
+        relative_number_of_pages = (len(Post.objects.filter(published_date__lte = timezone.now())) - 1) // 5
+        posts = Post.objects.filter(published_date__lte = timezone.now()).order_by('published_date').reverse()
     else:
-        relative_number_of_pages = (len(Post.objects.filter(published_date__lte=timezone.now()).filter(status=False))- 1)//5
-        posts = Post.objects.filter(published_date__lte=timezone.now()).order_by('published_date').reverse().filter(status=False)
+        relative_number_of_pages = (len(Post.objects.filter(published_date__lte = timezone.now(), status = False)) - 1) // 5
+        posts = Post.objects.filter(published_date__lte = timezone.now(), status = False).order_by('published_date').reverse()
+    print(relative_number_of_pages)
     if (len(posts) - lk * 5) < 0:
-        posts = posts[(lk-1)*5:]
+        posts = posts[(lk - 1)* 5 : ]
     else:
-        posts = posts[(lk-1) * 5:lk * 5]
+        posts = posts[(lk - 1) * 5 : lk * 5]
     number_of_pages = []
     for i in range(4):
-        if lk-(4-i) > 0:
-            number_of_pages.append(lk-(4-i))
-
+        if lk - (4 - i) > 0:
+            number_of_pages.append(lk - (4 - i))
     for i in range(4):
         if lk + i < relative_number_of_pages + 2:
-            number_of_pages.append(lk+i)
-    rendertemplate = {'posts': posts, 'number_of_pages': number_of_pages, "current_page":lk, 'tposts':True}
+            number_of_pages.append(lk + i)
+    index = 0
+    for post in posts:
+        post.index = index
+        index += 1
+    rendertemplate = {'posts' : posts, 'number_of_pages' : number_of_pages, "current_page" : lk, 'ad_and_side_menu' : True}
     return render(request, 'blog/' + check_dark_theme(request) + 'post_list.html', set_dict_for_render(rendertemplate, request))
 
 def post_detail(request, pk):
-    post = get_object_or_404(Post, pk=pk)
+    page_post = get_object_or_404(Post, url = pk)
     if request.user.is_active:
-        new_view = View.objects.create(post = post, user = request.user, date = timezone.now())
+        new_view = View.objects.create(post = page_post, user = request.user, date = timezone.now())
     else:
-        new_view = View.objects.create(post = post, date = timezone.now())
+        new_view = View.objects.create(post = page_post, date = timezone.now())
     new_view.save()
-    print('new view')
     if request.user.is_active:
-        liked = bool(Like.objects.filter(author=request.user, post=post))
+        liked = bool(Like.objects.filter(author = request.user, post = page_post))
     else:
         liked = False
-    survey = Survey.objects.filter(post=post)
+    survey = Survey.objects.filter(post = page_post)
     uservoted = False
     for variant in survey:
-        for i in Vote.objects.filter(variant=variant):
+        for i in Vote.objects.filter(variant = variant):
             if i.user == request.user:
                 uservoted = True
     if request.method == "POST" and request.POST.get("add_comment"):
-        comment = Comment.objects.create(post = post, created_date = timezone.now())
+        comment = Comment.objects.create(post = page_post, created_date = timezone.now())
         if request.user.is_active:
             comment.author = request.user.username
             comment.photo_of_user = Profile.objects.get(user = request.user).photo
@@ -101,31 +203,44 @@ def post_detail(request, pk):
         comment.text = request.POST.get('text_of_comment')
         comment.save()
         print('new comment')
-        return redirect('post_detail', pk=post.pk)
-    rendertemplate = {'post': post, 'user':request.user, 'survey': survey, 'uservoted': uservoted, "liked":liked, 'tposts':True}
+        return redirect('post_detail', pk = page_post.url)
+    rendertemplate = {'post' : page_post, 'user' : request.user, 'survey' : survey, 'uservoted' : uservoted, "liked" : liked, 'ad_and_side_menu' : True}
     return render(request, 'blog/' + check_dark_theme(request) + 'post_detail.html', set_dict_for_render(rendertemplate, request))
 
 
 def comment_remove(request, pk):
     if not request.user.is_staff:
-        return HttpResponse(status=404)
-    comment = Comment.objects.get(pk=pk)
+        return redirect('post_list')
+    comment = Comment.objects.get(pk = pk)
     comment.delete()
     print('comment removed')
-    return redirect('post_detail', pk=comment.post.pk)
+    return redirect('post_detail', pk=comment.post.url)
 
 def post_new(request):
     if not request.user.is_staff:
-        return HttpResponse(status=404)
+        return redirect('post_list')
     if request.method == "POST" and request.POST.get("save_post"):
         post = Post.objects.create(author = request.user, title = request.POST.get("title"), text = request.POST.get("posttext"), published_date = timezone.now())
         for i in Image.objects.all():
             if (request.POST.get("cover_name") == i.image):
                 post.cover = i
-        for i in request.POST.get('tags_container').split('close'):
+        tags = request.POST.get('tags_container').split('close')
+        for i in tags:
             if i != '':
-                new_tag = Tag.objects.create(tag = i, post = post)
-                new_tag.save()
+                if request.POST.get('video') != "on" and i.lower() != "video":
+                    new_tag = Tag.objects.create(tag = i, post = post)
+                    new_tag.save()
+        if request.POST.get('video') == "on":
+            post.video = True
+            new_tag = Tag.objects.create(tag = 'Video', post = post)
+            for i in tags:
+                if 'video' == i.lower():
+                    for a in post.tags.all():
+                        if a.tag.lower() == 'video':
+                            if Tag.objects.get_or_create(tag = "Video", post = post)[1]:
+                                new_tag.delete()
+        else:
+            post.video = False
         if request.POST.get('survey_is_present') == "on":
             post.question = request.POST.get('survey_question')
             post.survey_is_present = True
@@ -135,26 +250,31 @@ def post_new(request):
                 post.type_of_vote = False
             for i in request.POST.getlist('variant_of_survey'):
                 if i != '':
-                    survey = Survey.objects.create(post=post, variant=i)
+                    survey = Survey.objects.create(post = post, variant = i)
                     survey.save()
+        post.url = post.title.replace(' ', '-')
+        for i in Post.objects.all():
+            if post.url.lower() == i.url.lower():
+                post.url = post.url + '1'
+        
         post.save()
         print('new post')
-        return redirect('post_detail', pk=post.pk)
+        return redirect('post_detail', pk=post.url)
     elif request.method == "POST" and request.FILES.get('file'):
-        new_image = Image.objects.create(image=request.FILES.get('file'), upload_date = timezone.now())
+        new_image = Image.objects.create(image = request.FILES.get('file'), upload_date = timezone.now())
         new_image.save()
         print('new image uploaded')
-    rendertemplate = {"post_new": True, 'images':image_list(), "mimage_list" : Image.objects.all()}
+    rendertemplate = {"post_new" : True,"image_list" : Image.objects.all().order_by("upload_date").reverse()}
     return render(request, 'blog/' + check_dark_theme(request) + 'post_edit.html', set_dict_for_render(rendertemplate, request))
 
 def post_edit(request, pk):
     if not request.user.is_staff:
-        return HttpResponse(status=404)
-    post = Post.objects.get(pk=pk)
+        return redirect('post_list')
+    post = Post.objects.get(url = pk)
     surveys = dict()
     a = 0
-    for i in Survey.objects.filter(post=post):
-        surveys.update({i.variant:a})
+    for i in Survey.objects.filter(post = post):
+        surveys.update({i.variant : a})
         a += 1
     if request.method == "POST" and request.POST.get("save_post"):
         post.title = request.POST.get("title")
@@ -162,13 +282,13 @@ def post_edit(request, pk):
             if (request.POST.get("cover_name") == i.image):
                 post.cover = i
         post.text = request.POST.get("posttext")
-        if request.POST.get('tags_container') != '':
-            for tag in post.tags.all():
-                tag.delete()
-            for i in request.POST.get('tags_container').split('close'):
-                if i != '':
-                    new_tag = Tag.objects.create(tag = i, post = post)
-                    new_tag.save()
+        for tag in post.tags.all():
+            tag.delete()
+        tags = request.POST.get('tags_container').split('close')
+        for i in tags:
+            if i != '':
+                new_tag = Tag.objects.create(tag = i, post = post)
+                new_tag.save()
         if request.POST.get('status') == "on":
             post.status = True
         else:
@@ -176,42 +296,61 @@ def post_edit(request, pk):
         if request.POST.get('survey_is_present') == "on":
             post.question = request.POST.get('survey_question')
             post.survey_is_present = True
-            for i in Survey.objects.filter(post=post):
+            for i in Survey.objects.filter(post = post):
                 i.delete()
             for i in request.POST.getlist('variant_of_survey'):
                 if i != '':
-                    survey = Survey.objects.create(post=post, variant=i)
+                    survey = Survey.objects.create(post = post, variant = i)
                     survey.save()
         else:
             post.survey_is_present = False
+        if request.POST.get('video') == "on":
+            post.video = True
+            new_tag = Tag.objects.create(tag = 'Video', post = post)
+            for i in tags:
+                if i.lower() == 'video':
+                    new_tag.delete()
+        else:
+            post.video = False
+            for i in tags:
+                if 'video' == i.lower():
+                    for i in post.tags.all():
+                        if i.tag.lower() == 'video':
+                            i.delete()
+        post.url = post.title.replace(' ', '-')
+        for i in Post.objects.all():
+            if post.url.lower() == i.url.lower():
+                post.url = post.url + '1'
         post.save()
         print('post ' + post.title + ' edited')
-        return redirect('post_detail', pk=post.pk)
+        return redirect('post_detail', pk = post.url)
     elif request.method == "POST" and request.FILES.get('file'):
-        new_image = Image.objects.create(image=request.FILES.get('file'), upload_date = timezone.now())
+        new_image = Image.objects.create(image = request.FILES.get('file'), upload_date = timezone.now())
         new_image.save()
         print("new image uploaded")
-    rendertemplate = {'post':post,'surveys':surveys, 'images':image_list(), "mimage_list" : Image.objects.all()}
+    rendertemplate = {'post' : post, 'surveys':surveys, "image_list" : Image.objects.all().order_by("upload_date").reverse()}
     return render(request, 'blog/' + check_dark_theme(request) + 'post_edit.html', set_dict_for_render(rendertemplate, request))
 
 def post_remove(request, pk):
     if not request.user.is_staff:
-        return HttpResponse(status=404)
-    post = Post.objects.get(pk=pk).delete()
+        return redirect('post_list')
+    post = Post.objects.get(url = pk).delete()
     print('post removed')
     return redirect('post_list')
 
 
 def user_login(request):
     if request.method == 'POST':
-        user = authenticate(username=request.POST.get('logininput'), password=request.POST.get('passwordinput'))
+        user = authenticate(username = request.POST.get('logininput'), password = request.POST.get('passwordinput'))
         if user is not None:
             if user.is_active:
                 login(request, user)
-                print('somebody have login')
-                return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+                if "login" in request.META.get('HTTP_REFERER'):
+                    return redirect('post_list')
+                else:
+                    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
         else:
-            return render(request, 'blog/login.html', {'incorrect_login_or_password':True})
+            return render(request, 'blog/login.html', {'incorrect_login_or_password' : True})
     return render(request, 'blog/login.html')
 
 def register(request):
@@ -220,13 +359,13 @@ def register(request):
     if request.method == 'POST':
         for i in User.objects.all():
             if i.username == request.POST.get('username'):
-                return render(request, 'blog/register.html', {"Error": "Acest nume de utilizator e ocupat"})
-        for i in ['admin', 'administrator', 'alan', 'estcurier', 'est-curier', 'administrația']:
+                return render(request, 'blog/register.html', {"Error" : "Acest nume de utilizator e ocupat"})
+        for i in ['admin', 'administrator', 'est curier', 'estcurier', 'est-curier', 'administrația']:
             if i in request.POST.get('username').lower():
-               return render(request, 'blog/register.html', {"Error": "Numele de utilizator conține un element interzis"})
+               return render(request, 'blog/register.html', {"Error" : "Numele de utilizator conține un element interzis"})
         if request.POST.get('password') == request.POST.get('repeatedpassword'):
             if len(request.POST.get('password')) >5:
-                user = User.objects.create(username = request.POST.get('username'), first_name = request.POST.get('firstname'), email = request.POST.get('email'), date_joined = timezone.now(), password = make_password(request.POST.get('repeatedpassword')))
+                user = User.objects.create(username = request.POST.get('username'), email = request.POST.get('email'), date_joined = timezone.now(), password = make_password(request.POST.get('repeatedpassword')))
                 user.save()
                 profile = Profile.objects.create(user=user)
                 profile.save()
@@ -235,35 +374,32 @@ def register(request):
                 print('new user')
                 return redirect('post_list')
             else:
-                return render(request, 'blog/register.html', {"Error": "Parola e prea slabă"})
+                return render(request, 'blog/register.html', {"Error" : "Parola e prea slabă"})
         else:
-            return render(request, 'blog/register.html', {"Error": "Parolele nu coincid"})
+            return render(request, 'blog/register.html', {"Error" : "Parolele nu coincid"})
     return render(request, 'blog/register.html')
 
 def user_logout(request):
     if not request.user.is_active:
         return redirect('post_list')
     logout(request)
-    print('user logout')
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 @login_required
 def add_like(request, pk):
-    post = Post.objects.get(pk=pk)
-    new_like, created = Like.objects.get_or_create(author=request.user, post=post)
+    post = Post.objects.get(url = pk)
+    new_like, created = Like.objects.get_or_create(author = request.user, post = post)
     if created:
         new_like.date = timezone.now()
         new_like.save()
-        print('new like')
     else:
-        like = Like.objects.get(author=request.user, post=post)
+        like = Like.objects.get(author = request.user, post = post)
         like.delete()
-        print('like removed')
     return redirect('post_detail', pk=post.pk)
 
 @login_required
 def vote(request,pk):
-    post = Post.objects.get(pk=pk)
+    post = Post.objects.get(url = pk)
     if post.type_of_vote:
         survey = Survey.objects.get(post = post, variant = request.POST.get('variant'))
         vote = Vote.objects.create(variant = survey, user = request.user)
@@ -275,7 +411,7 @@ def vote(request,pk):
             survey = Survey.objects.get(post = post, variant = i)
             vote = Vote.objects.create(variant = survey, user = request.user)
             vote.save()
-            survey.count = (len(Vote.objects.filter(variant= survey)))
+            survey.count = (len(Vote.objects.filter(variant = survey)))
             survey.save()
     return redirect('post_detail', pk=pk)
 
@@ -288,14 +424,14 @@ def setusertheme(request, theme):
 
 def ads_list(request):
     for i in Ad.objects.all():
-        if timedelta(days=7 * i.remove_date) + i.published_date < timezone.now():
+        if timedelta(days = 7 * i.remove_date) + i.published_date < timezone.now():
             i.delete()
     ads = dict()
     a = 1
     for i in Ad.objects.all():
         if a == 4:
             a = 1
-        ads.update({i:a})
+        ads.update({i : a})
         a += 1
     first_column, second_column, third_column = [], [], []
     for i in ads:
@@ -307,60 +443,38 @@ def ads_list(request):
             third_column.append(i)
     ads = [first_column, second_column, third_column]
     ads_for_mobile = Ad.objects.all()
-    rendertemplate = {'ads_page':True, 'ads_list':True, 'ads': ads, 'mads': ads_for_mobile}
+    rendertemplate = {'ads_page' : True, 'ads_list' : True, 'ads' : ads, 'mads' : ads_for_mobile}
     return render(request, 'blog/' + check_dark_theme(request) + 'ads.html',set_dict_for_render(rendertemplate, request))
 
 def ad_new(request):
     if not request.user.is_staff:
-        return HttpResponse(status=404)
+        return redirect('post_list')
     if request.method == "POST":
         ad = Ad.objects.create(text = request.POST.get('ad_text'), contact = request.POST.get('contact_data'), published_date = timezone.now(), remove_date = int(request.POST.get('count_of_days')))
         ad.save()
-        print('new ad')
         return redirect('ads')
-    rendertemplate = {'ads_page':True, 'ad_new':True}
+    rendertemplate = {'ads_page' : True, 'ad_new' : True}
     return render(request, 'blog/' + check_dark_theme(request) + 'ad_edit.html', set_dict_for_render(rendertemplate, request))
 
 def ad_edit(request, pk):
     if not request.user.is_staff:
-        return HttpResponse(status=404)
-    ad = Ad.objects.get(pk=pk)
+        return redirect('post_list')
+    ad = Ad.objects.get(pk = pk)
     if request.method == "POST":
         ad.text = request.POST.get('ad_text')
         ad.contact = request.POST.get('contact_data')
         ad.remove_date = int(request.POST.get('count_of_days'))
         ad.save()
-        print('ad edited')
         return redirect('ads')
-    rendertemplate = {'ads_page':True, 'ad':ad}
+    rendertemplate = {'ads_page' : True, 'ad' : ad}
     return render(request, 'blog/' + check_dark_theme(request) + 'ad_edit.html', set_dict_for_render(rendertemplate, request))
 
 def ad_delete(request, pk):
     if not request.user.is_staff:
-        return HttpResponse(status=404)
-    ad = Ad.objects.get(pk=pk)
+        return redirect('post_list')
+    ad = Ad.objects.get(pk = pk)
     ad.delete()
-    print('ad deleted')
     return redirect('ads')
-
-def image_list():
-    imgs = dict()
-    a = 1
-    for i in Image.objects.all().order_by("upload_date").reverse():
-        if a == 4:
-            a = 1
-        imgs.update({i:a})
-        a += 1
-    first_column, second_column, third_column = [], [], []
-    for i in imgs:
-        if imgs[i] == 1:
-            first_column.append(i)
-        if imgs[i] == 2:
-            second_column.append(i)
-        if imgs[i] == 3:
-            third_column.append(i)
-    images = [first_column, second_column, third_column]
-    return images
 
 def test_page(request):
     return render(request, 'blog/test.html')
@@ -395,7 +509,7 @@ def search(request):
                 for word_of_comment in prepare_word_list(comment.text.split(" ")):
                     if prepare(word_of_comment) == prepare(word) and comment not in comments:
                         comments.append(comment)
-    rendertemplate = {"posts":posts, "ads":ads, "comments":comments, "search_page": True}
+    rendertemplate = {"posts" : posts, "ads" : ads, "comments" : comments, "search_page" : True}
     return render(request, 'blog/' + check_dark_theme(request) + 'search_page.html', set_dict_for_render(rendertemplate, request))
 
 def search_by_teg(request, tag):
@@ -405,7 +519,7 @@ def search_by_teg(request, tag):
             for post_tag in post.tags.all():
                 if post_tag.tag.lower() == tag.lower():
                     posts.append(post)
-    rendertemplate = {"posts":posts, 'hide_ads_and_comments':True}
+    rendertemplate = {"posts" : posts, 'hide_ads_and_comments' : True, 'search_by_teg' : True}
     return render(request, 'blog/' + check_dark_theme(request) + 'search_page.html', set_dict_for_render(rendertemplate, request))
 
 def statistics(request):
@@ -428,7 +542,7 @@ def statistics(request):
     views_by_signed_and_not = {"Autentificat" : int(), "Oaspete" : int()}
     white_or_dark_theme_stat = {"Luminoasă" : int(),"Întunecată" : int()}
     comment_by_signed_and_not = {"Autentificați" : int(), "Oaspeți" : int()}
-    for i in range(int(timezone.now().strftime("%d")), -1, -1):
+    for i in range(int(timezone.now().strftime("%d")), - 1, - 1):
         views_by_date.update({i : [View.objects.filter(date__date=timezone.now() - timedelta(days = int(timezone.now().strftime("%d")) - i)).reverse().count(), Like.objects.filter(date__date=timezone.now() - timedelta(days = int(timezone.now().strftime("%d")) - i)).reverse().count(), Comment.objects.filter(created_date__date=timezone.now() - timedelta(days = int(timezone.now().strftime("%d")) - i)).reverse().count()] })
     for i in range(int(timezone.now().strftime("%m")), -1, -1):
         views_by_month.update({(timezone.now() - relativedelta(months = int(timezone.now().strftime("%m"))-i)).strftime("%B") : [View.objects.filter(date__date=timezone.now() - relativedelta(months = int(timezone.now().strftime("%m")) - i)).reverse().count(), Like.objects.filter(date__date=timezone.now() - relativedelta(months = int(timezone.now().strftime("%m")) - i)).reverse().count(), Comment.objects.filter(created_date__date=timezone.now() - relativedelta(months = int(timezone.now().strftime("%m")) - i)).reverse().count()] })
@@ -449,5 +563,117 @@ def statistics(request):
             comment_by_signed_and_not["Autentificați"] += 1
         else:
             comment_by_signed_and_not["Oaspeți"] += 1
-    rendertemplate = {"Administrators":Administrators, "Users": Users, "Posts":Posts, "Views":Views, "Likes": Likes, "Comments": Comments, "views_by_date" : views_by_date, "views_by_month": views_by_month, "views_by_year": views_by_year, 'views_by_signed_and_not': views_by_signed_and_not , "white_or_dark_theme_stat":white_or_dark_theme_stat, "comment_by_signed_and_not" : comment_by_signed_and_not}
+    rendertemplate = {"Administrators" : Administrators, "Users" : Users, "Posts" : Posts, "Views" : Views, "Likes" : Likes, "Comments" : Comments, "views_by_date" : views_by_date, "views_by_month" : views_by_month, "views_by_year" : views_by_year, 'views_by_signed_and_not' : views_by_signed_and_not , "white_or_dark_theme_stat" : white_or_dark_theme_stat, "comment_by_signed_and_not" : comment_by_signed_and_not}
     return render(request, 'blog/' + check_dark_theme(request) + 'statistic.html', set_dict_for_render(rendertemplate, request))
+
+def report_comment(request, pk):
+    comment = Comment.objects.get(pk = pk)
+    report = Report.objects.create(comment = comment)
+    report.save()
+    return redirect('post_detail', pk = comment.post.url)
+
+def report_page(request):
+    if not request.user.is_staff:
+        return redirect('post_list')
+    reported_comments = [] 
+    for i in Report.objects.all():
+        if i.comment not in reported_comments:
+            reported_comments.append(i.comment)
+    rendertemplate = {"reported_comments" : reported_comments}
+    return render(request, 'blog/' + check_dark_theme(request) + 'raport_page.html', set_dict_for_render(rendertemplate, request))
+    
+def approve_comment(request, pk):
+    if not request.user.is_staff:
+        return redirect('post_list')
+    for i in Comment.objects.get(pk = pk).reports.all():
+        i.delete()
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+def ad_manage(request):
+    if not request.user.is_staff:
+        return redirect('post_list')
+    if request.method == "POST":
+        ad = Sidebar_Ad.objects.get_or_create(pk = 0)[1]
+        ad.text = request.POST.get('text', "Salut!")
+        ad.link = request.POST.get('link')
+        if request.FILES.get('image') != None:
+            new_image = Image.objects.create(image=request.FILES.get('image'), upload_date = timezone.now())
+            new_image.save()
+            ad.image = new_image
+        ad.save()
+    rendertemplate = {}
+    return render(request, 'blog/' + check_dark_theme(request) + 'ad_manage.html', set_dict_for_render(rendertemplate, request))
+
+def image_list(request):
+    if not request.user.is_staff:
+        return redirect('post_list')
+    elif request.POST.get('remove_image'):
+        image = Image.objects.get(pk = request.POST.get('pk'))
+        if os.path.exists(os.getcwd().replace("\\", "/") + "/media/" + str(image.image)):
+            os.remove(os.getcwd().replace("\\", "/") + "/media/" + str(image.image))
+        image.delete()
+    elif request.FILES.get('new_image'):
+        image = Image.objects.create(image = request.FILES.get('new_image'), upload_date = timezone.now())
+        image.save()
+    rendertemplate = {"image_list" : Image.objects.all().order_by("upload_date").reverse()}
+    return render(request, 'blog/' + check_dark_theme(request) + 'image_list.html', set_dict_for_render(rendertemplate, request))
+
+def history(request):
+    if not request.user.is_authenticated:
+        return redirect('post_list')
+    views = View.objects.filter(user = request.user).order_by("date").reverse()
+    history = {}
+    for i in views:
+        if len(history) >= 4:
+            break
+        if (history.get(i.date.date())):
+            history[i.date.date()].append(i)
+        else:
+            history[i.date.date()] = [i]
+    rendertemplate = {"third_ad" :  Ad_Block.objects.get_or_create(pk = 3)[0], "history" : history}
+    return render(request, 'blog/' + check_dark_theme(request) + 'history.html', set_dict_for_render(rendertemplate, request))
+
+def edit_side(request):
+    if not request.user.is_staff:
+        return redirect('post_list')
+    if request.POST.get('save_ad'):
+        changed_ad = Ad_Block.objects.get_or_create(pk = request.POST.get('save_ad'))[0]
+        changed_ad.link = request.POST.get("ad_link", "")
+        changed_ad.title = request.POST.get("ad_title", "")
+        changed_ad.description = request.POST.get("ad_description", "")
+        image, exist = Image.objects.get_or_create(image = request.FILES.get('ad_img', changed_ad.image.image))
+        if exist:
+            image.upload_date = timezone.now()
+        if request.POST.get('active') == "on":
+            changed_ad.active = True
+        else:
+            changed_ad.active = False
+        image.save()
+        changed_ad.image = image
+        changed_ad.save()
+    rendertemplate = {'week_img' : Ad_Block.objects.get_or_create(pk = 0)[0], 'first_ad' : Ad_Block.objects.get_or_create(pk = 1)[0], 'second_ad' : Ad_Block.objects.get_or_create(pk = 2)[0], 'third_ad' : Ad_Block.objects.get_or_create(pk = 3)[0]}
+    return render(request, 'blog/' + check_dark_theme(request) + 'side_ad.html', set_dict_for_render(rendertemplate, request))
+
+def online_newspapper(request):
+    if not request.user.is_authenticated:
+        return redirect('post_list')
+    if request.POST.get('add_pdf'):
+        new_np = NewsPapper.objects.create(title = request.POST.get('nr'), pdf = request.FILES.get('pdf'), date = timezone.now())
+        new_np.save()
+    if request.POST.get('save_pdf_changes'):
+        np = NewsPapper.objects.get(pk = request.POST.get('pk'))
+        np.title = request.POST.get('new_nr')
+        np.save()
+    if request.POST.get('remove_pdf'):
+        np = NewsPapper.objects.get(pk = request.POST.get('pk'))
+        if os.path.exists(os.getcwd().replace("\\", "/") + "/media/" + str(np.pdf)):
+            os.remove(os.getcwd().replace("\\", "/") + "/media/" + str(np.pdf))
+        np.delete()
+    if request.POST.get('buy_online_premium'):
+        profile = Profile.objects.get(user = request.user)
+        profile.is_premium = True
+        profile.save()
+    if request.POST.get('buy_material_premium'):
+        pass
+    rendertemplate = {'np' : NewsPapper.objects.all(), "premium" : Profile.objects.get(user = request.user).is_premium}
+    return render(request, 'blog/' + check_dark_theme(request) + 'online_newspapper.html', set_dict_for_render(rendertemplate, request))

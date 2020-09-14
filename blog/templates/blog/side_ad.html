@@ -1,0 +1,259 @@
+{% extends 'blog/base.html' %}
+{% load static %}
+{% block content %}
+<style>
+    .top_article, .image_of_top_article{
+      height: 11.5rem;
+    }
+</style>
+<div class="row">
+    <div class="col s6">
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <h3>Imaginea săptămânii</h3>
+            <div class="col s6">
+                <div class="card" style="padding: 0">
+                    <div class="card-image">
+                        <img src="/media/{{week_img.image.image}}" id="img_img">
+                        <span class="card-title" id="img_title">{{week_img.title}}</span>
+                    </div>
+                    <div class="card-content">
+                        <p>Imaginea săptămânii</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col s6">
+                <div class="card">
+                    <div class="card-content">
+                        <span class="card-title">Edită</span>
+                        <p>
+                            <input type="checkbox" id="week_img_check" class="filled-in" name="active" {% if week_img.active %} checked {% endif %}/>
+                            <label for="week_img_check">Activ</label>
+                        </p>
+                        <div class="file-field input-field">
+                            <div class="btn">
+                                <span>Imaginea</span>
+                                <input type="file" name="ad_img" oninput="change_img_img(this.files[0])">
+                            </div>
+                            <div class="file-path-wrapper">
+                                <input class="file-path validate" type="text">
+                            </div>
+                        </div>
+                        <div class="input-field">
+                            <input id="img_title" oninput="change_img_title(this.value)" type="text" name="ad_title" value="{{week_img.title}}" class="validate">
+                            <label for="img_title">Titlul imaginii</label>
+                        </div>
+                        <button class="btn" name="save_ad" value="0" style="width: 100%;">Salvează</button>
+                  </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <script>
+        function change_img_title(new_title){
+            document.getElementById('img_title').innerHTML = new_title
+        }
+        function change_img_img(new_img){
+            document.getElementById('img_img').src = URL.createObjectURL(new_img)
+        }
+    </script>
+    <div class="col s6">
+        <h3>I bloc publicitar</h3>
+        <div class="col s6">
+            <a href="{{ first_ad.link }}" target="_blank" id='first_ad_link'>
+                <div class="card horizontal top_article">
+                    <div class="card-image">
+                        <img style="width: 8rem" class="image image_of_top_article" id="first_ad_img" src="/media/{{first_ad.image.image}}">
+                    </div>
+                    <div class="card-stacked">
+                        <div class="card-content">
+                            <i class="material-icons right black-text">monetization_on</i>
+                            <span class="card-title black-text" id="first_ad_title">{{ first_ad.title }}</span>
+                            <p class="black-text" id="first_ad_description">{{ first_ad.description }}</p>
+                        </div> 
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col s6">
+            <div class="card">
+                <div class="card-content">
+                    <span class="card-title">Edită</span>
+                    <form method="POST" enctype="multipart/form-data">
+                        <p>
+                            <input type="checkbox" name="active" class="filled-in" id="first_ad_check" {% if first_ad.active %} checked {% endif %}/>
+                            <label for="first_ad_check">Activ</label>
+                        </p>
+                        {% csrf_token %}
+                        <div class="file-field input-field">
+                            <div class="btn">
+                                <span>Imaginea</span>
+                                <input type="file" name="ad_img" oninput="change_first_ad_img(this.files[0])">
+                            </div>
+                            <div class="file-path-wrapper">
+                                <input class="file-path validate" type="text">
+                            </div>
+                        </div>
+                        <div class="input-field">
+                            <input id="img_link" oninput="change_first_ad_link(this.value)" value="{{first_ad.link}}" type="text" name="ad_link" class="validate">
+                            <label for="img_link">Link</label>
+                        </div>
+                        <div class="input-field">
+                            <input id="img_title" oninput="change_first_ad_title(this.value)" value="{{first_ad.title}}" type="text" name="ad_title" class="validate">
+                            <label for="img_title">Titlul imaginii</label>
+                        </div>
+                        <div class="input-field">
+                            <input id="img_description" type="text" oninput="change_first_ad_description(this.value)" value="{{first_ad.description}}" name="ad_description" class="validate">
+                            <label for="img_description">Titlul imaginii</label>
+                        </div>
+                        <button class="btn" name="save_ad" value="1" style="width: 100%;">Salvează</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        function change_first_ad_link(new_link){
+            document.getElementById('first_ad_link').href = new_link
+        }
+        function change_first_ad_title(new_title){
+            document.getElementById('first_ad_title').innerHTML = new_title
+        }
+        function change_first_ad_description(new_description){
+            document.getElementById('first_ad_description').innerHTML = new_description
+        }
+        function change_first_ad_img(new_img){
+            document.getElementById('first_ad_img').src = URL.createObjectURL(new_img)
+        }
+    </script>
+    <div class="col s6">
+        <h3>II bloc publicitar</h3>
+        <div class="col s6">
+            <a href="{{ second_ad.link }}" id="second_ad_link" class="black-text">
+                <div class="card post hoverable">
+                    <div class="card-image valign-wrapper">
+                        <img src="/media/{{second_ad.image.image}}" id="second_ad_img" class="image post-image">
+                    </div>
+                    <div class="card-stacked">
+                        <div class="card-content">
+                            <div class="section">
+                                <i class="material-icons right">monetization_on</i>
+                                <h4 id="second_ad_title">{{ second_ad.title }}</h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col s6">
+            <div class="card">
+                <div class="card-content">
+                    <form method="POST" enctype="multipart/form-data">
+                    <span class="card-title">Edită</span>
+                    <p>
+                        <input type="checkbox" id="second_ad_check" class="filled-in" name="active" {% if second_ad.active %} checked {% endif %}/>
+                        <label for="second_ad_check">Activ</label>
+                    </p>
+                        {% csrf_token %}
+                        <div class="file-field input-field">
+                            <div class="btn">
+                                <span>Imaginea</span>
+                                <input type="file" name="ad_img" oninput="change_second_ad_img(this.files[0])">
+                            </div>
+                            <div class="file-path-wrapper">
+                                <input class="file-path validate" type="text">
+                            </div>
+                        </div>
+                        <div class="input-field">
+                            <input id="img_title" type="text" name="ad_link" oninput="change_second_ad_link(this.value)" value="{{second_ad.link}}" class="validate">
+                            <label for="img_title">Link</label>
+                        </div>
+                        <div class="input-field">
+                            <input id="img_title" name="ad_title" oninput="change_second_ad_title(this.value)" type="text" value="{{second_ad.title}}" class="validate">
+                            <label for="img_title">Titlul imaginii</label>
+                        </div>
+                        <button class="btn" name="save_ad" value="2" style="width: 100%;">Salvează</button>
+                    </form>
+              </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        function change_second_ad_link(new_link){
+            document.getElementById('second_ad_link').href = new_link
+        }
+        function change_second_ad_title(new_title){
+            document.getElementById('second_ad_title').innerHTML = new_title
+        }
+        function change_second_ad_img(new_img){
+            document.getElementById('second_ad_img').src = URL.createObjectURL(new_img)
+        }
+    </script>
+    <div class="col s6">
+        <h3>III bloc publicitar</h3>
+        <div class="col s6">
+            <a href="{{third_ad.link}}" id="third_ad_link" target="_blank">
+                <div class="card" style="padding: 0">
+                    <div class="card-image">
+                        <img src="/media/{{third_ad.image.image}}" id="third_ad_img">
+                        <span class="card-title" id="third_ad_title">{{third_ad.title}}</span>
+                    </div>
+                    <div class="card-content">
+                        <i class="material-icons right black-text">monetization_on</i>
+                        <p id="third_ad_description" class="black-text">{{third_ad.description}}</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col s6">
+            <div class="card">
+                <div class="card-content">
+                    <form method="POST" enctype="multipart/form-data">
+                    <span class="card-title">Edită</span>
+                    <p>
+                        <input type="checkbox" id="third_ad_check" class="filled-in" name="active" {% if third_ad.active %} checked {% endif %}/>
+                        <label for="third_ad_check">Activ</label>
+                    </p>
+                        {% csrf_token %}
+                        <div class="file-field input-field">
+                            <div class="btn">
+                                <span>Imaginea</span>
+                                <input type="file" name="ad_img" oninput="change_third_ad_img(this.files[0])">
+                            </div>
+                            <div class="file-path-wrapper">
+                                <input class="file-path validate" type="text">
+                            </div>
+                        </div>
+                        <div class="input-field">
+                            <input id="img_title" type="text" class="validate" oninput="change_third_ad_link(this.value)" value="{{ third_ad.link }}" name="ad_link">
+                            <label for="img_title">Link</label>
+                        </div>
+                        <div class="input-field">
+                            <input id="img_title" type="text" class="validate" oninput="change_third_ad_title(this.value)" value="{{ third_ad.title }}" name="ad_title">
+                            <label for="img_title">Titlul</label>
+                        </div>
+                        <div class="input-field">
+                            <input id="img_title" type="text" class="validate" oninput="change_third_ad_description(this.value)" value="{{ third_ad.description }}" name="ad_description">
+                            <label for="img_title">Descrierea</label>
+                        </div>
+                        <button class="btn" style="width: 100%;" name="save_ad" value="3">Salvează</button>
+                    </form>
+              </div>
+        </div>
+        <script>
+            function change_third_ad_link(new_link){
+                document.getElementById('third_ad_link').href = new_link
+            }
+            function change_third_ad_title(new_title){
+                document.getElementById('third_ad_title').innerHTML = new_title
+            }
+            function change_third_ad_description(new_description){
+                document.getElementById('third_ad_description').innerHTML = new_description
+            }
+            function change_third_ad_img(new_img){
+                document.getElementById('third_ad_img').src = URL.createObjectURL(new_img)
+            }
+        </script>
+    </div>
+</div>
+{% endblock %}

@@ -1,3 +1,41 @@
+@media only screen and (min-width: 993px){
+    .top_articles {
+      height: 48rem;
+      right: 1%; 
+      width:25%; 
+    }
+
+    .top_article, .image_of_top_article{
+      height: 12.7rem;
+    }
+  }
+  
+@media only screen and (min-width: 1224px){
+    .top_articles {
+      height: 46rem;
+      right: 1%; 
+      width:25%; 
+    }
+
+    .top_article, .image_of_top_article{
+      height: 11.5rem;
+    }
+}
+  
+@media only screen and (min-width : 1824px) {
+    .top_articles {
+        height: 66rem;
+    }
+    
+    .top_article, .image_of_top_article{
+        height: 17.5rem;
+    }  
+}
+
+.image_of_top_article {
+    width: 5rem !important;
+}
+
 .divider {
     margin-top: 1%;
 }
@@ -35,17 +73,4 @@
 
 .like {
     vertical-align: middle;
-}
-
-.visible {
-    animation-name: visible_comment;
-    animation-duration: 0.5s;
-}
-
-@keyframes visible_comment {
-    0% {border:0; opacity: 0%;}
-    25% {opacity: 25%;}
-    50% {border:10px solid #0288d1;opacity: 50%;}
-    75% {opacity: 75%;}
-    100% {border:1px solid #0288d1; opacity: 100%;}
 }
