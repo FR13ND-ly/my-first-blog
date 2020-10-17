@@ -125,7 +125,6 @@ def add_ad_and_side_menu(rdict):
     return rdict
 
 def post_list(request):
-    print(mobile(request))
     if request.user.is_staff:
         relative_number_of_pages = ((len(Post.objects.filter(published_date__lte = timezone.now())) - 1) // 5)
         posts = Post.objects.filter(published_date__lte = timezone.now()).order_by('published_date').reverse()[0 : 5]
@@ -221,8 +220,9 @@ def post_new(request):
     if request.method == "POST" and request.POST.get("save_post"):
         post = Post.objects.create(author = request.user, title = request.POST.get("title"), text = request.POST.get("posttext"), published_date = timezone.now())
         for i in Image.objects.all():
-            if (request.POST.get("cover_name") == i.image):
+            if request.POST.get("cover_name").replace(" ", "_") == i.image:
                 post.cover = i
+                
         tags = request.POST.get('tags_container').split('close')
         for i in tags:
             if i != '':
@@ -255,7 +255,6 @@ def post_new(request):
         for i in Post.objects.all():
             if post.url.lower() == i.url.lower():
                 post.url = post.url + '1'
-        
         post.save()
         print('new post')
         return redirect('post_detail', pk=post.url)
