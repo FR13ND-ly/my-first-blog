@@ -17,6 +17,7 @@ class Post(models.Model):
     type_of_vote = models.BooleanField(default=True)
     url = models.CharField(max_length=200, default=True)
     video = models.BooleanField(default=False)
+    block_comments = models.BooleanField(default=False)
 
     def publish(self):
         self.published_date = timezone.now()
@@ -36,7 +37,6 @@ class Comment(models.Model):
     text = models.TextField(null=True)
     post = models.ForeignKey('blog.Post', on_delete=models.CASCADE, related_name='comments')
     created_date = models.DateTimeField(default=timezone.now)
-    photo_of_user = models.ImageField(upload_to="blog/static/media/", blank=True)
     by_administration = models.BooleanField(default=False)
     by_authenticated = models.BooleanField(default=False)
 

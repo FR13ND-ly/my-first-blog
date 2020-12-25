@@ -4,30 +4,13 @@
     <link rel="stylesheet" href="{% static 'css/post_list.css' %}">
     {% if mobile %}
     <div class="row">
-        <div class="col s12 valign-wrapper">
-            {% for post in posts %}
-                <div class="big-image card hide" id="mpost{{post.index}}">
-                    <div class="card-image big_image_photo_container" style="height: 20rem;">
-                        <a href="/articol/{{post.url}}">
-                            <img src="/media/{{post.cover.image}}" style="height: 20rem;" class="big_image_the_photo image">
-                        </a>
-                        <span class="card-title z-depth-5" id="big_image_title">{{ post.title }}</span>
-                    </div>
-                    <a href="{% url 'post_detail' pk=post.url %}">
-                        <div class="card-content s12 hoverable">
-                            <p class="black-text text_of_big_image">{{ post.text|striptags|linebreaksbr|truncatewords:20 }}</p>
-                        </div>
-                    </a>
-                </div>
-            {% endfor %}
-        </div>
         <div class="col s12">
             {% for post in posts %}
                 <a href="{% url 'post_detail' pk=post.url %}" class="black-text">
                     <div class="card hoverable">
                         <div class="card-image valign-wrapper">
                             <img src="/media/{{post.cover.image}}" class="image">
-                            <span class="card-title">{% if post.status %} Privat: {% endif %}{{ post.title }}<p style="font-size: 1rem;">{{ post.published_date }}</p></span>
+                            <span class="card-title">{% if post.status %} Privat: {% endif %}{{ post.title|truncatechars:70 }}<p style="font-size: 1rem;">{{ post.published_date }}</p></span>
                         </div>
                     </div>
                 </a>
@@ -65,7 +48,7 @@
                         <a href="/articol/{{post.url}}">
                             <img src="/media/{{post.cover.image}}" class="big_image_the_photo image">
                         </a>
-                        <span class="card-title z-depth-5 big_image_title">{{ post.title }}</span>
+                        <span class="card-title z-depth-5 big_image_title">{{ post.title|truncatechars:70 }}</span>
                         <span class="hide" onclick="next_big_image({{post.index}})" id="previous_big_image{{post.index}}"><i id="big_image_switcher_right" class="material-icons large big_image_switcher">arrow_forward</i></span>
                         <span class="hide" onclick="previous_big_image({{post.index}})" id="next_big_image{{post.index}}"><i id="big_image_switcher_left" class="material-icons large big_image_switcher">arrow_back</i></span>
                     </div>
@@ -80,7 +63,7 @@
         <div class="col s3">
             <form method="GET" action="/search">
                 <div class="input-field">
-                    <input id="search_input" name="search" type="text" class="black-text">
+                    <input id="search_input" name="search" type="text" class="white-text">
                     <label for="search_input">Caută</label>
                     <button class="waves-effect waves-light btn" id="search_btn" onclick="search_check()" style="position:absolute; right:0%; top: 0"><i class="material-icons">search</i></button>
                 </div>
@@ -162,7 +145,7 @@
                             <div class="card-stacked">
                                 <div class="card-content">
                                     <div class="section">
-                                        <h4>{{ post.title }}</h4>
+                                        <p style="font-size: 1.9rem;">{{ post.title | truncatechars:70 }}</p>
                                     </div>
                                     <div class="divider"></div>
                                     <div class="section">
@@ -201,7 +184,7 @@
                             <div class="card-stacked">
                                 <div class="card-content">
                                     <div class="section">
-                                        <h4>{{ post.title }}</h4>
+                                        <p style="font-size: 1.9rem;">{{ post.title | truncatechars:70 }}</p>
                                     </div>
                                     <div class="divider"></div>
                                     <div class="section">
@@ -240,7 +223,7 @@
                             <div class="card-stacked">
                                 <div class="card-content">
                                     <div class="section">
-                                        <h4>{{ post.title }}</h4>
+                                        <p style="font-size: 1.9rem;">{{ post.title | truncatechars:70 }}</p>
                                     </div>
                                     <div class="divider"></div>
                                     <div class="section">

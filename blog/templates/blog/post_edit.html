@@ -159,6 +159,8 @@
                     <label for="draft">Schiță</label><br>
                     <input type="checkbox" id="video" class="filled-in" name="video" {% if post.video %} checked {% endif %}/>
                     <label for="video">Conține video</label>
+                    <input type="checkbox" id="block_comments" class="filled-in" name="block_comments" {% if post.block_comments %} checked {% endif %}/>
+                    <label for="block_comments">Interzice comentariile</label>
                     <h5>Etichete</h5>
                     <div class="chips chips-autocomplete">
                     </div>

@@ -3,13 +3,20 @@
 {% block content %}
 <link rel="stylesheet" href="{% static 'css/post_list.css' %}">
 <div class="row">
+    <form method="GET" action="/search">
+        <div class="input-field">
+            <input id="search_input" name="search" type="text" class="white-text" value="{{ search_item }}">
+            <label for="search_input">Caută</label>
+            <button class="waves-effect waves-light btn" id="search_btn" onclick="search_check()" style="position:absolute; right:0%; top: 0"><i class="material-icons">search</i></button>
+        </div>
+    </form>
     <div id="articles">
         <h3 class="white-text">Posturi</h3>
         {% for post in posts %}
             <div class="col s12 m12 hide-on-small-only">
                 <div class="card horizontal hoverable blue-grey darken-3 white-text">
                     <div class="card-image valign-wrapper">
-                        <img src="/media/{{post.cover.image}}" class="image" id="article_image">
+                        <img src="/media/{{post.cover.image}}" class="image article_image">
                     </div>
                     <div class="card-stacked">
                         <div class="card-content">
@@ -20,28 +27,28 @@
                                 </div>
                                 <div class="divider"></div>
                                 <div class="section">
-                                    <p class="article_icons_container"><i class="material-icons tiny white-text article_icon">access_time</i> {{ post.published_date }} |<i class="material-icons tiny white-text article_icon">contacts</i> {{post.author}} | <i class="material-icons tiny white-text article_icon">remove_red_eye</i> {{post.view.count}} | <i class="material-icons tiny white-text article_icon">favorite</i> {{post.likes.count}}</p>
+                                    <p class="article_icons_container"><i class="material-icons red-text tiny white-text article_icon">access_time</i> {{ post.published_date }} |<i class="material-icons red-text tiny white-text article_icon">contacts</i> {{post.author}} | <i class="material-icons tiny red-text white-text article_icon">remove_red_eye</i> {{post.view.count}} | <i class="material-icons red-text tiny white-text article_icon">favorite</i> {{post.likes.count}}</p>
                                 </div>
                             </a>
                         </div>
                     </div>
                 </div>
-                </div>
+            </div>
             <div class="col s12 m12 hide-on-med-and-up">
-                <div class="card hoverable blue-grey darken-3 white-text">
+                <div class="card hoverable">
                     <div class="card-image valign-wrapper">
                         <img src="/media/{{post.cover.image}}" class="image">
                     </div>
                     <div class="card-stacked">
                         <div class="card-content">
-                            <a href="{% url 'post_detail' pk=post.pk %}" class="white-text">
+                            <a href="{% url 'post_detail' pk=post.pk %}" class="black-text">
                                 <div class="section">
                                     <h5>{% if post.status %} Privat: {% endif %}{{ post.title }}</h5>
-                                    <p class="article_text">{{ post.text|striptags|linebreaksbr|truncatewords:25 }}</p>
+                                    <p class="article_text">{{ post.text|striptags|linebreaksbr|truncatewords:20 }}</p>
                                 </div>
                                 <div class="divider"></div>
                                 <div class="section">
-                                    <p class="article_icons_container"><i class="material-icons tiny white-text article_icon">access_time</i> {{ post.published_date }} | <i class="material-icons tiny white-text article_icon">remove_red_eye</i> {{post.view.count}}</p>
+                                    <p class="article_icons_container"><i class="material-icons red-text tiny black-text article_icon">access_time</i> {{ post.published_date }} | <i class="material-icons red-text tiny black-text article_icon">remove_red_eye</i> {{post.view.count}}</p>
                                 </div>
                             </a>
                         </div>

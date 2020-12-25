@@ -11,7 +11,7 @@
                     <h4 class="hide-on-small-only" id="article_title">{{ post.title }}</h4>
                     <h5 class="hide-on-med-and-up">{{ post.title }}</h5>
                     <div class="divider"></div>
-                    <p id="article_icons_container"><i class="material-icons tiny article_icons white-text">access_time</i> {{ post.published_date }} |<i class="material-icons tiny article_icons white-text">contacts</i> {{post.author}} |  {{ post.view.count }} <i class="material-icons tiny article_icons white-text">remove_red_eye</i></p>
+                    <p id="article_icons_container"><i class="material-icons tiny article_icons white-text">access_time</i> {{ post.published_date }} | {{ post.view.count }} <i class="material-icons tiny article_icons white-text">remove_red_eye</i></p>
                     <div class="divider"></div>
                 </div>
                 {% autoescape off %}
@@ -81,8 +81,8 @@
                         </div>
                     </div>
                 </div>
-                <div class="card-action blue-grey darken-3">
-                    <button class="btn-flat btn waves-effect waves-light yellow-text text-darken-4" type="submit" value="add_comment" name="add_comment">Trimite <i class="material-icons right">send</i></button>
+                <div class="card-action blue-grey darken-3 ">
+                    <button class="btn-flat btn waves-effect waves-light yellow-text text-darken-4 " type="submit" value="add_comment" name="add_comment">Trimite <i class="material-icons right">send</i></button>
                 </div>
             </form>
         </div>
@@ -160,10 +160,10 @@
                             {% if uservoted %}
                                 <div class="collection-item blue-grey darken-3 white-text"><button class="btn" disabled >Ai votat deja!</button></div>
                             {% else %}
-                                <div class="collection-item"><button class="btn btn-default center light-blue darken-2" type="submit">Votează!</button></div>
+                                <div class="collection-item blue-grey darken-3 "><button class="btn btn-default center light-blue darken-2" type="submit">Votează!</button></div>
                             {% endif %}
                         {% else %}
-                            <div class="collection-item"><button class="btn btn-default center light-blue darken-2" type="button"  onclick="Materialize.toast('Trebuie să te autentifici!', 4000)">Votează!</button></div>
+                            <div class="collection-item blue-grey darken-3 "><button class="btn btn-default center light-blue darken-2" type="button"  onclick="Materialize.toast('Trebuie să te autentifici!', 4000)">Votează!</button></div>
                         {% endif %}
                     </div>
                 </form>

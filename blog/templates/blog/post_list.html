@@ -3,31 +3,14 @@
 {% block content %}
     <link rel="stylesheet" href="{% static 'css/post_list.css' %}">
     {% if mobile %}
-    <div class="row hide-on-med-and-up">
-        <div class="col s12 valign-wrapper">
-            {% for post in posts %}
-                <div class="big-image card hide" id="mpost{{post.index}}">
-                    <div class="card-image big_image_photo_container" style="height: 20rem;">
-                        <a href="/articol/{{post.url}}">
-                            <img src="/media/{{post.cover.image}}" style="height: 20rem;" class="big_image_the_photo image">
-                        </a>
-                        <span class="card-title z-depth-5" id="big_image_title">{{ post.title }}</span>
-                    </div>
-                    <a href="{% url 'post_detail' pk=post.url %}">
-                        <div class="card-content s12 hoverable">
-                            <p class="black-text text_of_big_image">{{ post.text|striptags|linebreaksbr|truncatewords:20 }}</p>
-                        </div>
-                    </a>
-                </div>
-            {% endfor %}
-        </div>
+    <div class="row">
         <div class="col s12">
             {% for post in posts %}
                 <a href="{% url 'post_detail' pk=post.url %}" class="black-text">
                     <div class="card hoverable">
                         <div class="card-image valign-wrapper">
                             <img src="/media/{{post.cover.image}}" class="image">
-                            <span class="card-title">{% if post.status %} Privat: {% endif %}{{ post.title }}<p style="font-size: 1rem;">{{ post.published_date }}</p></span>
+                            <span class="card-title">{% if post.status %} Privat: {% endif %}{{ post.title|truncatechars:70  }}<p style="font-size: 1rem;">{{ post.published_date }}</p></span>
                         </div>
                     </div>
                 </a>
@@ -162,7 +145,7 @@
                             <div class="card-stacked">
                                 <div class="card-content">
                                         <div class="section">
-                                            <h4>{{ post.title }}</h4>
+                                            <p style="font-size: 1.9rem;">{{ post.title | truncatechars:70 }}</p>
                                         </div>
                                         <div class="divider"></div>
                                         <div class="section">
@@ -201,7 +184,7 @@
                             <div class="card-stacked">
                                 <div class="card-content">
                                     <div class="section">
-                                        <h4>{{ post.title }}</h4>
+                                        <p style="font-size: 1.9rem;">{{ post.title | truncatechars:70 }}</p>
                                     </div>
                                     <div class="divider"></div>
                                     <div class="section">
@@ -240,7 +223,7 @@
                             <div class="card-stacked">
                                 <div class="card-content">
                                     <div class="section">
-                                        <h4>{{ post.title }}</h4>
+                                        <p style="font-size: 1.9rem;">{{ post.title | truncatechars:70 }}</p>
                                     </div>
                                     <div class="divider"></div>
                                     <div class="section">
@@ -288,7 +271,7 @@
                         <a href="{% url 'post_detail' pk=post.url %}" class="black-text">
                             <div class="card-image">
                                 <img src="/media/{{post.cover.image}}" class="image" style="height: 20rem">
-                                <span class="card-title">{% if post.status %} Privat: {% endif %}{{ post.title }}</span>
+                                <span class="card-title">{{ post.title|truncatechars:50 }}</span>
                             </div>
                         </a>
                     </div>

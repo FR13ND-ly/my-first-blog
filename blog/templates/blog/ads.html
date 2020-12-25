@@ -1,64 +1,31 @@
 {% extends 'blog/base.html' %}
 {% block content %}
-{% if mobile %}
 <div class="row">
-	<div class="col s12">
-		{% for ad in mads %}
-			<div class="card hoverable">
-				<div class="card-content">
-					<p>{{ ad.text| linebreaksbr }}</p>
-					<b>{{ ad.contact }}</b>
+	<div class="col {% if not mobile %}s9{% endif %}">
+		{% for ad in ads %}
+			<div class="col {% if mobile %}s12{% else %}s4{% endif %}">
+				<div class="card hoverable">
+					<div class="card-content">
+						<p>{{ ad.text| linebreaksbr }}</p>
+						<b>{{ ad.contact }}</b>
+					</div>
+					{% if user.is_staff %}
+						<a class="btn-floating halfway-fab waves-effect waves-light" href="{% url 'ad_edit' pk=ad.pk %}"><i class="material-icons">edit</i></a>
+					{% endif %}
 				</div>
-				{% if user.is_staff %}
-					<a class="btn-floating halfway-fab waves-effect waves-light" href="{% url 'ad_edit' pk=ad.pk %}"><i class="material-icons">edit</i></a>
-				{% endif %}
 			</div>
 		{% endfor %}
 	</div>
-</div>
-{% else %}
-<div class="row">
-	<div class="col s9">
-	<div class="card">
-		<div class="card-content">
-			<div class="row">
-				<div class="col s12">
-					<div class="row hide-on-small-only">
-						{% for column in ads %}
-							<div class="col s4">
-								{% for ad in column %}
-									<div class="row">
-        								<div class="col">
-          									<div class="card hoverable">
-            									<div class="card-content">
-             						 				<p>{{ ad.text| linebreaksbr }}</p>
-              										<b>{{ ad.contact }}</b>
-            									</div>
-            									{% if user.is_staff %}
-            										<a class="btn-floating halfway-fab waves-effect waves-light" href="{% url 'ad_edit' pk=ad.pk %}"><i class="material-icons">edit</i></a>
-            									{% endif %}
-          									</div>
-        								</div>
-    								</div>
-    							{% endfor %}
-  							</div>
-						{% endfor %}
-					</div>
+	{% if not mobile %}<div class="col s3">
+		<div class="card">
+			<div class="card-content">
+				<div class="row">
+					<h5>Anunț</h5>
+					<p>Dacă doriți ca publicitatea voastră să apară aici, contactaține pe estcurier@gmail.com sau adresați-vă la redacția Est-Curier</p>
 				</div>
 			</div>
 		</div>
 	</div>
+	{% endif %}
 </div>
-<div class="col s3">
-<div class="card hide-on-med-and-down">
-	<div class="card-content">
-		<div class="row">
-			<h5>Anunț</h5>
-			<p>Dacă doriți ca publicitatea voastră să apară aici, contactaține pe estcurier@gmail.com sau adresați-vă la redacția Est-Curier</p>
-		</div>
-	</div>
-</div>
-</div>
-</div>
-{% endif %}
 {% endblock %}

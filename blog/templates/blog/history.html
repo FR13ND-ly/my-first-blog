@@ -1,27 +1,48 @@
 {% extends 'blog/base.html' %}
 {% load static %}
 {% block content %}
-<div class="row hide-on-small-only">
+<link rel="stylesheet" href="{% static 'css/post_list.css' %}">
+<div class="row">
+    {% if mobile %}
     <div class="col s12">
         <h3>Istoricul vizionărilor</h3>
         {% for date, views in history.items %}
             <h5>{{date}}</h5>
             {% for view in views %}
-                <div class="col s12 m12">
+                <div class="col s12">
+                    <a href="{% url 'post_detail' pk=view.post.url %}" class="black-text">
+                        <div class="card hoverable">
+                            <div class="card-image valign-wrapper">
+                                <img src="/media/{{ view.post.cover.image }}" class="image">
+                                <span class="card-title">{% if view.post.status %} Privat: {% endif %}{{ view.post.title|truncatechars:50 }}<p style="font-size: 1rem;">{{ post.published_date }}</p></span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            {% endfor %}
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="col s12">
+        <h3>Istoricul vizionărilor</h3>
+        {% for date, views in history.items %}
+            <h5>{{date}}</h5>
+            {% for view in views %}
+                <div class="col s12">
                     <div class="card horizontal hoverable">
                         <div class="card-image valign-wrapper">
-                            <img src="/media/{{view.post.cover.image}}" style="width: 7rem;object-fit: cover; overflow: hidden; height: 16rem;" class="image" id="article_image">
+                            <img src="/media/{{view.post.cover.image}}" class="image article_image">
                         </div>
                         <div class="card-stacked">
                             <div class="card-content">
                                 <a href="{% url 'post_detail' pk=view.post.url %}" class="black-text">
                                     <div class="section">
-                                        <h4>{% if post.status %} Privat: {% endif %}{{ post.title }}</h4>
+                                        <h4>{% if post.status %} Privat: {% endif %}{{ view.post.title }}</h4>
                                         <p class="article_text" style="font-size:1.2rem">{{ view.post.text|striptags|linebreaksbr|truncatewords:35 }}</p>
                                     </div>
                                     <div class="divider"></div>
                                     <div class="section">
-                                        <p class="icons_container"><i class="material-icons red-text tiny black-text article_icon">access_time</i> {{ view.post.published_date }} |<i class="material-icons red-text tiny black-text icon">contacts</i> {{view.post.author}} | <i class="material-icons red-text tiny black-text icon">remove_red_eye</i> {{view.post.view.count}} | <i class="material-icons red-text tiny black-text icon">favorite</i> {{view.post.likes.count}}</p>
+                                        <p class="icons_container"><i class="material-icons tiny black-text icon">access_time</i> {{ view.post.published_date }} |<i class="material-icons tiny black-text icon">contacts</i> {{view.post.author}} | <i class="material-icons tiny black-text icon">remove_red_eye</i> {{view.post.view.count}} | <i class="material-icons tiny black-text icon">favorite</i> {{view.post.likes.count}}</p>
                                     </div>
                                 </a>
                             </div>
@@ -31,6 +52,7 @@
             {% endfor %}
         {% endfor %}
     </div>
+    {% endif %}
 </div>
 
 {% endblock %}

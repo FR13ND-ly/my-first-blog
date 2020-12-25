@@ -3,6 +3,13 @@
 {% block content %}
 <link rel="stylesheet" href="{% static 'css/post_list.css' %}">
 <div class="row">
+    <form method="GET" action="/search">
+        <div class="input-field">
+            <input id="search_input" name="search" type="text" class="black-text" value="{{ search_item }}">
+            <label for="search_input">Caută</label>
+            <button class="waves-effect waves-light btn" id="search_btn" onclick="search_check()" style="position:absolute; right:0%; top: 0"><i class="material-icons">search</i></button>
+        </div>
+    </form>
     <div class="col s12">
         <div id="articles">
             <h3>Articole</h3>
