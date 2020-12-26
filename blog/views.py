@@ -151,7 +151,7 @@ def post_detail(request, pk):
         for i in Vote.objects.filter(variant = variant).select_related('user'):
             if i.user == request.user:
                 uservoted = True
-    if request.method == "POST" and request.POST.get("add_comment"):
+    if request.method == "POST" and request.POST.get("add_comment") and not page_post.block_comments:
         comment = Comment.objects.create(post = page_post, created_date = timezone.now(), text = request.POST.get('text_of_comment'))
         if request.user.is_active:
             comment.author = request.user.username
@@ -179,7 +179,9 @@ def post_new(request):
         return redirect('post_list')
     if request.method == "POST" and request.POST.get("save_post"):
         post = Post.objects.create(author = request.user, title = request.POST.get("title"), text = request.POST.get("posttext"), published_date = timezone.now())
-        post.cover = Image.objects.get(image = request.POST.get("cover_name").replace(" ", "_"))
+        for i in Image.objects.all():
+            if (request.POST.get("cover_name") == i.image):
+                post.cover = i
         tags = request.POST.get('tags_container').split('close')
         for i in tags:
             if i != '':
@@ -197,6 +199,10 @@ def post_new(request):
                                 new_tag.delete()
         else:
             post.video = False
+        if request.POST.get('block_comments') == "on":
+            post.block_comments = True
+        else:
+            post.block_comments = False
         if request.POST.get('survey_is_present') == "on":
             post.question = request.POST.get('survey_question')
             post.survey_is_present = True
@@ -256,6 +262,10 @@ def post_edit(request, pk):
                     survey.save()
         else:
             post.survey_is_present = False
+        if request.POST.get('block_comments') == "on":
+            post.block_comments = True
+        else:
+            post.block_comments = False
         if request.POST.get('video') == "on":
             post.video = True
             new_tag = Tag.objects.create(tag = 'Video', post = post)

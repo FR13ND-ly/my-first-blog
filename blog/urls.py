@@ -4,6 +4,7 @@ from . import views
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.auth import views as authViews
+from django.views.static import serve 
 
 urlpatterns = [
     path('', views.post_list, name='post_list'),
@@ -34,4 +35,5 @@ urlpatterns = [
 	path('side_menu', views.edit_side, name="edit_side_menu"),
 	path('ziar_online', views.online_newspapper, name="online_newspapper"),
 	path('test', views.test_page, name="test"),
-   ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+	url(r'^media/(?P<path>.*)$', serve,{'document_root': settings.MEDIA_ROOT}), 
+   ]

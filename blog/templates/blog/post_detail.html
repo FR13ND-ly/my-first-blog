@@ -184,8 +184,10 @@
                 </form>
             </div>
         {% endif %}
-        <span class="new badge right light-blue darken-2" data-badge-caption="comentarii">{{ post.comments.count }}</span>
-        <a class="btn center-align light-blue darken-2" id="add_comment" onclick="add_comment()">Lasă un comentariu</a>
+        {% if not post.block_comments %}
+            <span class="new badge right light-blue darken-2" data-badge-caption="comentarii">{{ post.comments.count }}</span>
+            <a class="btn center-align light-blue darken-2" id="add_comment" onclick="add_comment()">Lasă un comentariu</a>
+        {% endif %}
         <div class="card hide" id="comment_form">
             <form method="POST">
                 {% csrf_token %}

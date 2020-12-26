@@ -30,7 +30,7 @@ class Ad_Block(models.Model):
     title = models.CharField(max_length=200, null=True)
     description = models.CharField(max_length=200, null=True)
     image = models.ForeignKey('blog.Image', on_delete=models.CASCADE, related_name='ad_block', null=True)
-    active = models.BooleanField(default=True)
+    active = models.BooleanField(default=False)
 
 class Comment(models.Model):
     author = models.CharField(max_length=200, null=True)
