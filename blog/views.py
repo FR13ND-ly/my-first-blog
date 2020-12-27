@@ -17,10 +17,13 @@ def set_dict_for_render(rdict, request):
     if request.user.is_active:
         profile = Profile.objects.get_or_create(user = request.user)
         rdict.update({'profile' : profile})
-    if request.user.is_staff:
-        rdict.update({'reports' : Report.objects.all()})
+        if request.user.is_staff:
+            rdict.update({'reports' : Report.objects.all()})
     if re.compile(r".*(iphone|mobile|androidtouch)",re.IGNORECASE).match(request.META['HTTP_USER_AGENT']):
         rdict.update({"mobile" : True})
+        if rdict.get('ad_and_side_menu'):
+            second_ad = Ad_Block.objects.select_related('image').get_or_create(pk = 2)[0]
+            rdict.update({"second_ad" : second_ad})
     elif rdict.get('ad_and_side_menu'):
         add_ad_and_side_menu(rdict)
         rdict.update({"mobile" : False})
@@ -574,7 +577,11 @@ def edit_side(request):
         changed_ad.link = request.POST.get("ad_link", "")
         changed_ad.title = request.POST.get("ad_title", "")
         changed_ad.description = request.POST.get("ad_description", "")
-        image, exist = Image.objects.get_or_create(image = request.FILES.get('ad_img', changed_ad.image.image))
+        if changed_ad.image == None:
+            image, exist = Image.objects.get_or_create(image = request.FILES.get('ad_img', changed_ad.image))
+        else:
+            exist = False
+            image = Image.objects.create(image = request.FILES.get('ad_img'))
         if exist:
             image.upload_date = timezone.now()
         if request.POST.get('active') == "on":

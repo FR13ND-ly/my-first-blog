@@ -1,15 +1,14 @@
 {% extends 'blog/darktheme_base.html' %}
 {% load static %}
 {% block content %}
-<link rel="stylesheet" href="{% static 'css/post_detail.css' %}">
+<link rel="stylesheet" href="{% static 'css/post_detail_darktheme.css' %}">
 {% if mobile %}
 <div class="row">
     <div class="col s12">
         <div class="card blue-grey darken-3 white-text">
             <div class="card-content">
                 <div class="section">
-                    <h4 class="hide-on-small-only" id="article_title">{{ post.title }}</h4>
-                    <h5 class="hide-on-med-and-up">{{ post.title }}</h5>
+                    <h5>{{ post.title }}</h5>
                     <div class="divider"></div>
                     <p id="article_icons_container"><i class="material-icons tiny article_icons white-text">access_time</i> {{ post.published_date }} | {{ post.view.count }} <i class="material-icons tiny article_icons white-text">remove_red_eye</i></p>
                     <div class="divider"></div>
@@ -30,8 +29,6 @@
                     {% endif %}
                 </form>
                 {% if user.is_staff %}
-                    <a class="btn waves-effect waves-light" href="{% url 'post_edit' pk=post.url %}">
-                        <i class="material-icons">edit</i></a>
                     <a class="btn waves-effect waves-light red darken-2" onclick="r = confirm('Sunteți sigur?'); if (r){this.href='remove'}" href="#">
                         <i class="material-icons">delete</i></a>
                 {% endif %}
@@ -105,13 +102,12 @@
     </div>
 </div>
 {% else %}
-<div class="row hide-on-small-only">
+<div class="row">
     <div class="col s9">
         <div class="card blue-grey darken-3 white-text">
             <div class="card-content">
                 <div class="section">
-                    <h4 class="hide-on-small-only" id="article_title">{{ post.title }}</h4>
-                    <h5 class="hide-on-med-and-up">{{ post.title }}</h5>
+                    <h4 id="article_title">{{ post.title }}</h4>
                     <div class="divider"></div>
                     <p id="article_icons_container"><i class="material-icons tiny article_icons">access_time</i> {{ post.published_date }} |<i class="material-icons tiny article_icons">contacts</i> {{post.author}} |  {{ post.view.count }} <i class="material-icons tiny article_icons">remove_red_eye</i></p>
                     <div class="divider"></div>
@@ -132,7 +128,7 @@
                     {% endif %}
                 </form>
                 {% if user.is_staff %}
-                    <a class="btn waves-effect waves-light hide-on-small-only" href="{% url 'post_edit' pk=post.url %}">
+                    <a class="btn waves-effect waves-light" href="{% url 'post_edit' pk=post.url %}">
                         <i class="material-icons">edit</i></a>
                     <a class="btn waves-effect waves-light red darken-2" onclick="r = confirm('Sunteți sigur?'); if (r){this.href='remove'}" href="#">
                         <i class="material-icons">delete</i></a>
@@ -274,7 +270,7 @@
         {% endif %}
     </div>
 </div>
-<div class="row hide-on-small-only">
+<div class="row">
     <div class="col s4 ">
         <a href="/search_by_tag/social">
             <div class="card light-blue darken-2">
@@ -311,7 +307,7 @@
         height: 30rem
     }
 </style>
-<div class="row hide-on-small-only">
+<div class="row">
     <div class="col s4">
     {% for post in social %}
         <a href="{% url 'post_detail' pk=post.url %}" class="black-text">
@@ -322,7 +318,7 @@
                 <div class="card-stacked">
                     <div class="card-content">
                         <div class="section">
-                            <h4>{{ post.title }}</h4>
+                            <p style="font-size: 1.9rem;">{{ post.title | truncatechars:70 }}</p>
                         </div>
                         <div class="divider"></div>
                         <div class="section">
@@ -334,7 +330,7 @@
         </a>
     {% endfor %}
     {% if second_ad_fposition %}
-        <a href="{{ second_ad.link }}" class="black-text hide-on-small-only">
+        <a href="{{ second_ad.link }}" class="black-text">
             <div class="card post blue-grey darken-3 white-text hoverable">
                 <div class="card-image valign-wrapper">
                     <img src="/media/{{second_ad.image.image}}" class="image post-image">
@@ -361,7 +357,7 @@
                 <div class="card-stacked">
                     <div class="card-content">
                         <div class="section">
-                            <h4>{{ post.title }}</h4>
+                            <p style="font-size: 1.9rem;">{{ post.title | truncatechars:70 }}</p>
                         </div>
                         <div class="divider"></div>
                         <div class="section">
@@ -400,7 +396,7 @@
                 <div class="card-stacked">
                     <div class="card-content">
                         <div class="section">
-                            <h4>{{ post.title }}</h4>
+                            <p style="font-size: 1.9rem;">{{ post.title | truncatechars:70 }}</p>
                         </div>
                         <div class="divider"></div>
                         <div class="section">
@@ -429,7 +425,7 @@
         </a>
     {% endif %}
 </div>
-<div class="row hide-on-small-only">
+<div class="row">
     <a href="/search_by_tag/video">
         <div class="col s12">
             <div class="card light-blue darken-2">
@@ -440,7 +436,7 @@
         </div>
     </a>
 </div>
-<div class="row hide-on-small-only">
+<div class="row">
 {% for post in e_posts %}
     <div class="col s4">
         <div class="card hoverable" style="padding: 0; margin-right: 5px;">

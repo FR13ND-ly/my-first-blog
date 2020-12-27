@@ -8,10 +8,9 @@
         <div class="card" >
             <div class="card-content">
                 <div class="section">
-                    <h4 class="hide-on-small-only" id="article_title">{{ post.title }}</h4>
-                    <h5 class="hide-on-med-and-up">{{ post.title }}</h5>
+                    <h5>{{ post.title }}</h5>
                     <div class="divider"></div>
-                    <p id="article_icons_container"><i class="material-icons tiny article_icons">access_time</i> {{ post.published_date }} |<i class="material-icons tiny article_icons">contacts</i> {{post.author}} |  {{ post.view.count }} <i class="material-icons tiny article_icons">remove_red_eye</i></p>
+                    <p id="article_icons_container"><i class="material-icons tiny article_icons">access_time</i> {{ post.published_date }} |  {{ post.view.count }} <i class="material-icons tiny article_icons">remove_red_eye</i></p>
                     <div class="divider"></div>
                 </div>
                 {% autoescape off %}
@@ -30,8 +29,6 @@
                     {% endif %}
                 </form>
                 {% if user.is_staff %}
-                    <a class="btn waves-effect waves-light" href="{% url 'post_edit' pk=post.url %}">
-                        <i class="material-icons">edit</i></a>
                     <a class="btn waves-effect waves-light red darken-2" onclick="r = confirm('Sunteți sigur?'); if (r){this.href='remove'}" href="#">
                         <i class="material-icons">delete</i></a>
                 {% endif %}
@@ -126,7 +123,6 @@
             <div class="card-content">
                 <div class="section">
                     <h4 class="hide-on-small-only" id="article_title">{{ post.title }}</h4>
-                    <h5 class="hide-on-med-and-up">{{ post.title }}</h5>
                     <div class="divider"></div>
                     <p id="article_icons_container"><i class="material-icons tiny article_icons">access_time</i> {{ post.published_date }} | {{ post.view.count }} <i class="material-icons tiny article_icons">remove_red_eye</i></p>
                     <div class="divider"></div>
@@ -337,7 +333,7 @@
                 <div class="card-stacked">
                     <div class="card-content">
                         <div class="section">
-                            <h4>{{ post.title }}</h4>
+                            <p style="font-size: 1.9rem;">{{ post.title | truncatechars:70 }}</p>
                         </div>
                         <div class="divider"></div>
                         <div class="section">
@@ -376,7 +372,7 @@
                 <div class="card-stacked">
                     <div class="card-content">
                         <div class="section">
-                            <h4>{{ post.title }}</h4>
+                            <p style="font-size: 1.9rem;">{{ post.title | truncatechars:70 }}</p>
                         </div>
                         <div class="divider"></div>
                         <div class="section">
@@ -415,7 +411,7 @@
                 <div class="card-stacked">
                     <div class="card-content">
                         <div class="section">
-                            <h4>{{ post.title }}</h4>
+                            <p style="font-size: 1.9rem;">{{ post.title | truncatechars:70 }}</p>
                         </div>
                         <div class="divider"></div>
                         <div class="section">
