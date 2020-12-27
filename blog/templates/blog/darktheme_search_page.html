@@ -20,7 +20,7 @@
                     </div>
                     <div class="card-stacked">
                         <div class="card-content">
-                            <a href="{% url 'post_detail' pk=post.pk %}" class="white-text">
+                            <a href="{% url 'post_detail' pk=post.url %}" class="white-text">
                                 <div class="section">
                                     <h4>{% if post.status %} Privat: {% endif %}{{ post.title }}</h4>
                                     <p class="article_text" style="font-size:1.2rem">{{ post.text|striptags|linebreaksbr|truncatewords:35 }}</p>
