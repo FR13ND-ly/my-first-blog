@@ -1,7 +1,7 @@
 {% extends 'blog/darktheme_base.html' %}
 {% load static %}
 {% block content %}
-<link rel="stylesheet" href="{% static 'css/post_detail_darktheme.css' %}">
+<link rel="stylesheet" href="{% static 'css/post_detail.css' %}">
 {% if mobile %}
 <div class="row">
     <div class="col s12">
@@ -451,7 +451,7 @@
 {% endfor %}
 </div>
 {% endif %}
-<script type="text/javascript" src="{% static 'js/post_detail.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/post_detail_darktheme.js' %}"></script>
 <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
 <script type="text/javascript">
     $(function(){
