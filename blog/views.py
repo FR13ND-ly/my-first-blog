@@ -574,22 +574,17 @@ def edit_side(request):
         return redirect('post_list')
     if request.POST.get('save_ad'):
         changed_ad = Ad_Block.objects.get_or_create(pk = request.POST.get('save_ad'))[0]
-        changed_ad.link = request.POST.get("ad_link", "")
-        changed_ad.title = request.POST.get("ad_title", "")
-        changed_ad.description = request.POST.get("ad_description", "")
-        if changed_ad.image == None:
-            image, exist = Image.objects.get_or_create(image = request.FILES.get('ad_img', changed_ad.image))
-        else:
-            exist = False
-            image = Image.objects.create(image = request.FILES.get('ad_img'))
-        if exist:
-            image.upload_date = timezone.now()
         if request.POST.get('active') == "on":
             changed_ad.active = True
         else:
             changed_ad.active = False
-        image.save()
-        changed_ad.image = image
+        changed_ad.link = request.POST.get("ad_link", "")
+        changed_ad.title = request.POST.get("ad_title", "")
+        changed_ad.description = request.POST.get("ad_description", "")
+        if not request.FILES.get('ad_img') == None:
+            image = Image.objects.get_or_create(image = request.FILES.get('ad_img'))[0]
+            image.save()
+            changed_ad.image = image
         changed_ad.save()
     rendertemplate = {'week_img' : Ad_Block.objects.select_related('image').get_or_create(pk = 0)[0], 'first_ad' : Ad_Block.objects.select_related('image').get_or_create(pk = 1)[0], 'second_ad' : Ad_Block.objects.select_related('image').get_or_create(pk = 2)[0], 'third_ad' : Ad_Block.objects.select_related('image').get_or_create(pk = 3)[0]}
     return render(request, 'blog/' + check_dark_theme(request) + 'side_ad.html', set_dict_for_render(rendertemplate, request))
